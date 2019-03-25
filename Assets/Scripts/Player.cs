@@ -6,7 +6,7 @@ public class Player : MonoBehaviour
 {
     // Serialized just for testing purposes, remove me
     [SerializeField]
-    private int indexPosition = 0; // Indicates the position on the board list (the list of cards that are on the board)
+    private int indexPosition; // Indicates the position on the board list (the list of cards that are on the board)
 
     [SerializeField]
     private float movementSteps = 0.5f;
@@ -26,15 +26,19 @@ public class Player : MonoBehaviour
         {
             Debug.LogError("Didn't find the animator component on the player object !");
         }
-        StartCoroutine("animateMovement",15);
+        StartCoroutine("animateMovement",150);
         //animateMovement(15);
+         
+
     }
 
     void Update()
     { 
+        
         if (Input.GetKeyUp(KeyCode.Space))
         {
-            StartCoroutine("movePawn",11);
+            //StartCoroutine("movePawn",1);
+            StartCoroutine("animateMovement", 1);
         }
         
     }
@@ -42,18 +46,37 @@ public class Player : MonoBehaviour
     IEnumerator animateMovement(int amountToMove)
     {
         for (int i = 0; i < amountToMove; i++)
-        {
-            anim.Play("StraightMovement", 0);
-            indexPosition = (indexPosition + 1) % 40;
-            if (indexPosition % 10 == 0)
+        { 
+
+            if (indexPosition % 10 == 9 || indexPosition % 10 == 0)
             {
-                anim.Play("RotationAnimation", 0);
+                anim.Play("StraightMovementToCorner", 0);
+                indexPosition = (indexPosition + 1) % 40;
+                yield return new WaitForSeconds(anim.GetCurrentAnimatorStateInfo(0).length);
+
+                if (indexPosition == 0)
+                {
+                    transform.position = new Vector3(2.5f, 0.125f, -6.49f);
+                }
+
+                if (indexPosition % 10 == 0)
+                {
+                    transform.eulerAngles += new Vector3(0, 90, 0); 
+                }
+
             }
-            yield return new WaitForSeconds(anim.GetCurrentAnimatorStateInfo(0).length + anim.GetCurrentAnimatorStateInfo(0).normalizedTime - .5f);   
+            else
+            {
+                anim.Play("StraightMovement", 0);
+                indexPosition = (indexPosition + 1) % 40;
+                yield return new WaitForSeconds(anim.GetCurrentAnimatorStateInfo(0).length);
+
+            }
         }
+    
         
     }
-
+    /*
     void callBackMovementStopped()
     {
         if (numberOfMoves > 0)
@@ -62,7 +85,8 @@ public class Player : MonoBehaviour
             animateMovement(numberOfMoves);
         }
     }
-
+    */
+    /*
     IEnumerator movePawn(int tilesToMove)
     {   // Iterate through each tile to move ( taking it step by step )
         for(int i = 1; i <= tilesToMove; i++)
@@ -89,7 +113,7 @@ public class Player : MonoBehaviour
         }
     }
 
-    
+    */
 
 
     /*  REALLY BAD STUFF
