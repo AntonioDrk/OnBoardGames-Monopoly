@@ -13,6 +13,7 @@ public class GameManager : MonoBehaviour
     private GameObject player;
     [SerializeField]
     private Vector3 cameraDistance = new Vector3(0, -2.8f, 2.9f);
+    
 
     void Start()
     {
