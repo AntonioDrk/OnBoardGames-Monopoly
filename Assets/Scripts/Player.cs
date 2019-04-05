@@ -1,53 +1,125 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
+using UnityEngine.Networking;
 
-public class Player : MonoBehaviour
-{
-    // Serialized just for testing purposes, remove me
+public class Player : NetworkBehaviour
+{ 
+     
+    public int idPlayer = 0;
+
+    // Serialized just for testing purposes, remove me 
     [SerializeField]
     private int indexPosition; // Indicates the position on the board list (the list of cards that are on the board)
-
     [SerializeField]
-    private float movementSteps = 0.5f;
+    private GameObject dice, gameManager;
 
-    [SerializeField]
-    private Transform[] proprietiesTransforms = new Transform[0];
+    private Animator anim; 
+    private DiceScript diceScript;
+    private GameManager gameManagerScript;
+    private Vector3 goPosition = new Vector3(2.5f, 0.125f, -6.49f);
+    private Vector3 jailPosition = new Vector3(-11f, 0.125f, -6f);
+    private Vector3 justVisitingPosition = new Vector3(-11.45854f, 0.125f, -6.49f);
+    private GameObject rollButton;
+    private Text playerMoneyText;
 
-    [SerializeField]
-    private Animator anim;
+    private int money = 1500;
+    private int doublesRolled = 0;
+    private int roundsInJail = 0;
+    private bool inJail = false;
 
-    int numberOfMoves = 0;
 
     void Start()
     {
+        playerMoneyText = GameObject.Find("playerMoneyText").GetComponent<Text>();
+        rollButton = GameObject.Find("RollDice");
+        gameManager = GameObject.Find("GameManager");
+        gameManagerScript = gameManager.GetComponent<GameManager>();
+        dice = GameObject.Find("Dice");
+        diceScript = dice.GetComponent<DiceScript>();
         anim = GetComponent<Animator>();
-        if(anim == null)
-        {
-            Debug.LogError("Didn't find the animator component on the player object !");
-        }
-        StartCoroutine("animateMovement",150);
-        //animateMovement(15);
-         
 
+        if (isLocalPlayer)
+        {
+            playerMoneyText.text = "$1500";
+            idPlayer = gameManagerScript.connectedPlayers + 1;
+            CmdAddPlayer();
+            Debug.Log("id: " + idPlayer); 
+            GameObject.Find("idText").GetComponent<Text>().text = "id: " + idPlayer;
+            transform.position = goPosition;
+        }
+           
     }
+     
 
     void Update()
     { 
-        
-        if (Input.GetKeyUp(KeyCode.Space))
-        {
-            //StartCoroutine("movePawn",1);
-            StartCoroutine("animateMovement", 1);
+        // exit from update if this is not the local player
+        if (!isLocalPlayer)
+             return;
+
+        if (gameManagerScript.playerTurn == idPlayer)
+            rollButton.SetActive(true);
+        else
+            rollButton.SetActive(false);
+
+
+        // if the dice rolled and it's player's turn
+        if (diceScript.rolled == true && gameManagerScript.playerTurn == idPlayer) 
+        { 
+            diceScript.rolled = false;
+            Debug.Log("Player " + idPlayer + " rolled " + diceScript.rolledNumber);
+
+
+            if (diceScript.isDouble)
+                doublesRolled++;
+            else
+                doublesRolled = 0;
+
+            if (inJail)
+            { 
+                roundsInJail += 1;
+
+                if(diceScript.isDouble || roundsInJail == 3)
+                {
+                    inJail = false;
+                    roundsInJail = 0;
+                    doublesRolled = 0;
+                    diceScript.isDouble = false;
+                    transform.position = justVisitingPosition;
+                    if (!diceScript.isDouble)
+                        money -= 50; 
+                }
+
+                if (roundsInJail < 3 && inJail)
+                    nextPlayer(); 
+            }
+             
+            if(doublesRolled == 3)
+            {
+                goToJail();
+            }
+            else if(!inJail)
+                StartCoroutine("animateMovement", diceScript.rolledNumber);
+
+            diceScript.rolledNumber = 0;
         }
-        
+
+
+        playerMoneyText.text = "$" + money;
+        Debug.Log("Doubles rolled: " + doublesRolled);
     }
+
+     
 
     IEnumerator animateMovement(int amountToMove)
     {
+        gameManagerScript.targetPlayerIsMoving = true;
+        gameManagerScript.targetPlayer = this.gameObject;
+
         for (int i = 0; i < amountToMove; i++)
         { 
-
             if (indexPosition % 10 == 9 || indexPosition % 10 == 0)
             {
                 anim.Play("StraightMovementToCorner", 0);
@@ -56,7 +128,9 @@ public class Player : MonoBehaviour
 
                 if (indexPosition == 0)
                 {
-                    transform.position = new Vector3(2.5f, 0.125f, -6.49f);
+                    transform.position = goPosition;
+                    money += 200;
+                    Debug.Log(money);
                 }
 
                 if (indexPosition % 10 == 0)
@@ -73,91 +147,50 @@ public class Player : MonoBehaviour
 
             }
         }
-    
-        
+
+
+        gameManagerScript.targetPlayerIsMoving = false;
+        if (indexPosition == 30)
+        {
+            goToJail();
+        }
+        else if(diceScript.isDouble)
+            diceScript.setDiceInactive();
+        else
+            nextPlayer();
     }
-    /*
-    void callBackMovementStopped()
+
+    [Command]
+    public void CmdNextPlayer()
     {
-        if (numberOfMoves > 0)
-        {
-            numberOfMoves--;
-            animateMovement(numberOfMoves);
-        }
-    }
-    */
-    /*
-    IEnumerator movePawn(int tilesToMove)
-    {   // Iterate through each tile to move ( taking it step by step )
-        for(int i = 1; i <= tilesToMove; i++)
-        {
-            // If we're in a corner rotate ( this will be necesary when the pawns have special models
-            // So the models look forward
-            if (indexPosition % 10 == 0)
-            {
-                transform.eulerAngles += new Vector3(0, 90, 0);
-            }
-            // Get the distance between our current position and our next's waypoint position
-            float distance = Vector3.Distance(transform.position, proprietiesTransforms[i-1].position);
-            // We divide our distance in "steps", so it looks like it's animated, each step is incremented by time
-            for (float step = 0; step < distance; step += movementSteps)
-            {
-                Debug.Log("Step is : " + step + "\nDistance is: " + distance);
-                transform.position = Vector3.MoveTowards(transform.position, proprietiesTransforms[i-1].position, step);
-                yield return null;
-            }
-
-            indexPosition = (indexPosition + 1) % 40;
-
-            yield return new WaitForSeconds(0.25f);
-        }
+        gameManagerScript.playerTurn++;
+        if (gameManagerScript.playerTurn > gameManagerScript.connectedPlayers) gameManagerScript.playerTurn = 1;
+        Debug.Log("playerTurn: " + gameManagerScript.playerTurn);
+        //gameManagerScript.playerTurnText.text = "Turn: Player " + gameManagerScript.playerTurn;
     }
 
-    */
-
-
-    /*  REALLY BAD STUFF
-    void movePlayer(int noTiles)
+    [Command]
+    public void CmdAddPlayer()
     {
-        int targetIndex = (indexPosition + noTiles) % 40;
-        float distance = Vector3.Distance(transform.position, proprietiesTransforms[0].position);
-
-        for (float step = 0; step < distance; step += 0.0005f*Time.deltaTime)
-        {
-            Debug.Log("Step is : " + step + "\nDistance is: " + distance);
-            transform.position = Vector3.MoveTowards(transform.position, proprietiesTransforms[0].position, step);
-        }
-
-        /*for(int i = 1; i <= noTiles; i++)
-        {
-            while(Vector3.Distance(transform.position,proprietiesTransforms[(i + indexPosition)%40].position) > 0.5)
-            {
-                float step = speed * Time.deltaTime;
-                transform.position = Vector3.MoveTowards(transform.position, proprietiesTransforms[0].position, speed);
-            }
-        }
+        gameManagerScript.connectedPlayers++;
+        Debug.Log("connectedPlayers: " + gameManagerScript.connectedPlayers);
+        //gameManagerScript.connectedPlayersText.text = gameManagerScript.connectedPlayers + " players";
     }
 
-    void updateMovement(int amountToMove)
+    void nextPlayer()
     {
-        if (amountToMove < 0)
-        {
-            return;
-        }
-
-        for (int i = 1; i <= amountToMove; i++)
-        {
-            Vector3 localForward = transform.worldToLocalMatrix.MultiplyVector(transform.forward);
-            transform.Translate(localForward * i * moveAmount * Time.fixedDeltaTime);
-            //transform.position = Vector3.Lerp(transform.position, localForward * i * moveAmount, Time.fixedDeltaTime);
-            //Vector3.MoveTowards(transform.position, localForward * i * moveAmount);
-            if ((i + indexPosition) % 10 == 0)
-            {
-                //Debug.Log("Sunt in if for some reason");
-                transform.eulerAngles += new Vector3(0, 90, 0);
-            }
-        }
-        indexPosition = (indexPosition + amountToMove) % 40;
+        diceScript.setDiceInactive();
+        CmdNextPlayer();
     }
-*/
+
+    void goToJail()
+    {
+        indexPosition = 10;
+        doublesRolled = 0;
+        roundsInJail = 0;
+        inJail = true;
+        transform.position = jailPosition;
+        transform.eulerAngles = new Vector3(0, 90, 0);
+        nextPlayer();
+    }
 }
