@@ -6,8 +6,7 @@ using UnityEngine.Networking;
 
 public class Player : NetworkBehaviour
 { 
-     
-    public int idPlayer = 0;
+    [SyncVar] public int idPlayer = 0;
 
     // Serialized just for testing purposes, remove me 
     [SerializeField]
@@ -19,24 +18,31 @@ public class Player : NetworkBehaviour
     private DiceScript diceScript;
     private GameManager gameManagerScript;
     private Vector3 goPosition = new Vector3(2.5f, 0.125f, -6.49f);
+    private Vector3 jailPosition = new Vector3(-11f, 0.125f, -6f);
+    private Vector3 justVisitingPosition = new Vector3(-11.45854f, 0.125f, -6.49f);
     private GameObject rollButton;
+    private Text playerMoneyText, idText;
+
+    private int money = 1500;
+    private int doublesRolled = 0;
+    private int roundsInJail = 0;
+    private bool inJail = false;
+
 
     void Start()
-    { 
-
+    {
+        playerMoneyText = GameObject.Find("playerMoneyText").GetComponent<Text>();
         rollButton = GameObject.Find("RollDice");
         gameManager = GameObject.Find("GameManager");
         gameManagerScript = gameManager.GetComponent<GameManager>();
-        dice = GameObject.Find("Dice");
+        dice = GameObject.Find("DiceManager");
         diceScript = dice.GetComponent<DiceScript>();
         anim = GetComponent<Animator>();
 
         if (isLocalPlayer)
         {
-            idPlayer = gameManagerScript.connectedPlayers + 1;
-            CmdAddPlayer();
-            Debug.Log("id: " + idPlayer); 
-            GameObject.Find("idText").GetComponent<Text>().text = "id: " + idPlayer;
+            CmdAddConnectedPlayer(this.gameObject); 
+            idText = GameObject.Find("idText").GetComponent<Text>();
             transform.position = goPosition;
         }
            
@@ -49,6 +55,8 @@ public class Player : NetworkBehaviour
         if (!isLocalPlayer)
              return;
 
+        idText.text = "id: " + idPlayer;
+
         if (gameManagerScript.playerTurn == idPlayer)
             rollButton.SetActive(true);
         else
@@ -59,11 +67,46 @@ public class Player : NetworkBehaviour
         if (diceScript.rolled == true && gameManagerScript.playerTurn == idPlayer) 
         { 
             diceScript.rolled = false;
-            Debug.Log("Player " + idPlayer + " rolled " + diceScript.rolledNumber); 
-            StartCoroutine("animateMovement", diceScript.rolledNumber);
+            Debug.Log("Player " + idPlayer + " rolled " + diceScript.rolledNumber);
+
+
+            if (diceScript.isDouble)
+                doublesRolled++;
+            else
+                doublesRolled = 0;
+
+            if (inJail)
+            { 
+                roundsInJail += 1;
+
+                if(diceScript.isDouble || roundsInJail == 3)
+                {
+                    inJail = false;
+                    roundsInJail = 0;
+                    doublesRolled = 0;
+                    diceScript.isDouble = false;
+                    transform.position = justVisitingPosition;
+                    if (!diceScript.isDouble)
+                        money -= 50; 
+                }
+
+                if (roundsInJail < 3 && inJail)
+                    nextPlayer(); 
+            }
+             
+            if(doublesRolled == 3)
+            {
+                goToJail();
+            }
+            else if(!inJail)
+                StartCoroutine("animateMovement", diceScript.rolledNumber);
+
             diceScript.rolledNumber = 0;
         }
-        
+
+
+        playerMoneyText.text = "$" + money;
+        Debug.Log("Doubles rolled: " + doublesRolled);
     }
 
      
@@ -75,7 +118,6 @@ public class Player : NetworkBehaviour
 
         for (int i = 0; i < amountToMove; i++)
         { 
-
             if (indexPosition % 10 == 9 || indexPosition % 10 == 0)
             {
                 anim.Play("StraightMovementToCorner", 0);
@@ -85,6 +127,8 @@ public class Player : NetworkBehaviour
                 if (indexPosition == 0)
                 {
                     transform.position = goPosition;
+                    money += 200;
+                    Debug.Log(money);
                 }
 
                 if (indexPosition % 10 == 0)
@@ -102,26 +146,58 @@ public class Player : NetworkBehaviour
             }
         }
 
-        gameManagerScript.targetPlayerIsMoving = false; 
-        CmdNextPlayer();
-        diceScript.setDiceInactive();
 
+        gameManagerScript.targetPlayerIsMoving = false;
+        if (indexPosition == 30)
+        {
+            goToJail();
+        }
+        else if(diceScript.isDouble)
+            diceScript.setDiceInactive();
+        else
+            nextPlayer();
     }
+      
 
     [Command]
     public void CmdNextPlayer()
     {
-        gameManagerScript.playerTurn++;
-        if (gameManagerScript.playerTurn > gameManagerScript.connectedPlayers) gameManagerScript.playerTurn = 1;
+        gameManagerScript.playerTurn = (gameManagerScript.playerTurn + 1) % gameManagerScript.connectedPlayers; 
         Debug.Log("playerTurn: " + gameManagerScript.playerTurn);
         //gameManagerScript.playerTurnText.text = "Turn: Player " + gameManagerScript.playerTurn;
     }
-
+    /*
     [Command]
     public void CmdAddPlayer()
     {
+        idPlayer = gameManagerScript.connectedPlayers + dic
         gameManagerScript.connectedPlayers++;
         Debug.Log("connectedPlayers: " + gameManagerScript.connectedPlayers);
         //gameManagerScript.connectedPlayersText.text = gameManagerScript.connectedPlayers + " players";
+    }
+    */
+    void nextPlayer()
+    {
+        diceScript.setDiceInactive();
+        CmdNextPlayer();
+    }
+
+    void goToJail()
+    {
+        indexPosition = 10;
+        doublesRolled = 0;
+        roundsInJail = 0;
+        inJail = true;
+        transform.position = jailPosition;
+        transform.eulerAngles = new Vector3(0, 90, 0);
+        nextPlayer();
+    }
+
+    [Command]
+    public void CmdAddConnectedPlayer(GameObject newPlayer)
+    {
+        gameManagerScript.players[gameManagerScript.connectedPlayers] = newPlayer; 
+        idPlayer = gameManagerScript.connectedPlayers;
+        gameManagerScript.connectedPlayers++;
     }
 }

@@ -12,7 +12,7 @@ public class Die_d6 : Die {
     void Start()
     {
         rb = GetComponent<Rigidbody>();
-        diceScript = transform.parent.gameObject.GetComponent<DiceScript>();
+        diceScript = transform.parent.parent.GetComponent<DiceScript>();
     }
 
     void OnEnable()

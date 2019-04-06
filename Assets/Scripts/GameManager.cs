@@ -22,8 +22,9 @@ public class GameManager : NetworkBehaviour
     [SerializeField]
     private Text playerTurnText, connectedPlayersText;
 
-    [SyncVar] public int playerTurn = 1; 
+    [SyncVar] public int playerTurn = 0; 
     [SyncVar] public int connectedPlayers = 0;
+    public GameObject[] players;
 
     void Start()
     { 
@@ -34,9 +35,9 @@ public class GameManager : NetworkBehaviour
         playerTurnText = GameObject.Find("playerTurnText").GetComponent<Text>(); 
         playerTurnText.text = "Turn: Player " + playerTurn;
 
-    }
-
-    
+        players = new GameObject[6];
+    } 
+     
     void Update()
     {
         playerTurnText.text = "Turn: Player " + playerTurn;

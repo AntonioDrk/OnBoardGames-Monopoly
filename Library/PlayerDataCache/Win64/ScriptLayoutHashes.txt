@@ -1,6 +1,6 @@
 Win64
 PlayerPath?
-C:/Users/Ema/Desktop/DevA - Multiplayer/Tests/2.0/Monopoly.exe
+C:/Users/Ema/Desktop/DevG/Tests/2.3/Monopoly.exe
 SceneListBegin?
 Assets/Scenes/GAME_SCENE.unity
 SceneListEnd?
@@ -115,11 +115,8 @@ ad9173d3a69d99153f38ed4b62226129 UnityEngine.Networking.dll:UnityEngine.Networki
 d251bf88db6c95a6b1aa0b69298da9ef UnityEngine.SpatialTracking.dll:UnityEngine.SpatialTracking.TrackedPoseDriver
 303ad70ce203ad874efe2965d0fbcff9 Unity.Analytics.Tracker.dll:UnityEngine.Analytics.AnalyticsEventTracker
 7fb9de8dcf73854b6b328eca1f7a6e6d Unity.Analytics.Tracker.dll:UnityEngine.Analytics.AnalyticsTracker
-43ac932808b139630e5bc941b911b418 Assembly-CSharp.dll:.Dice
 94017dcc9f00fe671ea7dc427b4da011 Unity.TextMeshPro.dll:TMPro.TMP_SpriteAsset
-753e7bc6c9dc9f09fa724e3cf3aaaf78 Assembly-CSharp.dll:.Die_d6
 b3ab2106268377ffe25dd18ac23dca28 Unity.TextMeshPro.dll:TMPro.TMP_Asset
-c4d25dcce583b8a06aa98e4eda039e4a Assembly-CSharp.dll:.DiceScript
 71bb6a6b6c8f052f948db64c7dd3ca4f Unity.Analytics.Editor.dll:UnityEditor.Analytics.AnalyticsEventTrackerEditor
 71bb6a6b6c8f052f948db64c7dd3ca4f Unity.TextMeshPro.dll:TMPro.TMP_SpriteAnimator
 4fd8bf02e3089425d3502e26c44ba31a Unity.TextMeshPro.dll:TMPro.TextContainer
@@ -155,10 +152,13 @@ fb6a1ea36b4f6ef5948d283d93760765 UnityEngine.GoogleAudioSpatializer.dll:UnityEng
 5b0391b7e3d9ea9db6c0a8fbd0ca23f6 UnityEngine.GoogleAudioSpatializer.dll:UnityEngine.Experimental.Audio.Google.GvrAudioSourceExtension
 a4f0a4f62100f1a4fb5cbe0e00dde83f Unity.TextMeshPro.dll:TMPro.TextMeshProUGUI
 5fc094978ce3e3591a7500ed380d854a Unity.Analytics.DataPrivacy.dll:UnityEngine.Analytics.DataPrivacyButton
-2cdb61e92ff2e76c83c6ae3587ac3b08 Assembly-CSharp.dll:.GameManager
+5dec76e3b03fcb249ce98baa2c63e114 Assembly-CSharp.dll:.GameManager
 d251bf88db6c95a6b1aa0b69298da9ef UnityEngine.SpatialTracking.dll:UnityEngine.SpatialTracking.TrackedPoseDriver
-6f4483d4f9cd6d8ba8f6c860d74fa945 Assembly-CSharp.dll:.Die
 d791aa6007fa3640be1164ea75bb087d Unity.TextMeshPro.dll:TMPro.TMP_StyleSheet
 c6666661329916e218bee7f5e79e60f5 Unity.TextMeshPro.dll:TMPro.TextMeshPro
 3165968ba45c74472d279ba04455fccb Unity.TextMeshPro.dll:TMPro.TMP_ColorGradient
 8649814970b42d345b89944b862453cc Unity.TextMeshPro.dll:TMPro.TMP_SubMesh
+43ac932808b139630e5bc941b911b418 Assembly-CSharp.dll:.Dice
+753e7bc6c9dc9f09fa724e3cf3aaaf78 Assembly-CSharp.dll:.Die_d6
+a947eb7670568c3fe0dd7ad050769b0a Assembly-CSharp.dll:.DiceScript
+6f4483d4f9cd6d8ba8f6c860d74fa945 Assembly-CSharp.dll:.Die
