@@ -12,7 +12,7 @@ public class Player : NetworkBehaviour
     [SerializeField]
     private int indexPosition; // Indicates the position on the board list (the list of cards that are on the board)
     [SerializeField]
-    private GameObject dice, gameManager;
+    private GameObject diceManager, gameManager;
 
     private Animator anim; 
     private DiceScript diceScript;
@@ -35,12 +35,13 @@ public class Player : NetworkBehaviour
         rollButton = GameObject.Find("RollDice");
         gameManager = GameObject.Find("GameManager");
         gameManagerScript = gameManager.GetComponent<GameManager>();
-        dice = GameObject.Find("DiceManager");
-        diceScript = dice.GetComponent<DiceScript>();
+        diceManager = GameObject.Find("DiceManager");
+        diceScript = diceManager.GetComponent<DiceScript>();
         anim = GetComponent<Animator>();
 
         if (isLocalPlayer)
         {
+            rollButton.SetActive(false);
             CmdAddConnectedPlayer(this.gameObject); 
             idText = GameObject.Find("idText").GetComponent<Text>();
             transform.position = goPosition;
@@ -58,14 +59,20 @@ public class Player : NetworkBehaviour
         idText.text = "id: " + idPlayer;
 
         if (gameManagerScript.playerTurn == idPlayer)
-            rollButton.SetActive(true);
+        {
+            if (rollButton.activeInHierarchy == false)
+            {
+                rollButton.SetActive(true);
+                rollButton.GetComponent<Button>().onClick.AddListener(rollDice);
+            }
+        }
         else
             rollButton.SetActive(false);
 
 
-        // if the dice rolled and it's player's turn
+        // if the diceManager rolled and it's player's turn 
         if (diceScript.rolled == true && gameManagerScript.playerTurn == idPlayer) 
-        { 
+        {
             diceScript.rolled = false;
             Debug.Log("Player " + idPlayer + " rolled " + diceScript.rolledNumber);
 
@@ -106,9 +113,8 @@ public class Player : NetworkBehaviour
 
 
         playerMoneyText.text = "$" + money;
-        Debug.Log("Doubles rolled: " + doublesRolled);
+        //Debug.Log("Doubles rolled: " + doublesRolled);
     }
-
      
 
     IEnumerator animateMovement(int amountToMove)
@@ -128,7 +134,7 @@ public class Player : NetworkBehaviour
                 {
                     transform.position = goPosition;
                     money += 200;
-                    Debug.Log(money);
+                    Debug.Log("Money " + money);
                 }
 
                 if (indexPosition % 10 == 0)
@@ -153,11 +159,42 @@ public class Player : NetworkBehaviour
             goToJail();
         }
         else if(diceScript.isDouble)
-            diceScript.setDiceInactive();
+            CmdSetDiceInactive();
         else
             nextPlayer();
     }
-      
+
+    public void rollDice()
+    {
+        Debug.Log("You have clicked the button!");
+        diceScript.diceCounter = 0;
+        diceScript.rolledNumber = 0;
+        CmdRollDice();
+    }
+
+    [Command]
+    public void CmdRollDice()
+    {
+        Debug.Log("ADFGHJKL");
+        
+        if (diceScript.transform.childCount > 0)
+        {
+            return;
+        }
+        
+        GameObject go = Instantiate(diceScript.dice);
+        diceScript.dice.transform.GetChild(0).transform.eulerAngles = new Vector3(90 * Random.Range(0, 4), 90 * Random.Range(0, 4), 90 * Random.Range(0, 4));
+        diceScript.dice.transform.GetChild(1).transform.eulerAngles = new Vector3(90 * Random.Range(0, 4), 90 * Random.Range(0, 4), 90 * Random.Range(0, 4));
+        //go.transform.parent = diceScript.transform;
+        NetworkServer.Spawn(go);
+        
+    }
+
+    [Command]
+    public void CmdSetDiceInactive()
+    {
+        NetworkServer.Destroy(diceManager.transform.GetChild(0).gameObject);
+    }
 
     [Command]
     public void CmdNextPlayer()
@@ -178,7 +215,7 @@ public class Player : NetworkBehaviour
     */
     void nextPlayer()
     {
-        diceScript.setDiceInactive();
+        CmdSetDiceInactive();
         CmdNextPlayer();
     }
 

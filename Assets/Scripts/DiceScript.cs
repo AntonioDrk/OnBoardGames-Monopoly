@@ -6,27 +6,22 @@ using UnityEngine.Networking;
 public class DiceScript : NetworkBehaviour
 {
     public int rolledNumber = 0; 
-    public bool rolled = false;
     public bool isDouble = false;
+    public bool rolled = false;
 
     public int diceCounter = 0;
     public GameObject dice;
+    public GameManager gameManager;
      
-
-    // Start is called before the first frame update
     void Start()
-    { 
-
-    }
-
-    // Update is called once per frame
-    void Update()
     {
-        
-    }
+           diceCounter = 100;
+           gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
+    } 
 
     public void addDice(int rolledValue)
     {
+        //Debug.Log("Dice counter: " + diceCounter);
         diceCounter++;
         rolledNumber += rolledValue;
         if (diceCounter == 2)
@@ -35,37 +30,16 @@ public class DiceScript : NetworkBehaviour
                 isDouble = true;
             else
                 isDouble = false;
+
             rolled = true;
         }
     }
-
-    
-    public void CmdRollDice()
-    {  
-        if(transform.childCount > 0)
-        {
-            Destroy(transform.GetChild(0));
-        }
-
-        diceCounter = 0;
-        GameObject go = Instantiate(dice, dice.transform.position, Random.rotation);
-        go.transform.parent = transform;
-        NetworkServer.Spawn(go);
-        //dice.transform.GetChild(0).gameObject.SetActive(true);
-        //dice.transform.GetChild(1).gameObject.SetActive(true);
-
-    }
-
+    /*
     public bool areDiceActive()
     {
         if (gameObject.transform.GetChild(0).gameObject.activeInHierarchy == true)
             return true;
         return false;
     }
-
-    public void setDiceInactive()
-    {
-        gameObject.transform.GetChild(0).gameObject.SetActive(false);
-        gameObject.transform.GetChild(1).gameObject.SetActive(false); 
-    }
+    */
 }

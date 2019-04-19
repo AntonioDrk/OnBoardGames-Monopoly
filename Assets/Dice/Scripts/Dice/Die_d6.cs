@@ -1,24 +1,24 @@
 using System;
 using UnityEngine;
+using UnityEngine.Networking;
 using System.Collections.Generic;
 
-public class Die_d6 : Die {
+public class Die_d6 : MonoBehaviour {
 
     public int diceNumber;
     private Collider myCollider;
-    private Rigidbody rb;
+    private Rigidbody rb; 
     private DiceScript diceScript;
 
     void Start()
     {
         rb = GetComponent<Rigidbody>();
-        diceScript = transform.parent.parent.GetComponent<DiceScript>();
+        diceScript = GameObject.Find("DiceManager").GetComponent<DiceScript>();
     }
 
     void OnEnable()
     {
-        transform.position = new Vector3(transform.position.x, 5.5f, transform.position.z);
-        transform.eulerAngles = new Vector3(90 * UnityEngine.Random.Range(0, 4), 90 * UnityEngine.Random.Range(0, 4), 90 * UnityEngine.Random.Range(0, 4));
+        transform.parent.parent = GameObject.Find("DiceManager").transform;
     }
 
     public void OnCollisionEnter(Collision collision)
