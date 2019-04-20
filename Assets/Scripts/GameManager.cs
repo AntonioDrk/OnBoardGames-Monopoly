@@ -26,6 +26,7 @@ public class GameManager : NetworkBehaviour
     [SyncVar] public int connectedPlayers = 0;
     public GameObject[] players;
 
+
     void Start()
     { 
         

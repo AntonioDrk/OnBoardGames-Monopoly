@@ -23,11 +23,14 @@ public class Player : NetworkBehaviour
     private GameObject rollButton;
     private Text playerMoneyText, idText;
 
+    [SyncVar]private Color plyColor;
+
+    private Renderer renderer;
+
     private int money = 1500;
     private int doublesRolled = 0;
     private int roundsInJail = 0;
     private bool inJail = false;
-
 
     void Start()
     {
@@ -38,23 +41,30 @@ public class Player : NetworkBehaviour
         diceManager = GameObject.Find("DiceManager");
         diceScript = diceManager.GetComponent<DiceScript>();
         anim = GetComponent<Animator>();
+        renderer = transform.GetChild(0).GetComponent<Renderer>();
 
         if (isLocalPlayer)
         {
             rollButton.SetActive(false);
-            CmdAddConnectedPlayer(this.gameObject); 
+            CmdAddConnectedPlayer(this.gameObject);
             idText = GameObject.Find("idText").GetComponent<Text>();
             transform.position = goPosition;
         }
-           
+
     }
-     
+    
+
 
     void Update()
-    { 
+    {
+        localPlayerUpdate();
+    }
+
+    void localPlayerUpdate()
+    {
         // exit from update if this is not the local player
         if (!isLocalPlayer)
-             return;
+            return;
 
         idText.text = "id: " + idPlayer;
 
@@ -71,7 +81,7 @@ public class Player : NetworkBehaviour
 
 
         // if the diceManager rolled and it's player's turn 
-        if (diceScript.rolled == true && gameManagerScript.playerTurn == idPlayer) 
+        if (diceScript.rolled == true && gameManagerScript.playerTurn == idPlayer)
         {
             diceScript.rolled = false;
             Debug.Log("Player " + idPlayer + " rolled " + diceScript.rolledNumber);
@@ -83,10 +93,10 @@ public class Player : NetworkBehaviour
                 doublesRolled = 0;
 
             if (inJail)
-            { 
+            {
                 roundsInJail += 1;
 
-                if(diceScript.isDouble || roundsInJail == 3)
+                if (diceScript.isDouble || roundsInJail == 3)
                 {
                     inJail = false;
                     roundsInJail = 0;
@@ -94,18 +104,18 @@ public class Player : NetworkBehaviour
                     diceScript.isDouble = false;
                     transform.position = justVisitingPosition;
                     if (!diceScript.isDouble)
-                        money -= 50; 
+                        money -= 50;
                 }
 
                 if (roundsInJail < 3 && inJail)
-                    nextPlayer(); 
+                    nextPlayer();
             }
-             
-            if(doublesRolled == 3)
+
+            if (doublesRolled == 3)
             {
                 goToJail();
             }
-            else if(!inJail)
+            else if (!inJail)
                 StartCoroutine("animateMovement", diceScript.rolledNumber);
 
             diceScript.rolledNumber = 0;
@@ -115,7 +125,7 @@ public class Player : NetworkBehaviour
         playerMoneyText.text = "$" + money;
         //Debug.Log("Doubles rolled: " + doublesRolled);
     }
-     
+
 
     IEnumerator animateMovement(int amountToMove)
     {
@@ -164,6 +174,11 @@ public class Player : NetworkBehaviour
             nextPlayer();
     }
 
+    public Renderer getRenderer()
+    {
+        return renderer;
+    }
+
     public void rollDice()
     {
         Debug.Log("You have clicked the button!");
@@ -172,10 +187,34 @@ public class Player : NetworkBehaviour
         CmdRollDice();
     }
 
+    void nextPlayer()
+    {
+        CmdSetDiceInactive();
+        CmdNextPlayer();
+    }
+
+    void goToJail()
+    {
+        indexPosition = 10;
+        doublesRolled = 0;
+        roundsInJail = 0;
+        inJail = true;
+        transform.position = jailPosition;
+        transform.eulerAngles = new Vector3(0, 90, 0);
+        nextPlayer();
+    }
+
+    [ClientRpc]
+    void RpcUpdateColor(Color col)
+    {
+        renderer.material.color = col;
+        plyColor = col;
+    }
+
     [Command]
     public void CmdRollDice()
     {
-        Debug.Log("ADFGHJKL");
+        Debug.Log("(ServerSide) Entered CmdRollDice");
         
         if (diceScript.transform.childCount > 0)
         {
@@ -203,38 +242,22 @@ public class Player : NetworkBehaviour
         Debug.Log("playerTurn: " + gameManagerScript.playerTurn);
         //gameManagerScript.playerTurnText.text = "Turn: Player " + gameManagerScript.playerTurn;
     }
-    /*
-    [Command]
-    public void CmdAddPlayer()
-    {
-        idPlayer = gameManagerScript.connectedPlayers + dic
-        gameManagerScript.connectedPlayers++;
-        Debug.Log("connectedPlayers: " + gameManagerScript.connectedPlayers);
-        //gameManagerScript.connectedPlayersText.text = gameManagerScript.connectedPlayers + " players";
-    }
-    */
-    void nextPlayer()
-    {
-        CmdSetDiceInactive();
-        CmdNextPlayer();
-    }
-
-    void goToJail()
-    {
-        indexPosition = 10;
-        doublesRolled = 0;
-        roundsInJail = 0;
-        inJail = true;
-        transform.position = jailPosition;
-        transform.eulerAngles = new Vector3(0, 90, 0);
-        nextPlayer();
-    }
 
     [Command]
     public void CmdAddConnectedPlayer(GameObject newPlayer)
     {
-        gameManagerScript.players[gameManagerScript.connectedPlayers] = newPlayer; 
+        gameManagerScript.players[gameManagerScript.connectedPlayers] = newPlayer;
         idPlayer = gameManagerScript.connectedPlayers;
         gameManagerScript.connectedPlayers++;
+
+        // Asign the Color for the player
+        plyColor = Random.ColorHSV(0, 1, 0, 1, 0.3f, 0.7f);
+        renderer.material.color = plyColor;
+
+        // Update each player for the new color change
+        for (int i = 0; i < gameManagerScript.connectedPlayers; i++)
+        {
+            gameManagerScript.players[i].GetComponent<Player>().RpcUpdateColor(gameManagerScript.players[i].GetComponent<Player>().plyColor);
+        }
     }
 }
