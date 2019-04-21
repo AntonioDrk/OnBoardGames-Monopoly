@@ -34,7 +34,6 @@ public class Player : NetworkBehaviour
 
     void Start()
     {
-        playerMoneyText = GameObject.Find("playerMoneyText").GetComponent<Text>();
         rollButton = GameObject.Find("RollDice");
         gameManager = GameObject.Find("GameManager");
         gameManagerScript = gameManager.GetComponent<GameManager>();
@@ -48,6 +47,7 @@ public class Player : NetworkBehaviour
             rollButton.SetActive(false);
             CmdAddConnectedPlayer(this.gameObject);
             idText = GameObject.Find("idText").GetComponent<Text>();
+            playerMoneyText = GameObject.Find("playerMoneyText").GetComponent<Text>();
             transform.position = goPosition;
         }
 
