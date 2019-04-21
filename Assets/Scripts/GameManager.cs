@@ -63,6 +63,37 @@ public class GameManager : NetworkBehaviour
         // Take the targets rotation on the y axis and apply it to the camera, don't change the cameras x axis rotation
         mainCamera.transform.eulerAngles = new Vector3(mainCamera.transform.eulerAngles.x, target.transform.eulerAngles.y, 0);
         
-    } 
+    }
 
+    // Add players to the list of players
+    public void CmdAddConnectedPlayer(GameObject newPlayer)
+    {
+        // Make sure this is run only on the server to not fuck up something
+        if (!isServer) return;
+
+        Player playerScript = newPlayer.GetComponent<Player>();
+
+        players[connectedPlayers] = newPlayer;
+        playerScript.idPlayer = connectedPlayers;
+        connectedPlayers++;
+
+        // Asign the Color for the player
+        playerScript.setPlyColor(Random.ColorHSV(0, 1, 0, 1, 0.3f, 0.7f));
+        playerScript.getRenderer().material.color = playerScript.getPlyColor();
+
+        // Update each player for the new color change
+        for (int i = 0; i < connectedPlayers; i++)
+        {
+            players[i].GetComponent<Player>().RpcUpdateColor(players[i].GetComponent<Player>().getPlyColor());
+        }
+    }
+
+    public void CmdNextPlayer()
+    {
+        // Make sure this is run only on the server to not fuck up something
+        if (!isServer) return;
+
+        playerTurn = (playerTurn + 1) % connectedPlayers;
+        Debug.Log("playerTurn: " + playerTurn);
+    }
 }

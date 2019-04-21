@@ -34,12 +34,32 @@ public class DiceScript : NetworkBehaviour
             rolled = true;
         }
     }
-    /*
-    public bool areDiceActive()
+
+    // This is already called in a command on the server
+    public void CmdRollDice()
     {
-        if (gameObject.transform.GetChild(0).gameObject.activeInHierarchy == true)
-            return true;
-        return false;
+        // Make sure this is run only on the server to not fuck up something
+        if (!isServer) return;
+
+        Debug.Log("(ServerSide) Entered CmdRollDice");
+
+        if (transform.childCount > 0)
+        {
+            return;
+        }
+
+        GameObject go = Instantiate(dice);
+        dice.transform.GetChild(0).transform.eulerAngles = new Vector3(90 * Random.Range(0, 4), 90 * Random.Range(0, 4), 90 * Random.Range(0, 4));
+        dice.transform.GetChild(1).transform.eulerAngles = new Vector3(90 * Random.Range(0, 4), 90 * Random.Range(0, 4), 90 * Random.Range(0, 4));
+        //go.transform.parent = diceScript.transform;
+        NetworkServer.Spawn(go);
     }
-    */
+
+    // This is already called in a command on the server
+    public void CmdSetDiceInactive()
+    {
+        // Make sure this is run only on the server to not fuck up something
+        if (!isServer) return;
+        NetworkServer.Destroy(transform.GetChild(0).gameObject);
+    }
 }

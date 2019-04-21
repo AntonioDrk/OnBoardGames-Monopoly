@@ -5,7 +5,7 @@ using UnityEngine.UI;
 using UnityEngine.Networking;
 
 public class Player : NetworkBehaviour
-{ 
+{
     [SyncVar] public int idPlayer = 0;
 
     // Serialized just for testing purposes, remove me 
@@ -14,7 +14,7 @@ public class Player : NetworkBehaviour
     [SerializeField]
     private GameObject diceManager, gameManager;
 
-    private Animator anim; 
+    private Animator anim;
     private DiceScript diceScript;
     private GameManager gameManagerScript;
     private Vector3 goPosition = new Vector3(2.5f, 0.125f, -6.49f);
@@ -23,10 +23,11 @@ public class Player : NetworkBehaviour
     private GameObject rollButton;
     private Text playerMoneyText, idText;
 
-    [SyncVar]private Color plyColor;
+    [SyncVar] private Color plyColor;
 
     private Renderer renderer;
 
+    [SerializeField]
     private int money = 1500;
     private int doublesRolled = 0;
     private int roundsInJail = 0;
@@ -52,8 +53,6 @@ public class Player : NetworkBehaviour
         }
 
     }
-    
-
 
     void Update()
     {
@@ -68,12 +67,13 @@ public class Player : NetworkBehaviour
 
         idText.text = "id: " + idPlayer;
 
+        // If it's my turn
         if (gameManagerScript.playerTurn == idPlayer)
         {
             if (rollButton.activeInHierarchy == false)
             {
                 rollButton.SetActive(true);
-                rollButton.GetComponent<Button>().onClick.AddListener(rollDice);
+                rollButton.GetComponent<Button>().onClick.AddListener(RollTheDice);
             }
         }
         else
@@ -123,7 +123,6 @@ public class Player : NetworkBehaviour
 
 
         playerMoneyText.text = "$" + money;
-        //Debug.Log("Doubles rolled: " + doublesRolled);
     }
 
 
@@ -179,12 +178,31 @@ public class Player : NetworkBehaviour
         return renderer;
     }
 
-    public void rollDice()
+    public void setPlyColor(Color value)
+    {
+        plyColor = value;
+    }
+
+    public Color getPlyColor()
+    {
+        return plyColor;
+    }
+
+
+    // This function is to make the link between the button on click event and sending a command
+    void RollTheDice()
     {
         Debug.Log("You have clicked the button!");
         diceScript.diceCounter = 0;
         diceScript.rolledNumber = 0;
         CmdRollDice();
+    }
+
+    // Tell the server to roll the dices from the Dice Manager 
+    [Command]
+    public void CmdRollDice()
+    {
+        diceScript.CmdRollDice();
     }
 
     void nextPlayer()
@@ -205,59 +223,28 @@ public class Player : NetworkBehaviour
     }
 
     [ClientRpc]
-    void RpcUpdateColor(Color col)
+    public void RpcUpdateColor(Color col)
     {
         renderer.material.color = col;
         plyColor = col;
     }
 
     [Command]
-    public void CmdRollDice()
-    {
-        Debug.Log("(ServerSide) Entered CmdRollDice");
-        
-        if (diceScript.transform.childCount > 0)
-        {
-            return;
-        }
-        
-        GameObject go = Instantiate(diceScript.dice);
-        diceScript.dice.transform.GetChild(0).transform.eulerAngles = new Vector3(90 * Random.Range(0, 4), 90 * Random.Range(0, 4), 90 * Random.Range(0, 4));
-        diceScript.dice.transform.GetChild(1).transform.eulerAngles = new Vector3(90 * Random.Range(0, 4), 90 * Random.Range(0, 4), 90 * Random.Range(0, 4));
-        //go.transform.parent = diceScript.transform;
-        NetworkServer.Spawn(go);
-        
-    }
-
-    [Command]
     public void CmdSetDiceInactive()
     {
-        NetworkServer.Destroy(diceManager.transform.GetChild(0).gameObject);
+        diceScript.CmdSetDiceInactive();
     }
 
     [Command]
     public void CmdNextPlayer()
     {
-        gameManagerScript.playerTurn = (gameManagerScript.playerTurn + 1) % gameManagerScript.connectedPlayers; 
-        Debug.Log("playerTurn: " + gameManagerScript.playerTurn);
-        //gameManagerScript.playerTurnText.text = "Turn: Player " + gameManagerScript.playerTurn;
+        gameManagerScript.CmdNextPlayer();
     }
 
     [Command]
     public void CmdAddConnectedPlayer(GameObject newPlayer)
     {
-        gameManagerScript.players[gameManagerScript.connectedPlayers] = newPlayer;
-        idPlayer = gameManagerScript.connectedPlayers;
-        gameManagerScript.connectedPlayers++;
-
-        // Asign the Color for the player
-        plyColor = Random.ColorHSV(0, 1, 0, 1, 0.3f, 0.7f);
-        renderer.material.color = plyColor;
-
-        // Update each player for the new color change
-        for (int i = 0; i < gameManagerScript.connectedPlayers; i++)
-        {
-            gameManagerScript.players[i].GetComponent<Player>().RpcUpdateColor(gameManagerScript.players[i].GetComponent<Player>().plyColor);
-        }
+        // To be able to call the function on something without authority, I will run the call of the function on the server
+        gameManagerScript.CmdAddConnectedPlayer(this.gameObject);
     }
 }
