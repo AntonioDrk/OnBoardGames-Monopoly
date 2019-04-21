@@ -24,7 +24,7 @@ public class GameManager : NetworkBehaviour
 
     [SyncVar] public int playerTurn = 0; 
     [SyncVar] public int connectedPlayers = 0;
-    public GameObject[] players;
+    public List<GameObject> players;
 
 
     void Start()
@@ -36,13 +36,13 @@ public class GameManager : NetworkBehaviour
         playerTurnText = GameObject.Find("playerTurnText").GetComponent<Text>(); 
         playerTurnText.text = "Turn: Player " + playerTurn;
 
-        players = new GameObject[6];
+        players = new List<GameObject>();
     } 
      
     void Update()
     {
         playerTurnText.text = "Turn: Player " + playerTurn;
-        connectedPlayersText.text = connectedPlayers + " players"; 
+        connectedPlayersText.text = connectedPlayers + " players";
 
         if (targetPlayerIsMoving)
             UpdatePosCamera(targetPlayer);
@@ -73,7 +73,7 @@ public class GameManager : NetworkBehaviour
 
         Player playerScript = newPlayer.GetComponent<Player>();
 
-        players[connectedPlayers] = newPlayer;
+        players.Add(newPlayer);
         playerScript.idPlayer = connectedPlayers;
         connectedPlayers++;
 
@@ -95,5 +95,20 @@ public class GameManager : NetworkBehaviour
 
         playerTurn = (playerTurn + 1) % connectedPlayers;
         Debug.Log("playerTurn: " + playerTurn);
+    }
+
+    [Command]
+    public void CmdOnPlayerDisconnect(NetworkInstanceId id)
+    {
+        Debug.Log("REMOVING DCED PLAYER");
+        GameObject playerDisconnected = NetworkServer.FindLocalObject(id);
+        if(playerDisconnected == null)
+        {
+            Debug.LogError("The player disconnected object is null for some reason!");
+            return;
+        }
+        players.Remove(playerDisconnected);
+        NetworkServer.Destroy(playerDisconnected);
+        connectedPlayers--;
     }
 }

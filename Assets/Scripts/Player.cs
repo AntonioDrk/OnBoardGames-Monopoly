@@ -9,8 +9,8 @@ public class Player : NetworkBehaviour
     [SyncVar] public int idPlayer = 0;
 
     // Serialized just for testing purposes, remove me 
-    [SerializeField]
-    private int indexPosition; // Indicates the position on the board list (the list of cards that are on the board)
+    [SerializeField][SyncVar]
+    private int indexPosition = 0; // Indicates the position on the board list (the list of cards that are on the board)
     [SerializeField]
     private GameObject diceManager, gameManager;
 
@@ -27,7 +27,7 @@ public class Player : NetworkBehaviour
 
     private Renderer renderer;
 
-    [SerializeField]
+    [SerializeField][SyncVar]
     private int money = 1500;
     private int doublesRolled = 0;
     private int roundsInJail = 0;
@@ -104,7 +104,7 @@ public class Player : NetworkBehaviour
                     diceScript.isDouble = false;
                     transform.position = justVisitingPosition;
                     if (!diceScript.isDouble)
-                        money -= 50;
+                        CmdAddMoney(-50);
                 }
 
                 if (roundsInJail < 3 && inJail)
@@ -136,13 +136,14 @@ public class Player : NetworkBehaviour
             if (indexPosition % 10 == 9 || indexPosition % 10 == 0)
             {
                 anim.Play("StraightMovementToCorner", 0);
-                indexPosition = (indexPosition + 1) % 40;
+                CmdMovePlayer();
+                
                 yield return new WaitForSeconds(anim.GetCurrentAnimatorStateInfo(0).length);
 
                 if (indexPosition == 0)
                 {
                     transform.position = goPosition;
-                    money += 200;
+                    CmdAddMoney(200);
                     Debug.Log("Money " + money);
                 }
 
@@ -155,7 +156,7 @@ public class Player : NetworkBehaviour
             else
             {
                 anim.Play("StraightMovement", 0);
-                indexPosition = (indexPosition + 1) % 40;
+                CmdMovePlayer();
                 yield return new WaitForSeconds(anim.GetCurrentAnimatorStateInfo(0).length);
 
             }
@@ -227,6 +228,18 @@ public class Player : NetworkBehaviour
     {
         renderer.material.color = col;
         plyColor = col;
+    }
+
+    [Command]
+    public void CmdAddMoney(int amount)
+    {
+        money += amount;
+    }
+
+    [Command]
+    public void CmdMovePlayer()
+    {
+        indexPosition = (indexPosition + 1) % 40;
     }
 
     [Command]
