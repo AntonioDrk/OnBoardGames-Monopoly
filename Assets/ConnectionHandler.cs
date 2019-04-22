@@ -9,7 +9,7 @@ public class ConnectionHandler : NetworkManager
 
     private void Update()
     {
-        if(gameManagerScript == null && GameObject.FindGameObjectWithTag("GameManager").GetComponent<GameManager>() != null)
+        if(gameManagerScript == null && GameObject.FindGameObjectWithTag("GameManager") != null)
             gameManagerScript = GameObject.FindGameObjectWithTag("GameManager").GetComponent<GameManager>();
     }
 

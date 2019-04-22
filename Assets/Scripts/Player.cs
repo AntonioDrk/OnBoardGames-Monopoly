@@ -26,6 +26,8 @@ public class Player : NetworkBehaviour
     [SyncVar] private Color plyColor;
 
     private Renderer renderer;
+    [SyncVar]
+    private int myMeshIndex;
 
     [SerializeField][SyncVar]
     private int money = 1500;
@@ -189,6 +191,8 @@ public class Player : NetworkBehaviour
         return plyColor;
     }
 
+    public int getMyMeshIndex(){ return myMeshIndex; }
+    public void setMyMeshIndex(int value) { myMeshIndex = value; }
 
     // This function is to make the link between the button on click event and sending a command
     void RollTheDice()
@@ -228,6 +232,13 @@ public class Player : NetworkBehaviour
     {
         renderer.material.color = col;
         plyColor = col;
+    }
+
+    [ClientRpc]
+    public void RpcUpdateMesh(int newMeshIndex)
+    {
+        transform.GetChild(0).GetComponent<MeshFilter>().mesh = gameManagerScript.getMeshes()[newMeshIndex];
+        myMeshIndex = newMeshIndex;
     }
 
     [Command]
