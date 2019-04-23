@@ -20,7 +20,7 @@ public class Player : NetworkBehaviour
     private Vector3 goPosition = new Vector3(2.5f, 0.125f, -6.49f);
     private Vector3 jailPosition = new Vector3(-11f, 0.125f, -6f);
     private Vector3 justVisitingPosition = new Vector3(-11.45854f, 0.125f, -6.49f);
-    private GameObject rollButton;
+    private GameObject rollButton, endTurnButton;
     private Text playerMoneyText, idText;
 
     [SyncVar] private Color plyColor;
@@ -34,11 +34,12 @@ public class Player : NetworkBehaviour
     private int doublesRolled = 0;
     private int roundsInJail = 0;
     private bool inJail = false;
+    [SerializeField] private int stage = -1; // -1 = it's not your turn, 0 = you rolled the dice
 
     void Start()
     {
-        rollButton = GameObject.Find("RollDice");
-        gameManager = GameObject.Find("GameManager");
+
+        gameManager = GameObject.Find("GameManager"); 
         gameManagerScript = gameManager.GetComponent<GameManager>();
         diceManager = GameObject.Find("DiceManager");
         diceScript = diceManager.GetComponent<DiceScript>();
@@ -47,7 +48,13 @@ public class Player : NetworkBehaviour
 
         if (isLocalPlayer)
         {
+            rollButton = GameObject.Find("RollDice");
+            rollButton.GetComponent<Button>().onClick.AddListener(RollTheDice);
+            endTurnButton = GameObject.Find("EndTurn");
+            endTurnButton.GetComponent<Button>().onClick.AddListener(nextPlayer);
             rollButton.SetActive(false);
+            endTurnButton.SetActive(false);
+
             CmdAddConnectedPlayer(this.gameObject);
             idText = GameObject.Find("idText").GetComponent<Text>();
             playerMoneyText = GameObject.Find("playerMoneyText").GetComponent<Text>();
@@ -68,27 +75,21 @@ public class Player : NetworkBehaviour
             return;
 
         idText.text = "id: " + idPlayer;
-
+        
         // If it's my turn
-        if (gameManagerScript.playerTurn == idPlayer)
-        {
-            if (rollButton.activeInHierarchy == false)
-            {
-                rollButton.SetActive(true);
-                rollButton.GetComponent<Button>().onClick.AddListener(RollTheDice);
-            }
+        if (gameManagerScript.playerTurn == idPlayer && stage == -1)
+        { 
+            rollButton.SetActive(true);
         }
         else
             rollButton.SetActive(false);
 
-
         // if the diceManager rolled and it's player's turn 
         if (diceScript.rolled == true && gameManagerScript.playerTurn == idPlayer)
-        {
+        { 
             diceScript.rolled = false;
             Debug.Log("Player " + idPlayer + " rolled " + diceScript.rolledNumber);
-
-
+            
             if (diceScript.isDouble)
                 doublesRolled++;
             else
@@ -110,7 +111,7 @@ public class Player : NetworkBehaviour
                 }
 
                 if (roundsInJail < 3 && inJail)
-                    nextPlayer();
+                    endTurn();
             }
 
             if (doublesRolled == 3)
@@ -164,16 +165,18 @@ public class Player : NetworkBehaviour
             }
         }
 
-
         gameManagerScript.targetPlayerIsMoving = false;
         if (indexPosition == 30)
         {
             goToJail();
         }
-        else if(diceScript.isDouble)
+        else if (diceScript.isDouble)
+        {
             CmdSetDiceInactive();
+            stage = -1; 
+        }
         else
-            nextPlayer();
+            endTurn();
     }
 
     public Renderer getRenderer()
@@ -194,10 +197,18 @@ public class Player : NetworkBehaviour
     public int getMyMeshIndex(){ return myMeshIndex; }
     public void setMyMeshIndex(int value) { myMeshIndex = value; }
 
+    void endTurn()
+    {
+        rollButton.SetActive(false);
+        endTurnButton.SetActive(true);
+    }
+
     // This function is to make the link between the button on click event and sending a command
     void RollTheDice()
     {
         Debug.Log("You have clicked the button!");
+        stage = 0;
+        rollButton.SetActive(false);
         diceScript.diceCounter = 0;
         diceScript.rolledNumber = 0;
         CmdRollDice();
@@ -212,6 +223,8 @@ public class Player : NetworkBehaviour
 
     void nextPlayer()
     {
+        endTurnButton.SetActive(false);
+        stage = -1;
         CmdSetDiceInactive();
         CmdNextPlayer();
     }
@@ -224,7 +237,7 @@ public class Player : NetworkBehaviour
         inJail = true;
         transform.position = jailPosition;
         transform.eulerAngles = new Vector3(0, 90, 0);
-        nextPlayer();
+        endTurn();
     }
 
     [ClientRpc]
