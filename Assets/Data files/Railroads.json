@@ -1,0 +1,56 @@
+{  
+   "Items":[  
+      {  
+         "id":"5",
+         "cardName":"Reading Railroad",
+         "priceValue":200,
+         "mortgageValue":100,
+         "rent":[  
+            25,
+            50,
+            100,
+            150,
+            200
+         ]
+      },
+      {  
+         "id":"15",
+         "cardName":"Pennsylvania Railroad",
+         "priceValue":200,
+         "mortgageValue":100,
+         "rent":[  
+            25,
+            50,
+            100,
+            150,
+            200
+         ]
+      },
+      {  
+         "id":"25",
+         "cardName":"B. & O. Railroad",
+         "priceValue":200,
+         "mortgageValue":100,
+         "rent":[  
+            25,
+            50,
+            100,
+            150,
+            200
+         ]
+      },
+      {  
+         "id":"35",
+         "cardName":"Short Line",
+         "priceValue":200,
+         "mortgageValue":100,
+         "rent":[  
+            25,
+            50,
+            100,
+            150,
+            200
+         ]
+      }
+   ]
+}

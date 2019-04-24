@@ -20,7 +20,7 @@ public class Player : NetworkBehaviour
     private Vector3 goPosition = new Vector3(2.5f, 0.125f, -6.49f);
     private Vector3 jailPosition = new Vector3(-11f, 0.125f, -6f);
     private Vector3 justVisitingPosition = new Vector3(-11.45854f, 0.125f, -6.49f);
-    private GameObject rollButton, endTurnButton;
+    private GameObject rollButton, endTurnButton, cardPanel;
     private Text playerMoneyText, idText;
 
     [SyncVar] private Color plyColor;
@@ -54,6 +54,8 @@ public class Player : NetworkBehaviour
             endTurnButton.GetComponent<Button>().onClick.AddListener(nextPlayer);
             rollButton.SetActive(false);
             endTurnButton.SetActive(false);
+            cardPanel = GameObject.Find("Card");
+            cardPanel.SetActive(false);
 
             CmdAddConnectedPlayer(this.gameObject);
             idText = GameObject.Find("idText").GetComponent<Text>();
@@ -64,7 +66,7 @@ public class Player : NetworkBehaviour
     }
 
     void Update()
-    {
+    { 
         localPlayerUpdate();
     }
 
@@ -200,13 +202,35 @@ public class Player : NetworkBehaviour
     void endTurn()
     {
         rollButton.SetActive(false);
+        int cardIndex = CardReader.getPropertyCardIndex(indexPosition);
+        if (cardIndex != -1) // if it's a property card
+        {
+
+            cardPanel.SetActive(true);
+            Debug.Log(CardReader.propertyCards[cardIndex].ToString());
+            cardPanel.transform.GetChild(0).transform.GetChild(0).GetComponent<Text>().text = CardReader.propertyCards[cardIndex].CardName;
+            cardPanel.transform.GetChild(1).GetComponent<Text>().text = "RENT $" + CardReader.propertyCards[cardIndex].rent[0].ToString();
+
+            cardPanel.transform.GetChild(3).GetComponent<Text>().text =
+                "$" + CardReader.propertyCards[cardIndex].rent[1].ToString() + '\n' +
+                "$" + CardReader.propertyCards[cardIndex].rent[2].ToString() + '\n' +
+                "$" + CardReader.propertyCards[cardIndex].rent[3].ToString() + '\n' +
+                "$" + CardReader.propertyCards[cardIndex].rent[4].ToString() + '\n';
+
+            cardPanel.transform.GetChild(4).GetComponent<Text>().text =
+                "With HOTEL $" + CardReader.propertyCards[cardIndex].rent[5].ToString() + '\n' +
+                "Mortgage Value $" + CardReader.propertyCards[cardIndex].mortgageValue.ToString() + '\n' +
+                "Houses cost $" + CardReader.propertyCards[cardIndex].pricePerHouse.ToString() + " each\n" +
+                "Hotels, $" + CardReader.propertyCards[cardIndex].pricePerHouse.ToString() + " plus 4 houses"; 
+
+        }
         endTurnButton.SetActive(true);
     }
 
     // This function is to make the link between the button on click event and sending a command
     void RollTheDice()
     {
-        Debug.Log("You have clicked the button!");
+        //Debug.Log("You have clicked the button!");
         stage = 0;
         rollButton.SetActive(false);
         diceScript.diceCounter = 0;
@@ -223,6 +247,7 @@ public class Player : NetworkBehaviour
 
     void nextPlayer()
     {
+        cardPanel.SetActive(false);
         endTurnButton.SetActive(false);
         stage = -1;
         CmdSetDiceInactive();
