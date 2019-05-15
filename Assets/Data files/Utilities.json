@@ -1,0 +1,16 @@
+{  
+   "Items":[  
+      {  
+         "id":"12",
+         "cardName":"Electric Company",
+         "priceValue":"150",
+         "mortgageValue":"75"
+      },
+      {  
+         "id":"28",
+         "cardName":"Water Works",
+         "priceValue":"150",
+         "mortgageValue":"75"
+      }
+   ]
+}

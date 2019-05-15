@@ -3,29 +3,25 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
 
-public class DiceScript : MonoBehaviour
+public class DiceScript : NetworkBehaviour
 {
     public int rolledNumber = 0; 
-    public bool rolled = false;
     public bool isDouble = false;
+    public bool rolled = false;
 
     public int diceCounter = 0;
+    public GameObject dice;
+    public GameManager gameManager;
      
-
-    // Start is called before the first frame update
     void Start()
-    { 
-
-    }
-
-    // Update is called once per frame
-    void Update()
     {
-        
-    }
+           diceCounter = 100;
+           gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
+    } 
 
     public void addDice(int rolledValue)
     {
+        //Debug.Log("Dice counter: " + diceCounter);
         diceCounter++;
         rolledNumber += rolledValue;
         if (diceCounter == 2)
@@ -38,28 +34,31 @@ public class DiceScript : MonoBehaviour
         }
     }
 
-    
+    // This is already called in a command on the server
     public void CmdRollDice()
     {
-        // if it's player's turn and the dice are not rolling  
-        if(!areDiceActive())
+        // Make sure this is run only on the server to not fuck up something
+        if (!isServer) return;
+
+        Debug.Log("(ServerSide) Entered CmdRollDice");
+
+        if (transform.childCount > 0)
         {
-            diceCounter = 0;
-            gameObject.transform.GetChild(0).gameObject.SetActive(true);
-            gameObject.transform.GetChild(1).gameObject.SetActive(true);
+            return;
         }
+
+        GameObject go = Instantiate(dice);
+        dice.transform.GetChild(0).transform.eulerAngles = new Vector3(90 * Random.Range(0, 4), 90 * Random.Range(0, 4), 90 * Random.Range(0, 4));
+        dice.transform.GetChild(1).transform.eulerAngles = new Vector3(90 * Random.Range(0, 4), 90 * Random.Range(0, 4), 90 * Random.Range(0, 4));
+        //go.transform.parent = diceScript.transform;
+        NetworkServer.Spawn(go);
     }
 
-    public bool areDiceActive()
+    // This is already called in a command on the server
+    public void CmdSetDiceInactive()
     {
-        if (gameObject.transform.GetChild(0).gameObject.activeInHierarchy == true)
-            return true;
-        return false;
-    }
-
-    public void setDiceInactive()
-    {
-        gameObject.transform.GetChild(0).gameObject.SetActive(false);
-        gameObject.transform.GetChild(1).gameObject.SetActive(false); 
+        // Make sure this is run only on the server to not fuck up something
+        if (!isServer) return;
+        NetworkServer.Destroy(transform.GetChild(0).gameObject);
     }
 }
