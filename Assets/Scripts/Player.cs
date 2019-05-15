@@ -34,7 +34,7 @@ public class Player : NetworkBehaviour
     private int doublesRolled = 0;
     private int roundsInJail = 0;
     private bool inJail = false;
-    [SerializeField] private int stage = -1; // -1 = it's not your turn, 0 = you rolled the dice
+    [SerializeField] private int stage = -1; // -1 = it's your turn, 0 = you rolled the dice
 
     void Start()
     {
@@ -175,7 +175,13 @@ public class Player : NetworkBehaviour
         else if (diceScript.isDouble)
         {
             CmdSetDiceInactive();
-            stage = -1; 
+            stage = -1;
+            int cardIndex = CardReader.getPropertyCardIndex(indexPosition);
+            Debug.Log("Card index: " + cardIndex);
+            if (cardIndex != -1) // if it's a property card
+            {
+                showCard(cardIndex);
+            }
         }
         else
             endTurn();
@@ -201,31 +207,36 @@ public class Player : NetworkBehaviour
 
     void endTurn()
     {
-        rollButton.SetActive(false);
+        //rollButton.SetActive(false);
         int cardIndex = CardReader.getPropertyCardIndex(indexPosition);
+        Debug.Log("Card index: " + cardIndex);
         if (cardIndex != -1) // if it's a property card
         {
-            cardPanel.SetActive(true);
-            Debug.Log(CardReader.propertyCards[cardIndex].ToString());
-            cardPanel.transform.GetChild(0).transform.GetComponent<Image>().color
-                = new Color32((byte)CardReader.propertyCards[cardIndex].cardColor[0], (byte)CardReader.propertyCards[cardIndex].cardColor[1], (byte)CardReader.propertyCards[cardIndex].cardColor[2],255);
-            cardPanel.transform.GetChild(0).transform.GetChild(0).GetComponent<Text>().text = CardReader.propertyCards[cardIndex].CardName;
-            cardPanel.transform.GetChild(1).GetComponent<Text>().text = "RENT $" + CardReader.propertyCards[cardIndex].rent[0].ToString();
-
-            cardPanel.transform.GetChild(3).GetComponent<Text>().text =
-                "$" + CardReader.propertyCards[cardIndex].rent[1].ToString() + '\n' +
-                "$" + CardReader.propertyCards[cardIndex].rent[2].ToString() + '\n' +
-                "$" + CardReader.propertyCards[cardIndex].rent[3].ToString() + '\n' +
-                "$" + CardReader.propertyCards[cardIndex].rent[4].ToString() + '\n';
-
-            cardPanel.transform.GetChild(4).GetComponent<Text>().text =
-                "With HOTEL $" + CardReader.propertyCards[cardIndex].rent[5].ToString() + '\n' +
-                "Mortgage Value $" + CardReader.propertyCards[cardIndex].mortgageValue.ToString() + '\n' +
-                "Houses cost $" + CardReader.propertyCards[cardIndex].pricePerHouse.ToString() + " each\n" +
-                "Hotels, $" + CardReader.propertyCards[cardIndex].pricePerHouse.ToString() + " plus 4 houses"; 
-
+            showCard(cardIndex);
         }
         endTurnButton.SetActive(true);
+    }
+
+    void showCard(int cardIndex)
+    {
+        cardPanel.SetActive(true);
+        Debug.Log(CardReader.propertyCards[cardIndex].ToString());
+        cardPanel.transform.GetChild(0).transform.GetComponent<Image>().color
+            = new Color32((byte)CardReader.propertyCards[cardIndex].cardColor[0], (byte)CardReader.propertyCards[cardIndex].cardColor[1], (byte)CardReader.propertyCards[cardIndex].cardColor[2], 255);
+        cardPanel.transform.GetChild(0).transform.GetChild(0).GetComponent<Text>().text = CardReader.propertyCards[cardIndex].CardName;
+        cardPanel.transform.GetChild(1).GetComponent<Text>().text = "RENT $" + CardReader.propertyCards[cardIndex].rent[0].ToString();
+
+        cardPanel.transform.GetChild(3).GetComponent<Text>().text =
+            "$" + CardReader.propertyCards[cardIndex].rent[1].ToString() + '\n' +
+            "$" + CardReader.propertyCards[cardIndex].rent[2].ToString() + '\n' +
+            "$" + CardReader.propertyCards[cardIndex].rent[3].ToString() + '\n' +
+            "$" + CardReader.propertyCards[cardIndex].rent[4].ToString() + '\n';
+
+        cardPanel.transform.GetChild(4).GetComponent<Text>().text =
+            "With HOTEL $" + CardReader.propertyCards[cardIndex].rent[5].ToString() + '\n' +
+            "Mortgage Value $" + CardReader.propertyCards[cardIndex].mortgageValue.ToString() + '\n' +
+            "Houses cost $" + CardReader.propertyCards[cardIndex].pricePerHouse.ToString() + " each\n" +
+            "Hotels, $" + CardReader.propertyCards[cardIndex].pricePerHouse.ToString() + " plus 4 houses";
     }
 
     // This function is to make the link between the button on click event and sending a command
@@ -233,6 +244,7 @@ public class Player : NetworkBehaviour
     {
         //Debug.Log("You have clicked the button!");
         stage = 0;
+        cardPanel.SetActive(false);
         rollButton.SetActive(false);
         diceScript.diceCounter = 0;
         diceScript.rolledNumber = 0;
