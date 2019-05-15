@@ -18,5 +18,5 @@ public abstract class Card
     public int Mortgage { get => mortgage; set => mortgage = value; }
     public int OwnerId { get => ownerId; set => ownerId = value; }
 
-    public abstract void doAction(int playerId);
+    public abstract void doAction(GameObject player);
 }

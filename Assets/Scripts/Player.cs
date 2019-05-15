@@ -206,6 +206,7 @@ public class Player : NetworkBehaviour
 
     public int getMyMeshIndex(){ return myMeshIndex; }
     public void setMyMeshIndex(int value) { myMeshIndex = value; }
+    public int getIndexPosition() { return indexPosition; }
 
     void endTurn()
     {
@@ -278,7 +279,7 @@ public class Player : NetworkBehaviour
         CmdNextPlayer();
     }
 
-    void goToJail()
+    public void goToJail()
     {
         indexPosition = 10;
         doublesRolled = 0;
@@ -287,6 +288,11 @@ public class Player : NetworkBehaviour
         transform.position = jailPosition;
         transform.eulerAngles = new Vector3(0, 90, 0);
         endTurn();
+    }
+
+    public void moveSpaces(int amount)
+    {
+        StartCoroutine("animateMovement", amount);
     }
 
     [ClientRpc]
@@ -307,6 +313,12 @@ public class Player : NetworkBehaviour
     public void CmdAddMoney(int amount)
     {
         money += amount;
+    }
+
+    [Command]
+    public void CmdTakeMoney(int amount)
+    {
+        money -= amount;
     }
 
     [Command]

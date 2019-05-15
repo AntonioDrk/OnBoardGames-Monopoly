@@ -6,17 +6,23 @@ using UnityEngine;
 [Serializable]
 public class RailwayCard  : Card
 {
+    public int id;
     public string cardName;
     public int[] rent = { 25, 50, 100, 200 };
 
-
-    // Start is called before the first frame update
-    void Start()
+    public void RailwayCardConstructor()
     {
+        Id = id;
         CardName = cardName;
         Price = 200;
         Mortgage = 100;
         OwnerId = -1;
+    }
+
+    // Start is called before the first frame update
+    void Start()
+    {
+
     }
 
     // Update is called once per frame
@@ -27,20 +33,22 @@ public class RailwayCard  : Card
 
     public override string ToString()
     {
-        return Id.ToString() + ": " + cardName.ToString() + " " +
-            Price.ToString() + " " + Mortgage.ToString();
+        return "Id: " + Id.ToString() +
+               "\nName: " + cardName.ToString() +
+               "\nPrice: " + Price.ToString() +
+               "\nMortgage: " + Mortgage.ToString();
     }
 
-    public override void doAction(int playerId)
+    public override void doAction(GameObject player)
     {
         if(OwnerId > 0)
         {
-            if(OwnerId != playerId)
+            /*if(OwnerId != playerId)
             {
                 Debug.Log("Player must pay rent.");
                 //Player.money -= rent[Owner.railwaysOwned];
                 //Debug.Log("Player + " Player.idPlayer + " paid $" + rent[Owner.railwaysOwned] + " to player " + OwnerId);
-            }
+            }*/
         }
         else
         {
