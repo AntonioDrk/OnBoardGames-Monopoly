@@ -19,9 +19,8 @@ public class PropertyCard : Card
     public int[] propertiesFromSameGroup;
 
     public void PropertyCardConstructor()
-    {
-        //Debug.Log(id);
-        Id = id;
+    { 
+        Id = id; 
         CardName = cardName;
         Price = priceValue;
         Mortgage = mortgageValue;

@@ -205,9 +205,10 @@ public class Player : NetworkBehaviour
         int cardIndex = CardReader.getPropertyCardIndex(indexPosition);
         if (cardIndex != -1) // if it's a property card
         {
-
             cardPanel.SetActive(true);
             Debug.Log(CardReader.propertyCards[cardIndex].ToString());
+            cardPanel.transform.GetChild(0).transform.GetComponent<Image>().color
+                = new Color32((byte)CardReader.propertyCards[cardIndex].cardColor[0], (byte)CardReader.propertyCards[cardIndex].cardColor[1], (byte)CardReader.propertyCards[cardIndex].cardColor[2],255);
             cardPanel.transform.GetChild(0).transform.GetChild(0).GetComponent<Text>().text = CardReader.propertyCards[cardIndex].CardName;
             cardPanel.transform.GetChild(1).GetComponent<Text>().text = "RENT $" + CardReader.propertyCards[cardIndex].rent[0].ToString();
 
