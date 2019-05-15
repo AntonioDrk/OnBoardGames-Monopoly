@@ -6,17 +6,23 @@ using UnityEngine;
 [Serializable]
 public class RailwayCard  : Card
 {
+    public int id;
     public string cardName;
     public int[] rent = { 25, 50, 100, 200 };
 
-
-    // Start is called before the first frame update
-    void Start()
+    public void RailwayCardConstructor()
     {
+        Id = id;
         CardName = cardName;
         Price = 200;
         Mortgage = 100;
         OwnerId = -1;
+    }
+
+    // Start is called before the first frame update
+    void Start()
+    {
+
     }
 
     // Update is called once per frame
