@@ -9,7 +9,8 @@ public class Player : NetworkBehaviour
     [SyncVar] public int idPlayer = 0;
 
     // Serialized just for testing purposes, remove me 
-    [SerializeField][SyncVar]
+    [SerializeField]
+    [SyncVar]
     private int indexPosition = 0; // Indicates the position on the board list (the list of cards that are on the board)
     [SerializeField]
     private GameObject diceManager, gameManager;
@@ -20,7 +21,7 @@ public class Player : NetworkBehaviour
     private Vector3 goPosition = new Vector3(2.5f, 0.125f, -6.49f);
     private Vector3 jailPosition = new Vector3(-11f, 0.125f, -6f);
     private Vector3 justVisitingPosition = new Vector3(-11.45854f, 0.125f, -6.49f);
-    private GameObject rollButton, endTurnButton, cardPanel, buyPropertyButton;
+    private GameObject rollButton, endTurnButton;
     private Text playerMoneyText, idText;
 
     [SyncVar] private Color plyColor;
@@ -29,18 +30,17 @@ public class Player : NetworkBehaviour
     [SyncVar]
     private int myMeshIndex;
 
-    [SerializeField][SyncVar] private int money = 1500;
+    [SerializeField] [SyncVar] private int money = 1500;
     private int doublesRolled = 0;
     private int roundsInJail = 0;
     private bool inJail = false;
-    [SerializeField] private int stage = -1; // -1 = it's your turn, 0 = you rolled the dice
+    [SerializeField] private int stage = 0; //  
 
     [SerializeField] private List<PropertyCard> ownedPropertyCards;
 
     void Start()
     {
-
-        gameManager = GameObject.Find("GameManager"); 
+        gameManager = GameObject.Find("GameManager");
         gameManagerScript = gameManager.GetComponent<GameManager>();
         diceManager = GameObject.Find("DiceManager");
         diceScript = diceManager.GetComponent<DiceScript>();
@@ -52,12 +52,10 @@ public class Player : NetworkBehaviour
             ownedPropertyCards = new List<PropertyCard>();
             rollButton = GameObject.Find("RollDice");
             rollButton.GetComponent<Button>().onClick.AddListener(RollTheDice);
+            rollButton.SetActive(false);
             endTurnButton = GameObject.Find("EndTurn");
             endTurnButton.GetComponent<Button>().onClick.AddListener(nextPlayer);
-            rollButton.SetActive(false);
             endTurnButton.SetActive(false);
-            cardPanel = GameObject.Find("Card");
-            cardPanel.SetActive(false);
 
             CmdAddConnectedPlayer(this.gameObject);
             idText = GameObject.Find("idText").GetComponent<Text>();
@@ -68,7 +66,7 @@ public class Player : NetworkBehaviour
     }
 
     void Update()
-    { 
+    {
         localPlayerUpdate();
     }
 
@@ -79,21 +77,22 @@ public class Player : NetworkBehaviour
             return;
 
         idText.text = "id: " + idPlayer;
-        
+
         // If it's my turn
-        if (gameManagerScript.playerTurn == idPlayer && stage == -1)
-        { 
+        if (gameManagerScript.playerTurn == idPlayer && stage == 0)
+        {
             rollButton.SetActive(true);
         }
         else
             rollButton.SetActive(false);
 
+
         // if the diceManager rolled and it's player's turn 
         if (diceScript.rolled == true && gameManagerScript.playerTurn == idPlayer)
-        { 
+        {
             diceScript.rolled = false;
             Debug.Log("Player " + idPlayer + " rolled " + diceScript.rolledNumber);
-            
+
             if (diceScript.isDouble)
                 doublesRolled++;
             else
@@ -123,15 +122,19 @@ public class Player : NetworkBehaviour
                 goToJail();
             }
             else if (!inJail)
-                StartCoroutine("animateMovement", diceScript.rolledNumber);
+                moveSpaces(diceScript.rolledNumber);
 
             diceScript.rolledNumber = 0;
         }
 
-
         playerMoneyText.text = "$" + money;
+
     }
 
+    public void moveSpaces(int amount)
+    {
+        StartCoroutine("animateMovement", amount);
+    }
 
     IEnumerator animateMovement(int amountToMove)
     {
@@ -139,12 +142,12 @@ public class Player : NetworkBehaviour
         gameManagerScript.targetPlayer = this.gameObject;
 
         for (int i = 0; i < amountToMove; i++)
-        { 
+        {
             if (indexPosition % 10 == 9 || indexPosition % 10 == 0)
             {
                 anim.Play("StraightMovementToCorner", 0);
                 CmdMovePlayer();
-                
+
                 yield return new WaitForSeconds(anim.GetCurrentAnimatorStateInfo(0).length);
 
                 if (indexPosition == 0)
@@ -156,7 +159,7 @@ public class Player : NetworkBehaviour
 
                 if (indexPosition % 10 == 0)
                 {
-                    transform.eulerAngles += new Vector3(0, 90, 0); 
+                    transform.eulerAngles += new Vector3(0, 90, 0);
                 }
 
             }
@@ -174,89 +177,60 @@ public class Player : NetworkBehaviour
         {
             goToJail();
         }
-        else if (diceScript.isDouble)
+        else
         {
-            CmdSetDiceInactive();
-            stage = -1;
+            stage = 2;
             int cardIndex = CardReader.getPropertyCardIndex(indexPosition);
             Debug.Log("Card index: " + cardIndex);
             if (cardIndex != -1) // if it's a property card
             {
-                showCard(cardIndex);
+                CardReader.propertyCards[cardIndex].doAction(this.gameObject);
             }
+            else
+                endMovement();
+        }
+
+    }
+
+    public Renderer getRenderer() { return renderer; }
+    public void setPlyColor(Color value) { plyColor = value; }
+    public Color getPlyColor() { return plyColor; }
+    public int getMyMeshIndex() { return myMeshIndex; }
+    public void setMyMeshIndex(int value) { myMeshIndex = value; }
+    public int getIndexPosition() { return indexPosition; }
+
+    public void endMovement()
+    {
+        CmdSetDiceInactive();
+        if (diceScript.isDouble)
+        {
+            stage = 0;
         }
         else
             endTurn();
     }
 
-    public Renderer getRenderer()
-    {
-        return renderer;
-    }
-
-    public void setPlyColor(Color value)
-    {
-        plyColor = value;
-    }
-
-    public Color getPlyColor()
-    {
-        return plyColor;
-    }
-
-    public int getMyMeshIndex(){ return myMeshIndex; }
-    public void setMyMeshIndex(int value) { myMeshIndex = value; }
-    public int getIndexPosition() { return indexPosition; }
-
     void endTurn()
     {
-        int cardIndex = CardReader.getPropertyCardIndex(indexPosition);
-        Debug.Log("Card index: " + cardIndex);
-        if (cardIndex != -1) // if it's a property card
-        {
-            showCard(cardIndex);
-        }
-        Debug.Log("Button active");
         endTurnButton.SetActive(true);
     }
 
-    void buyProperty(int cardIndex)
+    void nextPlayer()
     {
-        ownedPropertyCards.Add(CardReader.propertyCards[cardIndex]);
+        endTurnButton.SetActive(false);
+        stage = 0;
+        CmdNextPlayer();
     }
 
-    void showCard(int cardIndex)
+    public void buyProperty(PropertyCard propertyCard)
     {
-        cardPanel.SetActive(true);
-        Debug.Log(CardReader.propertyCards[cardIndex].ToString());
-
-        buyPropertyButton = GameObject.Find("BuyProperty");
-        buyPropertyButton.GetComponent<Button>().onClick.AddListener(() => buyProperty(cardIndex));
-
-        cardPanel.transform.GetChild(0).transform.GetComponent<Image>().color
-            = new Color32((byte)CardReader.propertyCards[cardIndex].cardColor[0], (byte)CardReader.propertyCards[cardIndex].cardColor[1], (byte)CardReader.propertyCards[cardIndex].cardColor[2], 255);
-        cardPanel.transform.GetChild(0).transform.GetChild(0).GetComponent<Text>().text = CardReader.propertyCards[cardIndex].CardName;
-        cardPanel.transform.GetChild(1).GetComponent<Text>().text = "RENT $" + CardReader.propertyCards[cardIndex].rent[0].ToString();
-
-        cardPanel.transform.GetChild(3).GetComponent<Text>().text =
-            "$" + CardReader.propertyCards[cardIndex].rent[1].ToString() + '\n' +
-            "$" + CardReader.propertyCards[cardIndex].rent[2].ToString() + '\n' +
-            "$" + CardReader.propertyCards[cardIndex].rent[3].ToString() + '\n' +
-            "$" + CardReader.propertyCards[cardIndex].rent[4].ToString() + '\n';
-
-        cardPanel.transform.GetChild(4).GetComponent<Text>().text =
-            "With HOTEL $" + CardReader.propertyCards[cardIndex].rent[5].ToString() + '\n' +
-            "Mortgage Value $" + CardReader.propertyCards[cardIndex].mortgageValue.ToString() + '\n' +
-            "Houses cost $" + CardReader.propertyCards[cardIndex].pricePerHouse.ToString() + " each\n" +
-            "Hotels, $" + CardReader.propertyCards[cardIndex].pricePerHouse.ToString() + " plus 4 houses";
+        ownedPropertyCards.Add(propertyCard);
     }
 
     // This function is to make the link between the button on click event and sending a command
     void RollTheDice()
     {
-        //Debug.Log("You have clicked the button!");
-        stage = 0;
-        cardPanel.SetActive(false);
+        stage = 1;
         rollButton.SetActive(false);
         diceScript.diceCounter = 0;
         diceScript.rolledNumber = 0;
@@ -270,15 +244,6 @@ public class Player : NetworkBehaviour
         diceScript.CmdRollDice();
     }
 
-    void nextPlayer()
-    {
-        cardPanel.SetActive(false);
-        endTurnButton.SetActive(false);
-        stage = -1;
-        CmdSetDiceInactive();
-        CmdNextPlayer();
-    }
-
     public void goToJail()
     {
         indexPosition = 10;
@@ -288,11 +253,6 @@ public class Player : NetworkBehaviour
         transform.position = jailPosition;
         transform.eulerAngles = new Vector3(0, 90, 0);
         endTurn();
-    }
-
-    public void moveSpaces(int amount)
-    {
-        StartCoroutine("animateMovement", amount);
     }
 
     [ClientRpc]

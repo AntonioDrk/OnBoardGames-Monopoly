@@ -18,6 +18,8 @@ public class CardReader : MonoBehaviour
     static public EventCard[] chanceCards;
     static public EventCard[] chestCards;
 
+    static public GameObject cardPanel, buyPropertyButton, cancelButton, payRentButton;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -26,6 +28,13 @@ public class CardReader : MonoBehaviour
         LoadUtilityCards(utilitiesFile);
         LoadChanceCards(chanceFile);
         LoadChestCards(chestFile);
+
+        cardPanel = GameObject.Find("Card");
+        buyPropertyButton = GameObject.Find("BuyProperty");
+        buyPropertyButton.SetActive(false);
+        cancelButton = GameObject.Find("Cancel");
+        cancelButton.SetActive(false);
+        cardPanel.SetActive(false);
     }
 
     // Update is called once per frame

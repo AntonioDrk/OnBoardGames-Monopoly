@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System;
 using UnityEngine;
+using UnityEngine.UI;
 
 [Serializable]
 public class PropertyCard : Card
@@ -19,38 +20,27 @@ public class PropertyCard : Card
     public int[] propertiesFromSameGroup;
 
     public void PropertyCardConstructor()
-    { 
-        Id = id; 
+    {
+        Id = id;
         CardName = cardName;
         Price = priceValue;
         Mortgage = mortgageValue;
         OwnerId = -1;
     }
 
-    // Start is called before the first frame update
-    void Start()
-    {
-
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-
-    }
-
     public override string ToString()
-    { 
-        return "Id: " + Id.ToString() + 
-               "\nName: " + cardName.ToString() + 
-               "\nPrice: " + priceValue.ToString() + 
-               "\nMortgage: " + mortgageValue.ToString() + 
-               "\nHotel: " + hasHotel.ToString() + 
+    {
+        return "Id: " + Id.ToString() +
+               "\nName: " + cardName.ToString() +
+               "\nPrice: " + priceValue.ToString() +
+               "\nMortgage: " + mortgageValue.ToString() +
+               "\nHotel: " + hasHotel.ToString() +
                "\nHouses: " + housesBuilt.ToString();
     }
 
     public override void doAction(GameObject player)
     {
+        showCard();
         if (OwnerId > 0)
         {
             /*if (OwnerId != playerId)
@@ -65,9 +55,13 @@ public class PropertyCard : Card
         }
         else
         {
-            Debug.Log("Player must buy this property.");
-            // TO-DO: print card on the screen and buttons to buy the property or auction it
+            Debug.Log("Player can buy this property.");
+            CardReader.buyPropertyButton.SetActive(true);
+            CardReader.buyPropertyButton.GetComponent<Button>().onClick.AddListener(() => buyProperty(player));
+            CardReader.cancelButton.GetComponent<Button>().onClick.AddListener(() => hideCard(player));
+            CardReader.cancelButton.SetActive(true);
         }
+
     }
 
     //  verifies if the all properties in the same colour group are equally developed
@@ -93,7 +87,7 @@ public class PropertyCard : Card
 
         return true;
     }
-    
+
     public void buildHouse()
     {
         if (!hasHotel && housesBuilt <= 3 && propertiesAreEquallyDeveloped())
@@ -114,4 +108,42 @@ public class PropertyCard : Card
         hasHotel = true;
         // TO-DO: animation for hotel being built
     }
+    
+    void showCard()
+    {
+        GameObject cardPanel = CardReader.cardPanel;
+        cardPanel.SetActive(true);
+
+        cardPanel.transform.GetChild(0).transform.GetComponent<Image>().color
+            = new Color32((byte)cardColor[0], (byte)cardColor[1], (byte)cardColor[2], 255);
+        cardPanel.transform.GetChild(0).transform.GetChild(0).GetComponent<Text>().text = cardName;
+        cardPanel.transform.GetChild(1).GetComponent<Text>().text = "RENT $" + rent[0].ToString();
+
+        cardPanel.transform.GetChild(3).GetComponent<Text>().text =
+            "$" + rent[1].ToString() + '\n' +
+            "$" + rent[2].ToString() + '\n' +
+            "$" + rent[3].ToString() + '\n' +
+            "$" + rent[4].ToString() + '\n';
+
+        cardPanel.transform.GetChild(4).GetComponent<Text>().text =
+            "With HOTEL $" + rent[5].ToString() + '\n' +
+            "Mortgage Value $" + mortgageValue.ToString() + '\n' +
+            "Houses cost $" + pricePerHouse.ToString() + " each\n" +
+            "Hotels, $" + pricePerHouse.ToString() + " plus 4 houses";
+    }
+
+    void hideCard(GameObject player)
+    {
+        CardReader.buyPropertyButton.SetActive(false);
+        CardReader.cancelButton.SetActive(false);
+        CardReader.cardPanel.SetActive(false);
+        player.GetComponent<Player>().endMovement();
+    }
+
+    void buyProperty(GameObject player)
+    {
+        player.GetComponent<Player>().buyProperty(this);
+        hideCard(player);
+    }
+    
 }

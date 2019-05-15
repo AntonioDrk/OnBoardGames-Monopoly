@@ -50,8 +50,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   idPlayer: 0
   indexPosition: 0
-  dice: {fileID: 0}
+  diceManager: {fileID: 0}
   gameManager: {fileID: 0}
+  money: 1500
+  stage: 0
+  ownedPropertyCards: []
 --- !u!95 &5493900274388599887
 Animator:
   serializedVersion: 3
