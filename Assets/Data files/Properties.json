@@ -49,9 +49,7 @@
             450
          ],
          "propertiesFromSameGroup":[  
-            {  
-               "id":"1"
-            }
+            1
          ]
       },
       {  
@@ -77,10 +75,8 @@
             550
          ],
          "propertiesFromSameGroup":[  
-            {  
-               "id1":"8",
-               "id2":"9"
-            }
+            8,
+			9
          ]
       },
       {  
@@ -106,10 +102,8 @@
             550
          ],
          "propertiesFromSameGroup":[  
-            {  
-               "id1":"7",
-               "id2":"8"
-            }
+            6,
+			9
          ]
       },
       {  
@@ -135,10 +129,8 @@
             600
          ],
          "propertiesFromSameGroup":[  
-            {  
-               "id1":"7",
-               "id2":"8"
-            }
+            6,
+			8
          ]
       },
       {  
@@ -164,17 +156,9 @@
             750
          ],
          "propertiesFromSameGroup":[  
-            {  
-               "id1":"13",
-               "id2":"14"
-            }
+            13,
+			14
          ]
-      },
-      {  
-         "id":"12",
-         "cardName":"Electric Company",
-         "priceValue":"150",
-         "mortgageValue":"75"
       },
       {  
          "id":"13",
@@ -199,10 +183,8 @@
             750
          ],
          "propertiesFromSameGroup":[  
-            {  
-               "id1":"11",
-               "id2":"14"
-            }
+            11,
+			14
          ]
       },
       {  
@@ -228,10 +210,8 @@
             900
          ],
          "propertiesFromSameGroup":[  
-            {  
-               "id1":"11",
-               "id2":"13"
-            }
+            11,
+			13
          ]
       },
       {  
@@ -257,10 +237,8 @@
             900
          ],
          "propertiesFromSameGroup":[  
-            {  
-               "id1":"18",
-               "id2":"19"
-            }
+            18,
+			19
          ]
       },
       {  
@@ -286,10 +264,8 @@
             950
          ],
          "propertiesFromSameGroup":[  
-            {  
-               "id1":"16",
-               "id2":"19"
-            }
+            16,
+			19
          ]
       },
       {  
@@ -315,10 +291,8 @@
             1000
          ],
          "propertiesFromSameGroup":[  
-            {  
-               "id1":"16",
-               "id2":"18"
-            }
+            16,
+			18
          ]
       },
       {  
@@ -344,10 +318,8 @@
             1050
          ],
          "propertiesFromSameGroup":[  
-            {  
-               "id1":"23",
-               "id2":"24"
-            }
+            23,
+			24
          ]
       },
       {  
@@ -373,10 +345,8 @@
             1050
          ],
          "propertiesFromSameGroup":[  
-            {  
-               "id1":"21",
-               "id2":"24"
-            }
+            21,
+			24
          ]
       },
       {  
@@ -402,10 +372,8 @@
             1100
          ],
          "propertiesFromSameGroup":[  
-            {  
-               "id1":"21",
-               "id2":"23"
-            }
+            21,
+			23
          ]
       },
       {  
@@ -431,10 +399,8 @@
             1150
          ],
          "propertiesFromSameGroup":[  
-            {  
-               "id1":"27",
-               "id2":"29"
-            }
+            27,
+			29
          ]
       },
       {  
@@ -460,17 +426,9 @@
             1150
          ],
          "propertiesFromSameGroup":[  
-            {  
-               "id1":"26",
-               "id2":"29"
-            }
+            26,
+			29
          ]
-      },
-      {  
-         "id":"28",
-         "cardName":"Water Works",
-         "priceValue":"150",
-         "mortgageValue":"75"
       },
       {  
          "id":"29",
@@ -495,10 +453,8 @@
             1200
          ],
          "propertiesFromSameGroup":[  
-            {  
-               "id1":"26",
-               "id2":"27"
-            }
+            26,
+			27
          ]
       },
       {  
@@ -524,10 +480,8 @@
             1275
          ],
          "propertiesFromSameGroup":[  
-            {  
-               "id1":"32",
-               "id2":"34"
-            }
+            32,
+			34
          ]
       },
       {  
@@ -553,10 +507,8 @@
             1275
          ],
          "propertiesFromSameGroup":[  
-            {  
-               "id1":"31",
-               "id2":"34"
-            }
+            31,
+			34
          ]
       },
       {  
@@ -582,10 +534,8 @@
             1400
          ],
          "propertiesFromSameGroup":[  
-            {  
-               "id1":"31",
-               "id2":"32"
-            }
+            31,
+			32
          ]
       },
       {  
@@ -611,9 +561,7 @@
             1500
          ],
          "propertiesFromSameGroup":[  
-            {  
-               "id":"39"
-            }
+            39
          ]
       },
       {  
@@ -639,9 +587,7 @@
             2000
          ],
          "propertiesFromSameGroup":[  
-            {  
-               "id":"37"
-            }
+            37
          ]
       }
    ]

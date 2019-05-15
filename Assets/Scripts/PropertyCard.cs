@@ -25,7 +25,6 @@ public class PropertyCard : Card
         Price = priceValue;
         Mortgage = mortgageValue;
         OwnerId = -1;
-        propertiesFromSameGroup = new int[cardsInGroup - 1];
     }
 
     // Start is called before the first frame update
