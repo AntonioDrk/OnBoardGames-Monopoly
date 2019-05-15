@@ -41,25 +41,27 @@ public class PropertyCard : Card
 
     public override string ToString()
     { 
-        return Id.ToString() + ": " + cardName.ToString() + " " +
-            priceValue.ToString() + " " + mortgageValue.ToString() + " " +
-            hasHotel.ToString() + " " +
-            housesBuilt.ToString();
+        return "Id: " + Id.ToString() + 
+               "\nName: " + cardName.ToString() + 
+               "\nPrice: " + priceValue.ToString() + 
+               "\nMortgage: " + mortgageValue.ToString() + 
+               "\nHotel: " + hasHotel.ToString() + 
+               "\nHouses: " + housesBuilt.ToString();
     }
 
-    public override void doAction(int playerId)
+    public override void doAction(GameObject player)
     {
         if (OwnerId > 0)
         {
-            if (OwnerId != playerId)
+            /*if (OwnerId != playerId)
             {
                 Debug.Log("Player must pay rent.");
-                /*if (hasHotel)
+                if (hasHotel)
                     Player.money -= rent[6];
                 else
-                    Player.money -= rent[housesBuilt];*/
+                    Player.money -= rent[housesBuilt];
                 //Debug.Log("Player + " Player.idPlayer + " paid $" + rent + " to player " + OwnerId);
-            }
+            }*/
         }
         else
         {

@@ -33,20 +33,22 @@ public class UtilityCard : Card
 
     public override string ToString()
     {
-        return Id.ToString() + ": " + cardName.ToString() + " " +
-            Price.ToString() + " " + Mortgage.ToString();
+        return "Id: " + Id.ToString() +
+               "\nName: " + cardName.ToString() +
+               "\nPrice: " + Price.ToString() +
+               "\nMortgage: " + Mortgage.ToString();
     }
 
-    public override void doAction(int playerId)
+    public override void doAction(GameObject player)
     {
         if (OwnerId > 0)
         {
-            if (OwnerId != playerId)
+            /*if (OwnerId != playerId)
             {
                 Debug.Log("Player must pay rent.");
                 //Player.money -= DiceScript.rolledNumber * rentMultiplier[Owner.utilitiesOwned];
                 //Debug.Log("Player + " Player.idPlayer + " paid $" + rent + " to player " + OwnerId);
-            }
+            }*/
         }
         else
         {

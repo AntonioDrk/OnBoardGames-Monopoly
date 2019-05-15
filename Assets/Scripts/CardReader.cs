@@ -56,8 +56,8 @@ public class CardReader : MonoBehaviour
             for (int i = 0; i < propertyCards.Length; i++)
                 propertyCards[i].PropertyCardConstructor();
 
-            for (int i = 0; i < propertyCards.Length; i++)
-                Debug.Log(propertyCards[i].ToString());
+            /*for (int i = 0; i < propertyCards.Length; i++)
+                Debug.Log(propertyCards[i].ToString());*/
         }
         else
         {
@@ -80,8 +80,8 @@ public class CardReader : MonoBehaviour
             for (int i = 0; i < railwayCards.Length; i++)
                 railwayCards[i].RailwayCardConstructor();
 
-            for (int i = 0; i < railwayCards.Length; i++)
-                Debug.Log(railwayCards[i].ToString());
+            /*for (int i = 0; i < railwayCards.Length; i++)
+                Debug.Log(railwayCards[i].ToString());*/
         }
         else
         {
@@ -103,8 +103,8 @@ public class CardReader : MonoBehaviour
             for (int i = 0; i < utilityCards.Length; i++)
                 utilityCards[i].UtilityCardConstructor();
 
-            for (int i = 0; i < utilityCards.Length; i++)
-                Debug.Log(utilityCards[i].ToString());
+            /*for (int i = 0; i < utilityCards.Length; i++)
+                Debug.Log(utilityCards[i].ToString());*/
         }
         else
         {
@@ -126,8 +126,8 @@ public class CardReader : MonoBehaviour
             for (int i = 0; i < chanceCards.Length; i++)
                 chanceCards[i].EventCardConstructor();
 
-            for (int i = 0; i < chanceCards.Length; i++)
-                Debug.Log(chanceCards[i].ToString());
+            /*for (int i = 0; i < chanceCards.Length; i++)
+                Debug.Log(chanceCards[i].ToString());*/
         }
         else
         {
@@ -149,8 +149,8 @@ public class CardReader : MonoBehaviour
             for (int i = 0; i < chestCards.Length; i++)
                 chestCards[i].EventCardConstructor();
 
-            for (int i = 0; i < chestCards.Length; i++)
-                Debug.Log(chestCards[i].ToString());
+            /*for (int i = 0; i < chestCards.Length; i++)
+                Debug.Log(chestCards[i].ToString());*/
         }
         else
         {
