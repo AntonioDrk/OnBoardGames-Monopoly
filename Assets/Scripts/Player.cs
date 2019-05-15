@@ -20,7 +20,7 @@ public class Player : NetworkBehaviour
     private Vector3 goPosition = new Vector3(2.5f, 0.125f, -6.49f);
     private Vector3 jailPosition = new Vector3(-11f, 0.125f, -6f);
     private Vector3 justVisitingPosition = new Vector3(-11.45854f, 0.125f, -6.49f);
-    private GameObject rollButton, endTurnButton, cardPanel;
+    private GameObject rollButton, endTurnButton, cardPanel, buyPropertyButton;
     private Text playerMoneyText, idText;
 
     [SyncVar] private Color plyColor;
@@ -29,12 +29,13 @@ public class Player : NetworkBehaviour
     [SyncVar]
     private int myMeshIndex;
 
-    [SerializeField][SyncVar]
-    private int money = 1500;
+    [SerializeField][SyncVar] private int money = 1500;
     private int doublesRolled = 0;
     private int roundsInJail = 0;
     private bool inJail = false;
     [SerializeField] private int stage = -1; // -1 = it's your turn, 0 = you rolled the dice
+
+    [SerializeField] private List<PropertyCard> ownedPropertyCards;
 
     void Start()
     {
@@ -48,6 +49,7 @@ public class Player : NetworkBehaviour
 
         if (isLocalPlayer)
         {
+            ownedPropertyCards = new List<PropertyCard>();
             rollButton = GameObject.Find("RollDice");
             rollButton.GetComponent<Button>().onClick.AddListener(RollTheDice);
             endTurnButton = GameObject.Find("EndTurn");
@@ -207,20 +209,29 @@ public class Player : NetworkBehaviour
 
     void endTurn()
     {
-        //rollButton.SetActive(false);
         int cardIndex = CardReader.getPropertyCardIndex(indexPosition);
         Debug.Log("Card index: " + cardIndex);
         if (cardIndex != -1) // if it's a property card
         {
             showCard(cardIndex);
         }
+        Debug.Log("Button active");
         endTurnButton.SetActive(true);
+    }
+
+    void buyProperty(int cardIndex)
+    {
+        ownedPropertyCards.Add(CardReader.propertyCards[cardIndex]);
     }
 
     void showCard(int cardIndex)
     {
         cardPanel.SetActive(true);
         Debug.Log(CardReader.propertyCards[cardIndex].ToString());
+
+        buyPropertyButton = GameObject.Find("BuyProperty");
+        buyPropertyButton.GetComponent<Button>().onClick.AddListener(() => buyProperty(cardIndex));
+
         cardPanel.transform.GetChild(0).transform.GetComponent<Image>().color
             = new Color32((byte)CardReader.propertyCards[cardIndex].cardColor[0], (byte)CardReader.propertyCards[cardIndex].cardColor[1], (byte)CardReader.propertyCards[cardIndex].cardColor[2], 255);
         cardPanel.transform.GetChild(0).transform.GetChild(0).GetComponent<Text>().text = CardReader.propertyCards[cardIndex].CardName;
