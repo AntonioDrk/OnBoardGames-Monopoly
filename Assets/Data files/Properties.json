@@ -2,6 +2,11 @@
    "Items":[  
       {  
          "id":1,
+         "cardColor":[  
+            171,
+			131,
+			112
+         ],
          "cardName":"Mediterranean Avenue",
          "priceValue":60,
          "mortgageValue":30,
@@ -23,6 +28,11 @@
       },
       {  
          "id":"3",
+         "cardColor":[  
+            171,
+			131,
+			112
+         ],
          "cardName":"Baltic Avenue",
          "priceValue":"60",
          "mortgageValue":"30",
@@ -46,6 +56,11 @@
       },
       {  
          "id":"6",
+         "cardColor":[  
+            189,
+			245,
+			255
+         ],
          "cardName":"Oriental Avenue",
          "priceValue":"100",
          "mortgageValue":"50",
@@ -70,6 +85,11 @@
       },
       {  
          "id":"8",
+         "cardColor":[  
+            189,
+			245,
+			255
+         ],
          "cardName":"Vermont Avenue",
          "priceValue":"100",
          "mortgageValue":"50",
@@ -94,6 +114,11 @@
       },
       {  
          "id":"9",
+         "cardColor":[  
+            189,
+			245,
+			255
+         ],
          "cardName":"Connecticut Avenue",
          "priceValue":"120",
          "mortgageValue":"60",
@@ -118,6 +143,11 @@
       },
       {  
          "id":"11",
+         "cardColor":[  
+            225,
+			114,
+			201
+         ],
          "cardName":"St. Charles Place",
          "priceValue":"140",
          "mortgageValue":"70",
@@ -148,6 +178,11 @@
       },
       {  
          "id":"13",
+         "cardColor":[  
+            225,
+			114,
+			201
+         ],
          "cardName":"States Avenue",
          "priceValue":"140",
          "mortgageValue":"70",
@@ -172,6 +207,11 @@
       },
       {  
          "id":"14",
+         "cardColor":[  
+            225,
+			114,
+			201
+         ],
          "cardName":"Virginia Avenue",
          "priceValue":"180",
          "mortgageValue":"80",
@@ -196,6 +236,11 @@
       },
       {  
          "id":"16",
+         "cardColor":[  
+            251,
+			191,
+			98
+         ],
          "cardName":"St. James Place",
          "priceValue":"180",
          "mortgageValue":"90",
@@ -220,6 +265,11 @@
       },
       {  
          "id":"18",
+         "cardColor":[  
+            251,
+			191,
+			98
+         ],
          "cardName":"Tennessee Avenue",
          "priceValue":"180",
          "mortgageValue":"90",
@@ -244,6 +294,11 @@
       },
       {  
          "id":"19",
+         "cardColor":[  
+            251,
+			191,
+			98
+         ],
          "cardName":"New York Avenue",
          "priceValue":"200",
          "mortgageValue":"100",
@@ -268,6 +323,11 @@
       },
       {  
          "id":"21",
+         "cardColor":[  
+            238,
+			87,
+			99
+         ],
          "cardName":"Kentucky Avenue",
          "priceValue":"220",
          "mortgageValue":"110",
@@ -292,6 +352,11 @@
       },
       {  
          "id":"23",
+         "cardColor":[  
+            238,
+			87,
+			99
+         ],
          "cardName":"Indiana Avenue",
          "priceValue":"220",
          "mortgageValue":"110",
@@ -316,6 +381,11 @@
       },
       {  
          "id":"24",
+         "cardColor":[  
+            238,
+			87,
+			99
+         ],
          "cardName":"Illinois Avenue",
          "priceValue":"240",
          "mortgageValue":"120",
@@ -340,6 +410,11 @@
       },
       {  
          "id":"26",
+         "cardColor":[  
+            255,
+			255,
+			73
+         ],
          "cardName":"Atlantic Avenue",
          "priceValue":"260",
          "mortgageValue":"130",
@@ -364,6 +439,11 @@
       },
       {  
          "id":"27",
+         "cardColor":[  
+            255,
+			255,
+			73
+         ],
          "cardName":"Ventnor Avenue",
          "priceValue":"260",
          "mortgageValue":"130",
@@ -394,6 +474,11 @@
       },
       {  
          "id":"29",
+         "cardColor":[  
+            255,
+			255,
+			73
+         ],
          "cardName":"Marvin Gardens",
          "priceValue":"280",
          "mortgageValue":"140",
@@ -418,6 +503,11 @@
       },
       {  
          "id":"31",
+         "cardColor":[  
+            83,
+			206,
+			145
+         ],
          "cardName":"Pacific Avenue",
          "priceValue":"300",
          "mortgageValue":"150",
@@ -442,6 +532,11 @@
       },
       {  
          "id":"32",
+         "cardColor":[  
+            83,
+			206,
+			145
+         ],
          "cardName":"North Carolina Avenue",
          "priceValue":"300",
          "mortgageValue":"150",
@@ -466,6 +561,11 @@
       },
       {  
          "id":"34",
+         "cardColor":[  
+            83,
+			206,
+			145
+         ],
          "cardName":"Pennsylvania Avenue",
          "priceValue":"240",
          "mortgageValue":"120",
@@ -490,6 +590,11 @@
       },
       {  
          "id":"37",
+         "cardColor":[  
+            65,
+			159,
+			233
+         ],
          "cardName":"Park Place",
          "priceValue":"350",
          "mortgageValue":"175",
@@ -513,6 +618,11 @@
       },
       {  
          "id":"39",
+         "cardColor":[  
+            65,
+			159,
+			233
+         ],
          "cardName":"Boardwalk",
          "priceValue":"400",
          "mortgageValue":"200",

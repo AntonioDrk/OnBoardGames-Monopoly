@@ -7,6 +7,7 @@ using UnityEngine;
 public class PropertyCard : Card
 {
     public int id;
+    public int[] cardColor = new int[3];
     public string cardName;
     public int priceValue;
     public int mortgageValue;
