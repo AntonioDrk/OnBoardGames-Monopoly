@@ -26,6 +26,7 @@ public class GameManager : NetworkBehaviour
     [SyncVar] public int playerTurn = 0; 
     [SyncVar] public int connectedPlayers = 0;
     public List<GameObject> players;
+    public SyncListInt propertyCardsOwners;
 
     [SerializeField]
     private List<Mesh> meshes; // Set them at startup in the editor!!
@@ -36,7 +37,7 @@ public class GameManager : NetworkBehaviour
     { 
         
         mainCamera = Camera.main;
-
+        
         connectedPlayersText = GameObject.Find("connectedPlayersText").GetComponent<Text>();
         playerTurnText = GameObject.Find("playerTurnText").GetComponent<Text>(); 
         playerTurnText.text = "Turn: Player " + playerTurn;
@@ -55,8 +56,11 @@ public class GameManager : NetworkBehaviour
         {
             meshesIndexes.Add(i);
         }
+
+        for (int i = 0; i < 22; i++)
+            propertyCardsOwners.Add(-1);
     } 
-     
+
     void Update()
     {
         playerTurnText.text = "Turn: Player " + playerTurn;
@@ -124,6 +128,19 @@ public class GameManager : NetworkBehaviour
 
         playerTurn = (playerTurn + 1) % connectedPlayers;
         Debug.Log("playerTurn: " + playerTurn);
+    }
+     
+    public void CmdChangeOwner(int cardIndex, int newOwnerId)
+    { 
+        if (!isServer) return; // ?
+        propertyCardsOwners[cardIndex] = newOwnerId;
+        Debug.Log("Owner changed for " + cardIndex + " : " + newOwnerId);
+    }
+        
+    public void CmdGiveMoneyToPlayer(int playerId, int amount)
+    {
+        if (!isServer) return; // ?
+        players[playerId].GetComponent<Player>().CmdAddMoney(amount);
     }
 
     [Command]

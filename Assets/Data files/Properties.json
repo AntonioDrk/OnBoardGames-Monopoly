@@ -2,6 +2,7 @@
    "Items":[  
       {  
          "id":1,
+		 "cardIndex":0,
          "cardColor":[  
             171,
 			131,
@@ -23,11 +24,12 @@
             250
          ],
          "propertiesFromSameGroup":[  
-            3
+            1
          ]
       },
       {  
          "id":"3",
+		 "cardIndex":1,
          "cardColor":[  
             171,
 			131,
@@ -49,11 +51,12 @@
             450
          ],
          "propertiesFromSameGroup":[  
-            1
+            0
          ]
       },
       {  
          "id":"6",
+		 "cardIndex":2,
          "cardColor":[  
             189,
 			245,
@@ -75,12 +78,13 @@
             550
          ],
          "propertiesFromSameGroup":[  
-            8,
-			9
+            3,
+			4
          ]
       },
       {  
          "id":"8",
+		 "cardIndex":3,
          "cardColor":[  
             189,
 			245,
@@ -102,12 +106,13 @@
             550
          ],
          "propertiesFromSameGroup":[  
-            6,
-			9
+            2,
+			4
          ]
       },
       {  
          "id":"9",
+		 "cardIndex":4,
          "cardColor":[  
             189,
 			245,
@@ -129,12 +134,13 @@
             600
          ],
          "propertiesFromSameGroup":[  
-            6,
-			8
+            2,
+			3
          ]
       },
       {  
          "id":"11",
+		 "cardIndex":5,
          "cardColor":[  
             225,
 			114,
@@ -156,12 +162,13 @@
             750
          ],
          "propertiesFromSameGroup":[  
-            13,
-			14
+            6,
+			7
          ]
       },
       {  
          "id":"13",
+		 "cardIndex":6,
          "cardColor":[  
             225,
 			114,
@@ -183,12 +190,13 @@
             750
          ],
          "propertiesFromSameGroup":[  
-            11,
-			14
+            5,
+			7
          ]
       },
       {  
          "id":"14",
+		 "cardIndex":7,
          "cardColor":[  
             225,
 			114,
@@ -210,12 +218,13 @@
             900
          ],
          "propertiesFromSameGroup":[  
-            11,
-			13
+            5,
+			6
          ]
       },
       {  
          "id":"16",
+		 "cardIndex":8,
          "cardColor":[  
             251,
 			191,
@@ -237,12 +246,13 @@
             900
          ],
          "propertiesFromSameGroup":[  
-            18,
-			19
+            9,
+			10
          ]
       },
       {  
          "id":"18",
+		 "cardIndex":9,
          "cardColor":[  
             251,
 			191,
@@ -264,12 +274,13 @@
             950
          ],
          "propertiesFromSameGroup":[  
-            16,
-			19
+            8,
+			10
          ]
       },
       {  
          "id":"19",
+		 "cardIndex":10,
          "cardColor":[  
             251,
 			191,
@@ -291,12 +302,13 @@
             1000
          ],
          "propertiesFromSameGroup":[  
-            16,
-			18
+            8,
+			9
          ]
       },
       {  
          "id":"21",
+		 "cardIndex":11,
          "cardColor":[  
             238,
 			87,
@@ -318,12 +330,13 @@
             1050
          ],
          "propertiesFromSameGroup":[  
-            23,
-			24
+            12,
+			13
          ]
       },
       {  
          "id":"23",
+		 "cardIndex":12,
          "cardColor":[  
             238,
 			87,
@@ -345,12 +358,13 @@
             1050
          ],
          "propertiesFromSameGroup":[  
-            21,
-			24
+            11,
+			13
          ]
       },
       {  
          "id":"24",
+		 "cardIndex":13,
          "cardColor":[  
             238,
 			87,
@@ -372,12 +386,13 @@
             1100
          ],
          "propertiesFromSameGroup":[  
-            21,
-			23
+            11,
+			12
          ]
       },
       {  
          "id":"26",
+		 "cardIndex":14,
          "cardColor":[  
             255,
 			255,
@@ -399,12 +414,13 @@
             1150
          ],
          "propertiesFromSameGroup":[  
-            27,
-			29
+            15,
+			16
          ]
       },
       {  
          "id":"27",
+		 "cardIndex":15,
          "cardColor":[  
             255,
 			255,
@@ -426,12 +442,13 @@
             1150
          ],
          "propertiesFromSameGroup":[  
-            26,
-			29
+            14,
+			16
          ]
       },
       {  
          "id":"29",
+		 "cardIndex":16,
          "cardColor":[  
             255,
 			255,
@@ -453,12 +470,13 @@
             1200
          ],
          "propertiesFromSameGroup":[  
-            26,
-			27
+            14,
+			15
          ]
       },
       {  
          "id":"31",
+		 "cardIndex":17,
          "cardColor":[  
             83,
 			206,
@@ -480,12 +498,13 @@
             1275
          ],
          "propertiesFromSameGroup":[  
-            32,
-			34
+            18,
+			19
          ]
       },
       {  
          "id":"32",
+		 "cardIndex":18,
          "cardColor":[  
             83,
 			206,
@@ -507,12 +526,13 @@
             1275
          ],
          "propertiesFromSameGroup":[  
-            31,
-			34
+            17,
+			19
          ]
       },
       {  
          "id":"34",
+		 "cardIndex":19,
          "cardColor":[  
             83,
 			206,
@@ -534,12 +554,13 @@
             1400
          ],
          "propertiesFromSameGroup":[  
-            31,
-			32
+            17,
+			18
          ]
       },
       {  
          "id":"37",
+		 "cardIndex":20,
          "cardColor":[  
             65,
 			159,
@@ -561,11 +582,12 @@
             1500
          ],
          "propertiesFromSameGroup":[  
-            39
+            21
          ]
       },
       {  
          "id":"39",
+		 "cardIndex":21,
          "cardColor":[  
             65,
 			159,
@@ -587,7 +609,7 @@
             2000
          ],
          "propertiesFromSameGroup":[  
-            37
+            20
          ]
       }
    ]

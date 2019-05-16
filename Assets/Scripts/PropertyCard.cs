@@ -8,17 +8,18 @@ using UnityEngine.Networking;
 [Serializable]
 public class PropertyCard : Card
 {
-    [SyncVar] public int id;
-    [SyncVar] public int[] cardColor = new int[3];
-    [SyncVar] public string cardName;
-    [SyncVar] public int priceValue;
-    [SyncVar] public int mortgageValue;
-    [SyncVar] public int pricePerHouse;
-    [SyncVar] private int housesBuilt = 0;
-    [SyncVar] public int cardsInGroup = 2;
-    [SyncVar] private bool hasHotel = false;
-    [SyncVar] public int[] rent = new int[6];
-    [SyncVar] public int[] propertiesFromSameGroup;
+    public int id;
+    public int cardIndex;
+    public int[] cardColor = new int[3];
+    public string cardName;
+    public int priceValue;
+    public int mortgageValue;
+    public int pricePerHouse;
+    private int housesBuilt = 0;
+    public int cardsInGroup = 2;
+    private bool hasHotel = false;
+    public int[] rent = new int[6];
+    public int[] propertiesFromSameGroup;
 
     public void PropertyCardConstructor()
     {
@@ -26,7 +27,7 @@ public class PropertyCard : Card
         CardName = cardName;
         Price = priceValue;
         Mortgage = mortgageValue;
-        OwnerId = -1;
+        cardIndex--;
     }
 
     public override string ToString()
@@ -41,25 +42,23 @@ public class PropertyCard : Card
 
     public override void doAction(GameObject player)
     {
+        int ownerId = GameObject.Find("GameManager").GetComponent<GameManager>().propertyCardsOwners[cardIndex];
         showCard();
-        Debug.Log("Owner's id for " + cardName + " : " + OwnerId);
-        if (OwnerId != -1)
+        Debug.Log("Owner's id for " + cardName + " : " + ownerId);
+        if (ownerId != -1)
         {
             Player playerScript = player.GetComponent<Player>();
-            if (OwnerId == playerScript.idPlayer)
+            if (ownerId == playerScript.idPlayer)
             {
                 CardReader.closeButton.SetActive(true);
                 CardReader.closeButton.GetComponent<Button>().onClick.AddListener(() => closeCard(player));
             }
-            /*if (OwnerId != playerId)
-            {
-                Debug.Log("Player must pay rent.");
-                if (hasHotel)
-                    Player.money -= rent[6];
-                else
-                    Player.money -= rent[housesBuilt];
-                //Debug.Log("Player + " Player.idPlayer + " paid $" + rent + " to player " + OwnerId);
-            }*/
+            else
+            { 
+                Debug.Log("Player must pay rent to player " + ownerId);
+                CardReader.payRentButton.SetActive(true);
+                CardReader.payRentButton.GetComponent<Button>().onClick.AddListener(() => payRent(player,playerScript, ownerId));
+            }
         }
         else
         {
@@ -70,6 +69,19 @@ public class PropertyCard : Card
             CardReader.cancelButton.GetComponent<Button>().onClick.AddListener(() => hideCard(player));
         }
 
+    }
+
+    //  verifies if the player has all properties in the same colour group but no houses on the property he landed on
+    bool hasAllProperties(int ownerId)
+    {
+        if (housesBuilt != 0) return false;
+        for(int index=0; index < propertiesFromSameGroup.Length; index++)
+        {
+            if (GameObject.Find("GameManager").GetComponent<GameManager>().propertyCardsOwners[propertiesFromSameGroup[index]] != ownerId)
+                return false;
+        }
+        Debug.Log("Player " + ownerId + " has all properies.");
+        return true;
     }
 
     //  verifies if the all properties in the same colour group are equally developed
@@ -177,11 +189,43 @@ public class PropertyCard : Card
     void buyProperty(GameObject player)
     {
         Player playerScript = player.GetComponent<Player>();
-        OwnerId = playerScript.idPlayer;
-        //Debug.Log("Owner's id for " + cardName + " : " + OwnerId);
+        CmdChangeOwner(playerScript.idPlayer); 
         playerScript.CmdTakeMoney(priceValue);
         playerScript.buyProperty(this);
         hideCard(player);
     }
-    
+
+    [Command]
+    void CmdChangeOwner(int newOwnerId)
+    {
+        GameObject.Find("GameManager").GetComponent<GameManager>().CmdChangeOwner(cardIndex, newOwnerId);
+    }
+
+    [Command]
+    void CmdGiveMoneyToPlayer(int ownerId,int amountPaid)
+    { 
+        GameObject.Find("GameManager").GetComponent<GameManager>().CmdGiveMoneyToPlayer(ownerId, amountPaid); // ?
+    }
+
+    // player pays rent to player[ownerId]
+    void payRent(GameObject player, Player playerScript, int ownerId) 
+    { 
+        CardReader.payRentButton.GetComponent<Button>().onClick.RemoveAllListeners();
+        CardReader.payRentButton.SetActive(false);
+
+        int amountPaid = 0;
+        if (hasHotel)
+            amountPaid = rent[5];
+        else if (hasAllProperties(ownerId)) //daca are toate din color group si fara case=> rent[0]x2
+            amountPaid = 2 * rent[0];
+        else
+            amountPaid = rent[housesBuilt];
+        
+        playerScript.CmdTakeMoney(amountPaid);
+        CmdGiveMoneyToPlayer(ownerId, amountPaid);
+
+        CardReader.cardPanel.SetActive(false);
+        player.GetComponent<Player>().endMovement();
+    }
+
 }

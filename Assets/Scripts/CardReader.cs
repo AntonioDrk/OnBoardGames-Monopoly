@@ -12,22 +12,22 @@ public class CardReader : MonoBehaviour
     string chanceFile = "Data files/Chance.json";
     string chestFile = "Data files/CommunityChest.json";
 
-    static public PropertyCard[] propertyCards;
+    static public PropertyCard[] propertyCards;/*
     static public RailwayCard[] railwayCards;
     static public UtilityCard[] utilityCards;
     static public EventCard[] chanceCards;
-    static public EventCard[] chestCards;
+    static public EventCard[] chestCards;*/
 
     static public GameObject cardPanel, buyPropertyButton, cancelButton, payRentButton, closeButton;
 
     // Start is called before the first frame update
     void Start()
     {
-        LoadPropertyCards(propertiesFile);
+        LoadPropertyCards(propertiesFile);/*
         LoadRailwayCards(railroadsFile);
         LoadUtilityCards(utilitiesFile);
         LoadChanceCards(chanceFile);
-        LoadChestCards(chestFile);
+        LoadChestCards(chestFile);*/
 
         cardPanel = GameObject.Find("Card");
         buyPropertyButton = GameObject.Find("BuyProperty");
@@ -36,6 +36,8 @@ public class CardReader : MonoBehaviour
         cancelButton.SetActive(false);
         closeButton = GameObject.Find("Close");
         closeButton.SetActive(false);
+        payRentButton = GameObject.Find("PayRent");
+        payRentButton.SetActive(false);
         cardPanel.SetActive(false);
     }
 
@@ -76,7 +78,7 @@ public class CardReader : MonoBehaviour
         }
 
     }
-
+    /*
     public void LoadRailwayCards(string fileName)
     {
         string filePath = Path.Combine(Application.dataPath, fileName);
@@ -91,8 +93,8 @@ public class CardReader : MonoBehaviour
             for (int i = 0; i < railwayCards.Length; i++)
                 railwayCards[i].RailwayCardConstructor();
 
-            /*for (int i = 0; i < railwayCards.Length; i++)
-                Debug.Log(railwayCards[i].ToString());*/
+            for (int i = 0; i < railwayCards.Length; i++)
+                Debug.Log(railwayCards[i].ToString());
         }
         else
         {
@@ -114,8 +116,8 @@ public class CardReader : MonoBehaviour
             for (int i = 0; i < utilityCards.Length; i++)
                 utilityCards[i].UtilityCardConstructor();
 
-            /*for (int i = 0; i < utilityCards.Length; i++)
-                Debug.Log(utilityCards[i].ToString());*/
+            for (int i = 0; i < utilityCards.Length; i++)
+                Debug.Log(utilityCards[i].ToString());
         }
         else
         {
@@ -137,8 +139,8 @@ public class CardReader : MonoBehaviour
             for (int i = 0; i < chanceCards.Length; i++)
                 chanceCards[i].EventCardConstructor();
 
-            /*for (int i = 0; i < chanceCards.Length; i++)
-                Debug.Log(chanceCards[i].ToString());*/
+            for (int i = 0; i < chanceCards.Length; i++)
+                Debug.Log(chanceCards[i].ToString());
         }
         else
         {
@@ -160,12 +162,12 @@ public class CardReader : MonoBehaviour
             for (int i = 0; i < chestCards.Length; i++)
                 chestCards[i].EventCardConstructor();
 
-            /*for (int i = 0; i < chestCards.Length; i++)
-                Debug.Log(chestCards[i].ToString());*/
+            for (int i = 0; i < chestCards.Length; i++)
+                Debug.Log(chestCards[i].ToString());
         }
         else
         {
             Debug.LogError("Cannot load file:" + fileName);
         }
-    }
+    }*/
 }
