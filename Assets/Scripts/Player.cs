@@ -21,7 +21,8 @@ public class Player : NetworkBehaviour
     private Vector3 goPosition = new Vector3(2.5f, 0.125f, -6.49f);
     private Vector3 jailPosition = new Vector3(-11f, 0.125f, -6f);
     private Vector3 justVisitingPosition = new Vector3(-11.45854f, 0.125f, -6.49f);
-    private GameObject rollButton, endTurnButton;
+    private GameObject rollButton, endTurnButton, ownedPropertiesPanel;
+    public GameObject ownedPropertyPanelPrefab;
     private Text playerMoneyText, idText;
 
     [SyncVar] private Color plyColor;
@@ -49,6 +50,7 @@ public class Player : NetworkBehaviour
 
         if (isLocalPlayer)
         {
+            ownedPropertiesPanel = GameObject.Find("OwnedProprietiesPanel");
             ownedPropertyCards = new List<PropertyCard>();
             rollButton = GameObject.Find("RollDice");
             rollButton.GetComponent<Button>().onClick.AddListener(RollTheDice);
@@ -198,6 +200,7 @@ public class Player : NetworkBehaviour
     public int getMyMeshIndex() { return myMeshIndex; }
     public void setMyMeshIndex(int value) { myMeshIndex = value; }
     public int getIndexPosition() { return indexPosition; }
+    public int getStage() { return stage;  }
 
     public void endMovement()
     {
@@ -224,7 +227,23 @@ public class Player : NetworkBehaviour
 
     public void buyProperty(PropertyCard propertyCard)
     {
+        Debug.Log("Bought " + propertyCard.cardName);
+
+        int numberOfOwnedCards = ownedPropertyCards.Count;
+        Debug.Log(numberOfOwnedCards);
+
         ownedPropertyCards.Add(propertyCard);
+        
+        GameObject ownedPropertyPanel = Instantiate(ownedPropertyPanelPrefab);
+        ownedPropertyPanel.transform.GetComponent<Image>().color
+            = new Color32((byte)propertyCard.cardColor[0], (byte)propertyCard.cardColor[1], (byte)propertyCard.cardColor[2], 255);
+        ownedPropertyPanel.transform.SetParent(ownedPropertiesPanel.transform);
+        ownedPropertyPanel.transform.position = new Vector3(0, 0, 0);
+        ownedPropertyPanel.GetComponent<RectTransform>().offsetMax = new Vector2(0, -26 * numberOfOwnedCards);
+        ownedPropertyPanel.GetComponent<RectTransform>().offsetMin = new Vector2(0, 363 - 25 * numberOfOwnedCards);
+        ownedPropertyPanel.GetComponent<RectTransform>().localScale = new Vector3(1,1,1);
+        ownedPropertyPanel.transform.GetChild(0).GetComponent<Text>().text = propertyCard.cardName;
+        ownedPropertyPanel.GetComponent<Button>().onClick.AddListener(() => propertyCard.showOwnedCard(this.gameObject));
     }
 
     // This function is to make the link between the button on click event and sending a command
@@ -252,6 +271,7 @@ public class Player : NetworkBehaviour
         inJail = true;
         transform.position = jailPosition;
         transform.eulerAngles = new Vector3(0, 90, 0);
+        CmdSetDiceInactive();
         endTurn();
     }
 
@@ -278,6 +298,7 @@ public class Player : NetworkBehaviour
     [Command]
     public void CmdTakeMoney(int amount)
     {
+        Debug.Log("Took $" + amount);
         money -= amount;
     }
 

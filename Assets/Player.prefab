@@ -52,6 +52,8 @@ MonoBehaviour:
   indexPosition: 0
   diceManager: {fileID: 0}
   gameManager: {fileID: 0}
+  ownedPropertyPanelPrefab: {fileID: 3958510613029917670, guid: a9de705e55292124f9ecd76ebbe07d4d,
+    type: 3}
   money: 1500
   stage: 0
   ownedPropertyCards: []
