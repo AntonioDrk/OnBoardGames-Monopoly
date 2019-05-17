@@ -26,8 +26,6 @@ public class Player : NetworkBehaviour
     private Text playerMoneyText, idText;
 
     [SyncVar] private Color plyColor;
-    [SyncVar] public int chestJailCardOwner = -1;
-    [SyncVar] public int chanceJailCardOwner = -1;
 
     private Renderer renderer;
     [SyncVar]
@@ -184,33 +182,14 @@ public class Player : NetworkBehaviour
         else
         {
             stage = 2;
-            if (indexPosition == 2 || indexPosition == 17 || indexPosition== 33) // Comunity Chest
+            int cardIndex = CardReader.getPropertyCardIndex(indexPosition);
+            Debug.Log("Card index: " + cardIndex);
+            if (cardIndex != -1) // if it's a property card
             {
-                int eventNr = 0;
-                if(chestJailCardOwner == -1)
-                    eventNr = Random.Range(0, 14);
-                else
-                    eventNr = Random.Range(0, 13);
+                CardReader.propertyCards[cardIndex].doAction(this.gameObject);
             }
-            else if(indexPosition == 7 || indexPosition == 22 || indexPosition == 36) //Chance
-            {
-                int eventNr = 0;
-                if (chanceJailCardOwner == -1)
-                    eventNr = Random.Range(0, 14);
-                else
-                    eventNr = Random.Range(0, 13);
-            }
-            else 
-            {
-                int cardIndex = CardReader.getPropertyCardIndex(indexPosition);
-                Debug.Log("Card index: " + cardIndex);
-                if (cardIndex != -1) // if it's a property card
-                {
-                    CardReader.propertyCards[cardIndex].doAction(this.gameObject);
-                }
-                else
-                    endMovement();
-            }
+            else
+                endMovement();
         }
 
     }
