@@ -17,7 +17,6 @@ public class EventCard : Card
         CardName = cardName;
         Price = 0;
         Mortgage = 0;
-        OwnerId = -1;
     }
 
     // Start is called before the first frame update
@@ -43,73 +42,103 @@ public class EventCard : Card
     {
         if (cardName.Equals("Chance"))
         {
-            switch(id)
+            switch (id)
             {
-                case 1: takeMoneyFromPlayer(player, 15);
+                case 0:
+                    player.GetComponent<Player>().moveSpaces(-3);
                     break;
-                case 2: movePlayerToIndex(player, 0);
+                case 1:
+                    takeMoneyFromPlayer(player, 15);
                     break;
-                case 3: // case si hoteluri
+                case 2:
+                    movePlayerToIndex(player, 0);
                     break;
-                case 4: movePlayerToIndex(player, 24);
+                case 3:
+                    Debug.Log(description);// case si hoteluri
                     break;
-                case 5: // pay each player
+                case 4:
+                    movePlayerToIndex(player, 24);
                     break;
-                case 6: movePlayerToRailroad(player);
+                case 5:
+                    Debug.Log(description); // pay each player
                     break;
-                case 7: movePlayerToIndex(player, 5);
+                case 6:
+                    movePlayerToRailroad(player);
                     break;
-                case 8: giveMoneyToPlayer(player, 150);
+                case 7:
+                    movePlayerToIndex(player, 5);
                     break;
-                case 9: //get out of jail
+                case 8:
+                    giveMoneyToPlayer(player, 150);
                     break;
-                case 10: giveMoneyToPlayer(player, 50);
+                case 9:
+                    giveMoneyToPlayer(player, 50);
                     break;
-                case 11: movePlayerToIndex(player, 11);
+                case 10:
+                    movePlayerToIndex(player, 11);
                     break;
-                case 12: movePlayerToRailroad(player);
+                case 11:
+                    movePlayerToRailroad(player);
                     break;
-                case 13: sendPlayerToJail(player);
+                case 12:
+                    sendPlayerToJail(player);
                     break;
-                case 14: movePlayerToIndex(player, 39);
+                case 13:
+                    movePlayerToIndex(player, 39);
                     break;
-                case 15: player.GetComponent<Player>().moveSpaces(-3);
+                case 14:
+                    Debug.Log(description); //get out of jail
                     break;
             }
         }
-        else if(cardName.Equals("Community Chest"))
+        else if (cardName.Equals("Community Chest"))
         {
-            switch(id)
+            switch (id)
             {
-                case 1: //collect from every player
+                case 0:
+                    giveMoneyToPlayer(player, 20);
                     break;
-                case 2: takeMoneyFromPlayer(player, 100);
+                case 1:
+                    Debug.Log(description); //collect from every player
                     break;
-                case 3: giveMoneyToPlayer(player, 45);
+                case 2:
+                    takeMoneyFromPlayer(player, 100);
                     break;
-                case 4: giveMoneyToPlayer(player, 100);
+                case 3:
+                    giveMoneyToPlayer(player, 45);
                     break;
-                case 5: giveMoneyToPlayer(player, 25);
+                case 4:
+                    giveMoneyToPlayer(player, 100);
                     break;
-                case 6: //case si hoteluri
+                case 5:
+                    giveMoneyToPlayer(player, 25);
                     break;
-                case 7: takeMoneyFromPlayer(player, 50);
+                case 6:
+                    Debug.Log(description); //case si hoteluri
                     break;
-                case 8: giveMoneyToPlayer(player, 100);
+                case 7:
+                    takeMoneyFromPlayer(player, 50);
                     break;
-                case 9: giveMoneyToPlayer(player, 10);
+                case 8:
+                    giveMoneyToPlayer(player, 100);
                     break;
-                case 10: giveMoneyToPlayer(player, 200);
+                case 9:
+                    giveMoneyToPlayer(player, 10);
                     break;
-                case 11: movePlayerToIndex(player, 0);
+                case 10:
+                    giveMoneyToPlayer(player, 200);
                     break;
-                case 12: //get out of jail
+                case 11:
+                    movePlayerToIndex(player, 0);
                     break;
-                case 13: sendPlayerToJail(player);
+                case 12:
+                    sendPlayerToJail(player);
                     break;
-                case 14: giveMoneyToPlayer(player, 100);
+                case 13:
+                    giveMoneyToPlayer(player, 100);
                     break;
-                case 15: giveMoneyToPlayer(player, 20);
+                case 14:
+                    Debug.Log(description); //get out of jail
                     break;
             }
         }

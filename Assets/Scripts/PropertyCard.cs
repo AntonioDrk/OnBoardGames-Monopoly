@@ -27,7 +27,6 @@ public class PropertyCard : Card
         CardName = cardName;
         Price = priceValue;
         Mortgage = mortgageValue;
-        cardIndex--;
     }
 
     public override string ToString()

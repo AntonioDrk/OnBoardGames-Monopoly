@@ -26,6 +26,8 @@ public class Player : NetworkBehaviour
     private Text playerMoneyText, idText;
 
     [SyncVar] private Color plyColor;
+    [SyncVar] public int chestJailCardOwner;
+    [SyncVar] public int chanceJailCardOwner;
 
     private Renderer renderer;
     [SyncVar]
@@ -107,16 +109,21 @@ public class Player : NetworkBehaviour
                 if (diceScript.isDouble || roundsInJail == 3)
                 {
                     inJail = false;
+                    if (!diceScript.isDouble)
+                        CmdAddMoney(-50);
+                    else
+                        CmdAddMoney(-25);
                     roundsInJail = 0;
                     doublesRolled = 0;
                     diceScript.isDouble = false;
                     transform.position = justVisitingPosition;
-                    if (!diceScript.isDouble)
-                        CmdAddMoney(-50);
                 }
 
                 if (roundsInJail < 3 && inJail)
+                {
+                    CmdSetDiceInactive();
                     endTurn();
+                }
             }
 
             if (doublesRolled == 3)
@@ -182,14 +189,38 @@ public class Player : NetworkBehaviour
         else
         {
             stage = 2;
-            int cardIndex = CardReader.getPropertyCardIndex(indexPosition);
-            Debug.Log("Card index: " + cardIndex);
-            if (cardIndex != -1) // if it's a property card
+            CmdSetDiceInactive();
+            if (indexPosition == 2 || indexPosition == 17 || indexPosition == 33) // Comunity Chest
             {
-                CardReader.propertyCards[cardIndex].doAction(this.gameObject);
+                int eventNr = 0;
+                if (chestJailCardOwner == -1)
+                    eventNr = Random.Range(0, 14);
+                else
+                    eventNr = Random.Range(0, 13);
+
+                endMovement();
+            }
+            else if (indexPosition == 7 || indexPosition == 22 || indexPosition == 36) //Chance
+            {
+                int eventNr = 0;
+                if (chanceJailCardOwner == -1)
+                    eventNr = Random.Range(0, 14);
+                else
+                    eventNr = Random.Range(0, 13);
+
+                endMovement();
             }
             else
-                endMovement();
+            {
+                int cardIndex = CardReader.getPropertyCardIndex(indexPosition);
+                Debug.Log("Card index: " + cardIndex);
+                if (cardIndex != -1) // if it's a property card
+                {
+                    CardReader.propertyCards[cardIndex].doAction(this.gameObject);
+                }
+                else
+                    endMovement();
+            }
         }
 
     }
