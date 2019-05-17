@@ -37,7 +37,7 @@ public class Player : NetworkBehaviour
     private int doublesRolled = 0;
     private int roundsInJail = 0;
     private bool inJail = false;
-    [SerializeField] private int stage = 0; //  
+    [SerializeField] private int stage = 0;
 
     [SerializeField] private List<PropertyCard> ownedPropertyCards;
 
@@ -222,10 +222,11 @@ public class Player : NetworkBehaviour
     public void setMyMeshIndex(int value) { myMeshIndex = value; }
     public int getIndexPosition() { return indexPosition; }
     public int getStage() { return stage;  }
+    public int getMoney() { return money; }
 
     public void endMovement()
     {
-        CmdSetDiceInactive();
+        //CmdSetDiceInactive();
         if (diceScript.isDouble)
         {
             stage = 0;
@@ -251,7 +252,7 @@ public class Player : NetworkBehaviour
         Debug.Log("Bought " + propertyCard.cardName);
 
         int numberOfOwnedCards = ownedPropertyCards.Count;
-        Debug.Log(numberOfOwnedCards);
+        //Debug.Log("Nr of owned cards: " + numberOfOwnedCards);
 
         ownedPropertyCards.Add(propertyCard);
         
@@ -308,7 +309,7 @@ public class Player : NetworkBehaviour
     {
         transform.GetChild(0).GetComponent<MeshFilter>().mesh = gameManagerScript.getMeshes()[newMeshIndex];
         myMeshIndex = newMeshIndex;
-    }
+    } 
 
     [Command]
     public void CmdAddMoney(int amount)
