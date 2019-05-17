@@ -189,7 +189,8 @@ public class Player : NetworkBehaviour
         else
         {
             stage = 2;
-            CmdSetDiceInactive();
+            if(diceManager.transform.childCount > 0)
+                CmdSetDiceInactive();
             if (indexPosition == 2 || indexPosition == 17 || indexPosition == 33) // Comunity Chest
             {
                 int eventNr = 0;
@@ -197,6 +198,11 @@ public class Player : NetworkBehaviour
                     eventNr = Random.Range(0, 14);
                 else
                     eventNr = Random.Range(0, 13);
+
+                Debug.Log("Event nr: " + eventNr + " triggered.");
+                Debug.Log(CardReader.chestCards[eventNr].ToString());
+                CardReader.closeEventButton.SetActive(true);
+                CardReader.closeEventButton.GetComponent<Button>().onClick.AddListener(() => CardReader.chestCards[eventNr].doAction(this.gameObject));
 
                 endMovement();
             }
@@ -208,6 +214,11 @@ public class Player : NetworkBehaviour
                 else
                     eventNr = Random.Range(0, 13);
 
+                Debug.Log("Event nr: " + eventNr + " triggered.");
+                Debug.Log(CardReader.chanceCards[eventNr].ToString());
+                CardReader.closeEventButton.SetActive(true);
+                CardReader.closeEventButton.GetComponent<Button>().onClick.AddListener(() => CardReader.chanceCards[eventNr].doAction(this.gameObject));
+                
                 endMovement();
             }
             else
@@ -277,7 +288,7 @@ public class Player : NetworkBehaviour
         ownedPropertyPanel.transform.GetChild(0).GetComponent<Text>().text = propertyCard.cardName;
         ownedPropertyPanel.GetComponent<Button>().onClick.AddListener(() => propertyCard.showOwnedCard(this.gameObject));
     }
-
+    
     // This function is to make the link between the button on click event and sending a command
     void RollTheDice()
     {
@@ -303,7 +314,10 @@ public class Player : NetworkBehaviour
         inJail = true;
         transform.position = jailPosition;
         transform.eulerAngles = new Vector3(0, 90, 0);
-        CmdSetDiceInactive();
+
+        if (diceManager.transform.childCount > 0)
+            CmdSetDiceInactive();
+
         endTurn();
     }
 

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System;
 using UnityEngine;
+using UnityEngine.UI;
 
 [Serializable]
 public class EventCard : Card
@@ -17,6 +18,7 @@ public class EventCard : Card
         CardName = cardName;
         Price = 0;
         Mortgage = 0;
+        //Debug.Log("Event id: " + id);
     }
 
     // Start is called before the first frame update
@@ -33,19 +35,20 @@ public class EventCard : Card
 
     public override string ToString()
     {
-        return "Id: " + Id.ToString() + 
+        return "Id: " + id.ToString() + 
                "Type: " + cardName.ToString() + 
                "Description: " + description.ToString();
     }
 
     public override void doAction(GameObject player)
     {
+        CardReader.closeEventButton.GetComponent<Button>().onClick.RemoveAllListeners();
+        CardReader.closeEventButton.SetActive(false);
         if (cardName.Equals("Chance"))
         {
             switch (id)
             {
-                case 0:
-                    player.GetComponent<Player>().moveSpaces(-3);
+                case 0: Debug.Log(description); // move back 3 spaces
                     break;
                 case 1:
                     takeMoneyFromPlayer(player, 15);
@@ -166,7 +169,10 @@ public class EventCard : Card
         if (playerIndex < index)
             spacesToMove = index - playerIndex;
         else
-            spacesToMove = 40 - (index - playerIndex);
+            spacesToMove = 40 - playerIndex + index;
+
+        Debug.Log("Player index: " + playerIndex);
+        Debug.Log("Spaces to move to reach field with index " + index + ": " + spacesToMove);
         player.GetComponent<Player>().moveSpaces(spacesToMove);
     }
 
@@ -184,6 +190,7 @@ public class EventCard : Card
             index = 35;
         else if (playerIndex > 35)
             index = 5;
+        Debug.Log("Closest Railroad: " + index);
         movePlayerToIndex(player, index);
     }
 

@@ -1,5 +1,5 @@
 {  
-   "Items":[ ,
+   "Items":[
 	  {  
          "id":0,
          "cardColor":[  
@@ -149,6 +149,6 @@
          ],
          "cardName":"Chance",
 		 "description":"Get out of jail free This card may be kept until needed or sold"
-      },
+      }
    ]
 }
