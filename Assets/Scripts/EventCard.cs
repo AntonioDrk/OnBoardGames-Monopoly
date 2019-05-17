@@ -45,15 +45,17 @@ public class EventCard : Card
         {
             switch(id)
             {
+                case 0: player.GetComponent<Player>().moveSpaces(-3);
+                    break;
                 case 1: takeMoneyFromPlayer(player, 15);
                     break;
                 case 2: movePlayerToIndex(player, 0);
                     break;
-                case 3: // case si hoteluri
+                case 3: Debug.Log(description);// case si hoteluri
                     break;
                 case 4: movePlayerToIndex(player, 24);
                     break;
-                case 5: // pay each player
+                case 5: Debug.Log(description); // pay each player
                     break;
                 case 6: movePlayerToRailroad(player);
                     break;
@@ -61,19 +63,17 @@ public class EventCard : Card
                     break;
                 case 8: giveMoneyToPlayer(player, 150);
                     break;
-                case 9: //get out of jail
+                case 9: giveMoneyToPlayer(player, 50);
                     break;
-                case 10: giveMoneyToPlayer(player, 50);
+                case 10: movePlayerToIndex(player, 11);
                     break;
-                case 11: movePlayerToIndex(player, 11);
+                case 11: movePlayerToRailroad(player);
                     break;
-                case 12: movePlayerToRailroad(player);
+                case 12: sendPlayerToJail(player);
                     break;
-                case 13: sendPlayerToJail(player);
+                case 13: movePlayerToIndex(player, 39);
                     break;
-                case 14: movePlayerToIndex(player, 39);
-                    break;
-                case 15: player.GetComponent<Player>().moveSpaces(-3);
+                case 14: Debug.Log(description); //get out of jail
                     break;
             }
         }
@@ -81,7 +81,9 @@ public class EventCard : Card
         {
             switch(id)
             {
-                case 1: //collect from every player
+                case 0: giveMoneyToPlayer(player, 20);
+                    break;
+                case 1: Debug.Log(description); //collect from every player
                     break;
                 case 2: takeMoneyFromPlayer(player, 100);
                     break;
@@ -91,7 +93,7 @@ public class EventCard : Card
                     break;
                 case 5: giveMoneyToPlayer(player, 25);
                     break;
-                case 6: //case si hoteluri
+                case 6: Debug.Log(description); //case si hoteluri
                     break;
                 case 7: takeMoneyFromPlayer(player, 50);
                     break;
@@ -103,13 +105,11 @@ public class EventCard : Card
                     break;
                 case 11: movePlayerToIndex(player, 0);
                     break;
-                case 12: //get out of jail
+                case 12: sendPlayerToJail(player);
                     break;
-                case 13: sendPlayerToJail(player);
+                case 13: giveMoneyToPlayer(player, 100);
                     break;
-                case 14: giveMoneyToPlayer(player, 100);
-                    break;
-                case 15: giveMoneyToPlayer(player, 20);
+                case 14: Debug.Log(description); //get out of jail
                     break;
             }
         }
