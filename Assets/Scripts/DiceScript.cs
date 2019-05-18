@@ -32,7 +32,7 @@ public class DiceScript : NetworkBehaviour
             else
                 isDouble = false;
 
-            rolledNumber = 1;
+            //rolledNumber = 1;
             rolled = true;
         }
     }

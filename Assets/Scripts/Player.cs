@@ -36,6 +36,7 @@ public class Player : NetworkBehaviour
     [SerializeField] private int stage = 0;
 
     [SerializeField] private List<PropertyCard> ownedPropertyCards;
+    private List<GameObject> ownedPropertyList;
 
     void Start()
     {
@@ -48,6 +49,7 @@ public class Player : NetworkBehaviour
 
         if (isLocalPlayer)
         {
+            ownedPropertyList = new List<GameObject>();
             ownedPropertiesPanel = GameObject.Find("OwnedProprietiesPanel");
             ownedPropertyCards = new List<PropertyCard>();
             rollButton = GameObject.Find("RollDice");
@@ -284,11 +286,42 @@ public class Player : NetworkBehaviour
             = new Color32((byte)propertyCard.cardColor[0], (byte)propertyCard.cardColor[1], (byte)propertyCard.cardColor[2], 255);
         ownedPropertyPanel.transform.SetParent(ownedPropertiesPanel.transform);
         ownedPropertyPanel.transform.position = new Vector3(0, 0, 0);
-        ownedPropertyPanel.GetComponent<RectTransform>().offsetMax = new Vector2(0, -26 * numberOfOwnedCards);
-        ownedPropertyPanel.GetComponent<RectTransform>().offsetMin = new Vector2(0, 363 - 25 * numberOfOwnedCards);
+        changePositionOfPanel(ownedPropertyPanel, numberOfOwnedCards);
         ownedPropertyPanel.GetComponent<RectTransform>().localScale = new Vector3(1,1,1);
         ownedPropertyPanel.transform.GetChild(0).GetComponent<Text>().text = propertyCard.cardName;
         ownedPropertyPanel.GetComponent<Button>().onClick.AddListener(() => propertyCard.showOwnedCard(this.gameObject));
+        ownedPropertyList.Add(ownedPropertyPanel);
+        //Debug.LogError("Owned Property Panel List Count: " + ownedPropertyList.Count);
+    }
+
+    void changePositionOfPanel(GameObject ownedPropertyPanel, int id)
+    {
+        ownedPropertyPanel.GetComponent<RectTransform>().offsetMax = new Vector2(0, -26 * id);
+        ownedPropertyPanel.GetComponent<RectTransform>().offsetMin = new Vector2(0, 363 - 25 * id);
+    }
+
+    public void sellProperty(PropertyCard propertyCard)
+    {
+
+        Debug.Log("Sold " + propertyCard.cardName);        
+        int cardIndex = ownedPropertyCards.IndexOf(propertyCard);
+        if (cardIndex == -1)
+        {
+            Debug.LogError("Tried to delete " + propertyCard.cardName);
+            return;
+        }
+        
+        ownedPropertyCards.Remove(propertyCard);
+        
+        // move all the cards under the removed one
+        for(int k = cardIndex + 1; k < ownedPropertyList.Count; k++)
+        {
+            changePositionOfPanel(ownedPropertyList[k], k - 1);
+        }
+
+        Destroy(ownedPropertyList[cardIndex]);
+        ownedPropertyList.RemoveAt(cardIndex);
+        
     }
 
     // This function is to make the link between the button on click event and sending a command

@@ -19,7 +19,7 @@ public class CardReader : MonoBehaviour
     static public EventCard[] chestCards;
 
     static public GameObject cardPanel, buyPropertyButton, cancelButton, payRentButton, closeButton, closeEventButton, eventPanel,
-                                ComunityChestLogo, ChanceLogo;
+                                ComunityChestLogo, ChanceLogo, sellPropertyButton, sellHouseButton, buyHouseButton;
 
     // Start is called before the first frame update
     void Start()
@@ -40,6 +40,14 @@ public class CardReader : MonoBehaviour
         closeButton.SetActive(false);
         payRentButton = GameObject.Find("PayRent");
         payRentButton.SetActive(false);
+
+        // Owned Property Card
+        sellPropertyButton = GameObject.Find("SellProperty");
+        sellPropertyButton.SetActive(false);
+        sellHouseButton = GameObject.Find("SellHouse");
+        sellHouseButton.SetActive(false);
+        buyHouseButton = GameObject.Find("BuyHouse");
+        buyHouseButton.SetActive(false);
         cardPanel.SetActive(false);
 
         // Event Card

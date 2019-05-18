@@ -136,6 +136,14 @@ public class PropertyCard : Card
         CardReader.closeButton.SetActive(true);
         CardReader.closeButton.GetComponent<Button>().onClick.AddListener(closeCard);
 
+        // if it's your turn you can sell/buy houses and sell the property
+        if (GameObject.Find("GameManager").GetComponent<GameManager>().playerTurn == player.GetComponent<Player>().idPlayer)
+        {
+            CardReader.sellPropertyButton.SetActive(true);
+            CardReader.sellPropertyButton.GetComponent<Button>().onClick.RemoveAllListeners();
+            CardReader.sellPropertyButton.GetComponent<Button>().onClick.AddListener(() => sellProperty(player));
+        }
+
     }
 
     void showCard()
@@ -164,6 +172,7 @@ public class PropertyCard : Card
     void closeCard()
     {
         CardReader.closeButton.GetComponent<Button>().onClick.RemoveAllListeners();
+        CardReader.sellPropertyButton.SetActive(false);
         CardReader.closeButton.SetActive(false);
         CardReader.cardPanel.SetActive(false);
     }
@@ -193,6 +202,17 @@ public class PropertyCard : Card
         playerScript.CmdTakeMoney(priceValue);
         playerScript.buyProperty(this);
         hideCard(player);
+    }
+
+    void sellProperty(GameObject player)
+    {
+        CardReader.sellPropertyButton.GetComponent<Button>().onClick.RemoveAllListeners();
+        CardReader.sellPropertyButton.SetActive(false);
+        Player playerScript = player.GetComponent<Player>();
+        playerScript.CmdChangeOwner(-1, cardIndex);
+        playerScript.CmdAddMoney(mortgageValue); // players get in return the card's mortgage value
+        playerScript.sellProperty(this);
+        closeCard();
     }
 
     // player pays rent to player[ownerId]
