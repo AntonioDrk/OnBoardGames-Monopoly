@@ -34,7 +34,7 @@ public class Die_d6 : MonoBehaviour {
                 || myCollider.tag == "5" || myCollider.tag == "6")
             {
                 int rolledValue = 7 - Int32.Parse(myCollider.tag);
-                //Debug.Log("Dice " + diceNumber + " rolled " + rolledValue);
+                Debug.LogError("Dice " + diceNumber + " rolled " + rolledValue);
                 diceScript.addDice(rolledValue); 
             } 
                 

@@ -27,7 +27,6 @@ public class PropertyCard : Card
         CardName = cardName;
         Price = priceValue;
         Mortgage = mortgageValue;
-        cardIndex--;
     }
 
     public override string ToString()
@@ -62,7 +61,7 @@ public class PropertyCard : Card
         }
         else
         {
-            Debug.Log("Player can buy this property.");
+            Debug.Log("Player can buy this property. Card owner: " + ownerId);
             CardReader.buyPropertyButton.SetActive(true);
             CardReader.cancelButton.SetActive(true);
             CardReader.buyPropertyButton.GetComponent<Button>().onClick.AddListener(() => buyProperty(player));
@@ -189,23 +188,12 @@ public class PropertyCard : Card
     void buyProperty(GameObject player)
     {
         Player playerScript = player.GetComponent<Player>();
-        CmdChangeOwner(playerScript.idPlayer); 
+        playerScript.CmdChangeOwner(playerScript.idPlayer, cardIndex); 
         playerScript.CmdTakeMoney(priceValue);
         playerScript.buyProperty(this);
         hideCard(player);
     }
-
-    [Command]
-    void CmdChangeOwner(int newOwnerId)
-    {
-        GameObject.Find("GameManager").GetComponent<GameManager>().CmdChangeOwner(cardIndex, newOwnerId);
-    }
-
-    [Command]
-    void CmdGiveMoneyToPlayer(int ownerId,int amountPaid)
-    { 
-        GameObject.Find("GameManager").GetComponent<GameManager>().CmdGiveMoneyToPlayer(ownerId, amountPaid); // ?
-    }
+     
 
     // player pays rent to player[ownerId]
     void payRent(GameObject player, Player playerScript, int ownerId) 
@@ -222,7 +210,7 @@ public class PropertyCard : Card
             amountPaid = rent[housesBuilt];
         
         playerScript.CmdTakeMoney(amountPaid);
-        CmdGiveMoneyToPlayer(ownerId, amountPaid);
+        playerScript.CmdGiveMoneyToPlayer(ownerId, amountPaid);
 
         CardReader.cardPanel.SetActive(false);
         player.GetComponent<Player>().endMovement();

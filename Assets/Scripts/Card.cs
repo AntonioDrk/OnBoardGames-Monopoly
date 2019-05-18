@@ -4,7 +4,7 @@ using System;
 using UnityEngine;
 using UnityEngine.Networking;
 
-[Serializable]
+//[Serializable]
 public abstract class Card
 {
     private int id;

@@ -9,11 +9,8 @@ public class Player : NetworkBehaviour
     [SyncVar] public int idPlayer = 0;
 
     // Serialized just for testing purposes, remove me 
-    [SerializeField]
-    [SyncVar]
-    private int indexPosition = 0; // Indicates the position on the board list (the list of cards that are on the board)
-    [SerializeField]
-    private GameObject diceManager, gameManager;
+    [SerializeField] [SyncVar] private int indexPosition = 0; // Indicates the position on the board list (the list of cards that are on the board)
+    [SerializeField] private GameObject diceManager, gameManager;
 
     private Animator anim;
     private DiceScript diceScript;
@@ -22,14 +19,13 @@ public class Player : NetworkBehaviour
     private Vector3 jailPosition = new Vector3(-11f, 0.125f, -6f);
     private Vector3 justVisitingPosition = new Vector3(-11.45854f, 0.125f, -6.49f);
     private GameObject rollButton, endTurnButton, ownedPropertiesPanel;
-    public GameObject ownedPropertyPanelPrefab;
+    public GameObject ownedPropertyPanelPrefab;// playerInfoPrefab;
     private Text playerMoneyText, idText;
 
     [SyncVar] private Color plyColor;
 
     private Renderer renderer;
-    [SyncVar]
-    private int myMeshIndex;
+    [SyncVar] private int myMeshIndex;
 
     [SerializeField] [SyncVar] private int money = 1500;
     private int doublesRolled = 0;
@@ -64,11 +60,11 @@ public class Player : NetworkBehaviour
             playerMoneyText = GameObject.Find("playerMoneyText").GetComponent<Text>();
             transform.position = goPosition;
         }
-
+        
     }
 
     void Update()
-    {
+    { 
         localPlayerUpdate();
     }
 
@@ -76,11 +72,12 @@ public class Player : NetworkBehaviour
     {
         // exit from update if this is not the local player
         if (!isLocalPlayer)
-            return;
-
+                return;
+        
         idText.text = "id: " + idPlayer;
 
         // If it's my turn
+        if((isServer && gameManagerScript.gameStarted) || !isServer)
         if (gameManagerScript.playerTurn == idPlayer && stage == 0)
         {
             rollButton.SetActive(true);
@@ -107,16 +104,22 @@ public class Player : NetworkBehaviour
                 if (diceScript.isDouble || roundsInJail == 3)
                 {
                     inJail = false;
+                    if (!diceScript.isDouble)
+                        CmdAddMoney(-50);
+                    else
+                        CmdAddMoney(-25);
                     roundsInJail = 0;
                     doublesRolled = 0;
                     diceScript.isDouble = false;
-                    transform.position = justVisitingPosition;
-                    if (!diceScript.isDouble)
-                        CmdAddMoney(-50);
+                    transform.position = justVisitingPosition; 
                 }
 
                 if (roundsInJail < 3 && inJail)
+                {
+                    CmdSetDiceInactive();
                     endTurn();
+                }
+
             }
 
             if (doublesRolled == 3)
@@ -289,12 +292,48 @@ public class Player : NetworkBehaviour
     {
         transform.GetChild(0).GetComponent<MeshFilter>().mesh = gameManagerScript.getMeshes()[newMeshIndex];
         myMeshIndex = newMeshIndex;
-    } 
+    }
 
+    [ClientRpc]
+    public void RpcCreatePlayerInfo(int id, GameObject playerInfo)
+    { 
+        Debug.Log("Player " + id + " added info");
+        playerInfo.transform.GetChild(0).GetComponent<Text>().text = "Player " + id + "\n$" + money;
+        playerInfo.transform.SetParent(GameObject.Find("PlayersPanel").transform);
+        playerInfo.GetComponent<RectTransform>().offsetMax = new Vector2(-17, -(12 + 58 * id));
+        playerInfo.GetComponent<RectTransform>().offsetMin = new Vector2(21, 260 - 60 * id);
+        playerInfo.GetComponent<RectTransform>().localScale = new Vector3(1, 1, 1);
+    }
+
+    [ClientRpc]
+    public void RpcChangeColorOnPanel(GameObject playerInfo,byte r,byte g,byte b,byte a)
+    {
+        playerInfo.transform.GetComponent<Image>().color = new Color32(r,g,b,a);
+    }
+
+    [Command]
+    public void CmdChangeOwner(int newOwnerId, int cardIndex)
+    {
+        gameManagerScript.CmdChangeOwner(cardIndex, newOwnerId);
+    }
+
+    [Command]
+    public void CmdGiveMoneyToPlayer(int ownerId, int amountPaid)
+    {
+        gameManagerScript.CmdGiveMoneyToPlayer(ownerId, amountPaid);
+    }
+     
+    [ClientRpc]
+    public void RpcChangeMoneyOnPanel(GameObject playerInfo)
+    {
+        playerInfo.transform.GetChild(0).GetComponent<Text>().text = "Player " + idPlayer + "\n$" + money;
+    }
+     
     [Command]
     public void CmdAddMoney(int amount)
     {
         money += amount;
+        gameManagerScript.CmdChangeMoneyOnPanel(idPlayer, money);
     }
 
     [Command]
@@ -302,6 +341,7 @@ public class Player : NetworkBehaviour
     {
         Debug.Log("Took $" + amount);
         money -= amount;
+        gameManagerScript.CmdChangeMoneyOnPanel(idPlayer, money);
     }
 
     [Command]

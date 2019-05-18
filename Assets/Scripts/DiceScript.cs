@@ -21,16 +21,17 @@ public class DiceScript : NetworkBehaviour
 
     public void addDice(int rolledValue)
     {
-        //Debug.Log("Dice counter: " + diceCounter);
         diceCounter++;
         rolledNumber += rolledValue;
+        Debug.LogError("Dice counter: " + diceCounter + "Dice value: " + rolledValue);
         if (diceCounter == 2)
         {
             if (rolledValue == rolledNumber - rolledValue)
                 isDouble = true;
             else
                 isDouble = false;
-            
+
+            //rolledNumber = 6;
             rolled = true;
         }
     }
