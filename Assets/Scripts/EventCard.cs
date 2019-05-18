@@ -18,19 +18,6 @@ public class EventCard : Card
         CardName = cardName;
         Price = 0;
         Mortgage = 0;
-        //Debug.Log("Event id: " + id);
-    }
-
-    // Start is called before the first frame update
-    void Start()
-    {
-
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-
     }
 
     public override string ToString()
@@ -40,36 +27,63 @@ public class EventCard : Card
                "Description: " + description.ToString();
     }
 
-    public override void doAction(GameObject player)
+    void hideCard()
     {
         CardReader.closeEventButton.GetComponent<Button>().onClick.RemoveAllListeners();
-        CardReader.closeEventButton.SetActive(false);
+        CardReader.ChanceLogo.SetActive(false);
+        CardReader.ComunityChestLogo.SetActive(false);
+        CardReader.eventPanel.SetActive(false);
+    }
+
+    public override void doAction(GameObject player)
+    {
+        
+        CardReader.eventPanel.SetActive(true);
+        CardReader.eventPanel.transform.GetChild(0).GetComponent<Text>().text = cardName;
+        CardReader.eventPanel.transform.GetChild(1).GetComponent<Text>().text = description;
+        if (cardName == "Chance")
+            CardReader.ChanceLogo.SetActive(true);
+        else
+            CardReader.ComunityChestLogo.SetActive(true);
+        CardReader.closeEventButton.GetComponent<Button>().onClick.AddListener(() => activateEventCard(player));
+                
+    }
+
+    void activateEventCard(GameObject player)
+    {
+        hideCard();
+        bool isMoving = false;
         if (cardName.Equals("Chance"))
         {
             switch (id)
             {
-                case 0: Debug.Log(description); // move back 3 spaces
+                case 0:
+                    Debug.Log(description); // move back 3 spaces -> isMoving = true;
                     break;
                 case 1:
                     takeMoneyFromPlayer(player, 15);
                     break;
                 case 2:
                     movePlayerToIndex(player, 0);
+                    isMoving = true;
                     break;
                 case 3:
                     Debug.Log(description);// case si hoteluri
                     break;
                 case 4:
                     movePlayerToIndex(player, 24);
+                    isMoving = true;
                     break;
                 case 5:
                     Debug.Log(description); // pay each player
                     break;
                 case 6:
                     movePlayerToRailroad(player);
+                    isMoving = true;
                     break;
                 case 7:
                     movePlayerToIndex(player, 5);
+                    isMoving = true;
                     break;
                 case 8:
                     giveMoneyToPlayer(player, 150);
@@ -79,15 +93,19 @@ public class EventCard : Card
                     break;
                 case 10:
                     movePlayerToIndex(player, 11);
+                    isMoving = true;
                     break;
                 case 11:
                     movePlayerToRailroad(player);
+                    isMoving = true;
                     break;
                 case 12:
                     sendPlayerToJail(player);
+                    isMoving = true;
                     break;
                 case 13:
                     movePlayerToIndex(player, 39);
+                    isMoving = true;
                     break;
                 case 14:
                     Debug.Log(description); //get out of jail
@@ -133,9 +151,11 @@ public class EventCard : Card
                     break;
                 case 11:
                     movePlayerToIndex(player, 0);
+                    isMoving = true;
                     break;
                 case 12:
                     sendPlayerToJail(player);
+                    isMoving = true;
                     break;
                 case 13:
                     giveMoneyToPlayer(player, 100);
@@ -145,6 +165,9 @@ public class EventCard : Card
                     break;
             }
         }
+
+        if (!isMoving)
+            player.GetComponent<Player>().endMovement();
     }
 
     public void takeMoneyFromPlayer(GameObject player, int value)

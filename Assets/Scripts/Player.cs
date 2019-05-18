@@ -188,7 +188,18 @@ public class Player : NetworkBehaviour
             stage = 2;
             if(diceManager.transform.childCount > 0)
                 CmdSetDiceInactive();
-            if (indexPosition == 2 || indexPosition == 17 || indexPosition == 33) // Comunity Chest
+
+            if(indexPosition == 4) // Income Tax - Pay $200
+            {
+                CmdTakeMoney(200);
+                endMovement();
+            }
+            else if (indexPosition == 38) // Luxury Tax - Pay $100
+            {
+                CmdTakeMoney(100);
+                endMovement();
+            }
+            else if (indexPosition == 2 || indexPosition == 17 || indexPosition == 33) // Comunity Chest
             {
                 int eventNr = 0;
                 if (chestJailCardOwner == -1)
@@ -198,10 +209,7 @@ public class Player : NetworkBehaviour
 
                 Debug.Log("Event nr: " + eventNr + " triggered.");
                 Debug.Log(CardReader.chestCards[eventNr].ToString());
-                CardReader.closeEventButton.SetActive(true);
-                CardReader.closeEventButton.GetComponent<Button>().onClick.AddListener(() => CardReader.chestCards[eventNr].doAction(this.gameObject));
-
-                endMovement();
+                CardReader.chestCards[eventNr].doAction(this.gameObject);
             }
             else if (indexPosition == 7 || indexPosition == 22 || indexPosition == 36) //Chance
             {
@@ -213,15 +221,12 @@ public class Player : NetworkBehaviour
 
                 Debug.Log("Event nr: " + eventNr + " triggered.");
                 Debug.Log(CardReader.chanceCards[eventNr].ToString());
-                CardReader.closeEventButton.SetActive(true);
-                CardReader.closeEventButton.GetComponent<Button>().onClick.AddListener(() => CardReader.chanceCards[eventNr].doAction(this.gameObject));
-                
-                endMovement();
+                CardReader.chanceCards[eventNr].doAction(this.gameObject);
             }
             else
             {
                 int cardIndex = CardReader.getPropertyCardIndex(indexPosition);
-                Debug.Log("Card index: " + cardIndex);
+                Debug.Log("Property card index: " + cardIndex);
                 if (cardIndex != -1) // if it's a property card
                 {
                     CardReader.propertyCards[cardIndex].doAction(this.gameObject);
@@ -285,13 +290,14 @@ public class Player : NetworkBehaviour
         ownedPropertyPanel.transform.GetChild(0).GetComponent<Text>().text = propertyCard.cardName;
         ownedPropertyPanel.GetComponent<Button>().onClick.AddListener(() => propertyCard.showOwnedCard(this.gameObject));
     }
-    
+
     // This function is to make the link between the button on click event and sending a command
     void RollTheDice()
     {
         stage = 1;
         rollButton.SetActive(false);
         diceScript.diceCounter = 0;
+        //Debug.LogError("Dice counter becomes 0.");
         diceScript.rolledNumber = 0;
         CmdRollDice();
     }
@@ -371,7 +377,7 @@ public class Player : NetworkBehaviour
     public void CmdAddMoney(int amount)
     {
         money += amount;
-        gameManagerScript.CmdChangeMoneyOnPanel(idPlayer, money);
+        //gameManagerScript.CmdChangeMoneyOnPanel(idPlayer, money);
     }
 
     [Command]
@@ -379,7 +385,7 @@ public class Player : NetworkBehaviour
     {
         Debug.Log("Took $" + amount);
         money -= amount;
-        gameManagerScript.CmdChangeMoneyOnPanel(idPlayer, money);
+        //gameManagerScript.CmdChangeMoneyOnPanel(idPlayer, money);
     }
 
     [Command]

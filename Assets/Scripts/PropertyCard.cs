@@ -130,11 +130,12 @@ public class PropertyCard : Card
     
     public void showOwnedCard(GameObject player)
     {
-        if (player.GetComponent<Player>().getStage() != 0)
+        if (player.GetComponent<Player>().getStage() != 0) 
             return;
         showCard();
         CardReader.closeButton.SetActive(true);
         CardReader.closeButton.GetComponent<Button>().onClick.AddListener(closeCard);
+
     }
 
     void showCard()
@@ -193,7 +194,6 @@ public class PropertyCard : Card
         playerScript.buyProperty(this);
         hideCard(player);
     }
-     
 
     // player pays rent to player[ownerId]
     void payRent(GameObject player, Player playerScript, int ownerId) 
