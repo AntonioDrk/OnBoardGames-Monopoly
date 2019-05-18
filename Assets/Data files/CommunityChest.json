@@ -1,5 +1,15 @@
 {  
-   "Items":[  
+   "Items":[
+	  {  
+         "id":0,
+         "cardColor":[  
+            255,
+			215,
+			0
+         ],
+         "cardName":"Community Chest",
+		 "description":"Income tax refund collect $20"
+      },
       {  
          "id":1,
          "cardColor":[  
@@ -118,7 +128,7 @@
 			0
          ],
          "cardName":"Community Chest",
-		 "description":"Get out of jail free This card may be kept until needed or sold"
+		 "description":"Go to jail do not pass go do not collect $200"
       },
 	  {  
          "id":13,
@@ -128,7 +138,7 @@
 			0
          ],
          "cardName":"Community Chest",
-		 "description":"Go to jail do not pass go do not collect $200"
+		 "description":"Xmas fund matures collect $100"
       },
 	  {  
          "id":14,
@@ -138,17 +148,7 @@
 			0
          ],
          "cardName":"Community Chest",
-		 "description":"Xmas fund matures collect $100"
-      },
-	  {  
-         "id":15,
-         "cardColor":[  
-            255,
-			215,
-			0
-         ],
-         "cardName":"Community Chest",
-		 "description":"Income tax refund collect $20"
+		 "description":"Get out of jail free This card may be kept until needed or sold"
       }
    ]
 }

@@ -1,5 +1,15 @@
 {  
-   "Items":[  
+   "Items":[
+	  {  
+         "id":0,
+         "cardColor":[  
+            255,
+			69,
+			0
+         ],
+         "cardName":"Chance",
+		 "description":"Go back 3 spaces"
+      }, 
       {  
          "id":1,
          "cardColor":[  
@@ -88,7 +98,7 @@
 			0
          ],
          "cardName":"Chance",
-		 "description":"Get out of jail free This card may be kept until needed or sold"
+		 "description":"Bank pays your dividends of $50"
       },
 	  {  
          "id":10,
@@ -98,7 +108,7 @@
 			0
          ],
          "cardName":"Chance",
-		 "description":"Bank pays your dividends of $50"
+		 "description":"Advance to St. Charles Place if you pass GO! collect $200"
       },
 	  {  
          "id":11,
@@ -108,7 +118,7 @@
 			0
          ],
          "cardName":"Chance",
-		 "description":"Advance to St. Charles Place if you pass GO! collect $200"
+		 "description":"Advance to the nearest Railroad and pay owner twice the rental to which he is otherwise entitled. If Railroad is unowned, you may buy it from the Bank."
       },
 	  {  
          "id":12,
@@ -118,7 +128,7 @@
 			0
          ],
          "cardName":"Chance",
-		 "description":"Advance to the nearest Railroad and pay owner twice the rental to which he is otherwise entitled. If Railroad is unowned, you may buy it from the Bank."
+		 "description":"Go to jail do not pass GO! do not collect $200"
       },
 	  {  
          "id":13,
@@ -128,7 +138,7 @@
 			0
          ],
          "cardName":"Chance",
-		 "description":"Go to jail do not pass GO! do not collect $200"
+		 "description":"Advance to Boardwalk"
       },
 	  {  
          "id":14,
@@ -138,17 +148,7 @@
 			0
          ],
          "cardName":"Chance",
-		 "description":"Advance to Boardwalk"
-      },
-	  {  
-         "id":15,
-         "cardColor":[  
-            255,
-			69,
-			0
-         ],
-         "cardName":"Chance",
-		 "description":"Go back 3 spaces"
+		 "description":"Get out of jail free This card may be kept until needed or sold"
       }
    ]
 }
