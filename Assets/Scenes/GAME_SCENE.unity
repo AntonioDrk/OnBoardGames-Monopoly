@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 170076734}
-  m_IndirectSpecularColor: {r: 0.43667564, g: 0.48427135, b: 0.5645232, a: 1}
+  m_IndirectSpecularColor: {r: 0.4366757, g: 0.48427194, b: 0.5645252, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -1521,6 +1521,7 @@ MonoBehaviour:
   playerInfoPrefab: {fileID: 1957596252967745488, guid: c81b5de9ee728444d8cd4990e86b8d39,
     type: 3}
   gameStarted: 0
+  currentRolledNumber: 0
 --- !u!4 &460316503
 Transform:
   m_ObjectHideFlags: 0
@@ -5663,7 +5664,7 @@ MonoBehaviour:
   isDouble: 0
   rolled: 0
   diceCounter: 0
-  dice: {fileID: 7611480039141757373, guid: bd27d81dc4e40254a91ea7f334386c5d, type: 3}
+  dice: {fileID: 55826584443972402, guid: bd27d81dc4e40254a91ea7f334386c5d, type: 3}
   gameManager: {fileID: 0}
 --- !u!114 &1946007151
 MonoBehaviour:
