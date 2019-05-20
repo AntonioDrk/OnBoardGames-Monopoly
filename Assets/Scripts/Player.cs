@@ -279,25 +279,43 @@ public class Player : NetworkBehaviour
         int numberOfOwnedCards = ownedPropertyCards.Count;
         //Debug.Log("Nr of owned cards: " + numberOfOwnedCards);
 
-        ownedPropertyCards.Add(propertyCard);
-        
         GameObject ownedPropertyPanel = Instantiate(ownedPropertyPanelPrefab);
         ownedPropertyPanel.transform.GetComponent<Image>().color
             = new Color32((byte)propertyCard.cardColor[0], (byte)propertyCard.cardColor[1], (byte)propertyCard.cardColor[2], 255);
         ownedPropertyPanel.transform.SetParent(ownedPropertiesPanel.transform);
         ownedPropertyPanel.transform.position = new Vector3(0, 0, 0);
-        changePositionOfPanel(ownedPropertyPanel, numberOfOwnedCards);
         ownedPropertyPanel.GetComponent<RectTransform>().localScale = new Vector3(1,1,1);
         ownedPropertyPanel.transform.GetChild(0).GetComponent<Text>().text = propertyCard.cardName;
-        ownedPropertyPanel.GetComponent<Button>().onClick.AddListener(() => propertyCard.showOwnedCard(this.gameObject));
-        ownedPropertyList.Add(ownedPropertyPanel);
+        ownedPropertyPanel.GetComponent<Button>().onClick.AddListener(() => propertyCard.showOwnedCard(this.gameObject));        
         //Debug.LogError("Owned Property Panel List Count: " + ownedPropertyList.Count);
+        
+        // find the new position in the list
+        int newIndex = 0;
+        if(numberOfOwnedCards > 0)
+            while (newIndex < numberOfOwnedCards && ownedPropertyCards[newIndex].id < propertyCard.id) newIndex++;
+        
+        // last position
+        if (newIndex == numberOfOwnedCards)
+        {
+            ownedPropertyCards.Add(propertyCard);
+            ownedPropertyList.Add(ownedPropertyPanel);
+            changePositionOfPanel(ownedPropertyPanel, newIndex);
+        }
+        else
+        {
+            ownedPropertyCards.Insert(newIndex, propertyCard);
+            ownedPropertyList.Insert(newIndex, ownedPropertyPanel);
+            changePositionOfPanel(ownedPropertyPanel, newIndex);
+            for(int k=newIndex+1; k < numberOfOwnedCards+1; k++)
+                changePositionOfPanel(ownedPropertyList[k], k);
+        }
+
     }
 
-    void changePositionOfPanel(GameObject ownedPropertyPanel, int id)
+    void changePositionOfPanel(GameObject ownedPropertyPanel, int position)
     {
-        ownedPropertyPanel.GetComponent<RectTransform>().offsetMax = new Vector2(0, -26 * id);
-        ownedPropertyPanel.GetComponent<RectTransform>().offsetMin = new Vector2(0, 363 - 25 * id);
+        ownedPropertyPanel.GetComponent<RectTransform>().offsetMax = new Vector2(0, -29.7f * position);
+        ownedPropertyPanel.GetComponent<RectTransform>().offsetMin = new Vector2(0, 363 - 29.7f * position);
     }
 
     public void sellProperty(PropertyCard propertyCard)

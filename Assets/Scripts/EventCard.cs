@@ -41,6 +41,8 @@ public class EventCard : Card
         CardReader.eventPanel.SetActive(true);
         CardReader.eventPanel.transform.GetChild(0).GetComponent<Text>().text = cardName;
         CardReader.eventPanel.transform.GetChild(1).GetComponent<Text>().text = description;
+        CardReader.eventPanel.transform.GetComponent<Image>().color
+            = new Color32((byte)cardColor[0], (byte)cardColor[1], (byte)cardColor[2], 255);
         if (cardName == "Chance")
             CardReader.ChanceLogo.SetActive(true);
         else
