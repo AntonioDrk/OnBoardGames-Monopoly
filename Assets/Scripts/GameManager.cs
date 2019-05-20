@@ -26,7 +26,7 @@ public class GameManager : NetworkBehaviour
     [SyncVar] public int playerTurn = 0; 
     [SyncVar] public int connectedPlayers = 0;
     public List<GameObject> players;
-    public SyncListInt propertyCardsOwners;
+    public SyncListInt cardsOwner;
 
     [SerializeField] private List<Mesh> meshes; // Set them at startup in the editor!!
     private List<int> meshesIndexes; // Indexes of the meshes to use
@@ -34,6 +34,7 @@ public class GameManager : NetworkBehaviour
     private GameObject[] playerInfo = new GameObject[6];
     public bool gameStarted = false;
     private GameObject startGameButton;
+    public int currentRolledNumber;
     
     void Start()
     { 
@@ -64,8 +65,8 @@ public class GameManager : NetworkBehaviour
             meshesIndexes.Add(i);
         }
 
-        for (int i = 0; i < 22; i++)
-            propertyCardsOwners.Add(-1);
+        for (int i = 0; i < 28; i++)
+            cardsOwner.Add(-1);
     } 
 
     void Update()
@@ -173,7 +174,7 @@ public class GameManager : NetworkBehaviour
     public void CmdChangeOwner(int cardIndex, int newOwnerId)
     { 
         if (!isServer) return;
-        propertyCardsOwners[cardIndex] = newOwnerId;
+        cardsOwner[cardIndex] = newOwnerId;
         Debug.Log("Owner changed for " + cardIndex + " : " + newOwnerId);
     }
         
@@ -185,7 +186,7 @@ public class GameManager : NetworkBehaviour
             return; // ?
         }
         players[playerId].GetComponent<Player>().CmdAddMoney(amount);
-        Debug.LogError("Added " + amount + " to " + playerId);
+        //Debug.LogError("Added " + amount + " to " + playerId);
     }
 
     [Command]
@@ -204,6 +205,8 @@ public class GameManager : NetworkBehaviour
         players.Remove(playerDisconnected);
         NetworkServer.Destroy(playerDisconnected);
         connectedPlayers--;
+        // DESTROY PANEL OF DISCONNECTED PLAYER
+        // SELL HIS PROPERTIES TO THE BANK
     }
 
 //   ----------------  Getters and Setters   ----------------  

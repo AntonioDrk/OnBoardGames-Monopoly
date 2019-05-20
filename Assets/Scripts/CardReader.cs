@@ -13,22 +13,35 @@ public class CardReader : MonoBehaviour
     string chestFile = "Data files/CommunityChest.json";
 
     static public PropertyCard[] propertyCards;
-    static public RailwayCard[] railwayCards;
+    static public RailroadCard[] railroadCards;
     static public UtilityCard[] utilityCards;
     static public EventCard[] chanceCards;
     static public EventCard[] chestCards;
 
     static public GameObject cardPanel, buyPropertyButton, cancelButton, payRentButton, closeButton, closeEventButton, eventPanel,
-                                ComunityChestLogo, ChanceLogo, sellPropertyButton, sellHouseButton, buyHouseButton;
+                                ComunityChestLogo, ChanceLogo, sellPropertyButton, sellHouseButton, buyHouseButton, railroadPanel,
+                                utilityPanel, ElectricCompanyLogo, WaterWorksLogo;
 
     // Start is called before the first frame update
     void Start()
     {
         LoadPropertyCards(propertiesFile);
-        LoadRailwayCards(railroadsFile);
+        LoadRailroadCards(railroadsFile);
         LoadUtilityCards(utilitiesFile);
         LoadChanceCards(chanceFile);
         LoadChestCards(chestFile);
+
+        // Utilities
+        utilityPanel = GameObject.Find("UtilityCard");
+        ElectricCompanyLogo = GameObject.Find("ElectricCompanyLogo");
+        ElectricCompanyLogo.SetActive(false);
+        WaterWorksLogo = GameObject.Find("WaterWorksLogo");
+        WaterWorksLogo.SetActive(false);
+        utilityPanel.SetActive(false);
+
+        // Railroad Card
+        railroadPanel = GameObject.Find("RailroadCard");
+        railroadPanel.SetActive(false);
 
         // Property Card
         cardPanel = GameObject.Find("Card");
@@ -41,7 +54,7 @@ public class CardReader : MonoBehaviour
         payRentButton = GameObject.Find("PayRent");
         payRentButton.SetActive(false);
 
-        // Owned Property Card
+        // Owned Card
         sellPropertyButton = GameObject.Find("SellProperty");
         sellPropertyButton.SetActive(false);
         sellHouseButton = GameObject.Find("SellHouse");
@@ -88,9 +101,6 @@ public class CardReader : MonoBehaviour
             
             for (int i = 0; i < propertyCards.Length; i++)
                 propertyCards[i].PropertyCardConstructor();
-
-            /*for (int i = 0; i < propertyCards.Length; i++)
-                Debug.Log(propertyCards[i].ToString());*/
         }
         else
         {
@@ -99,22 +109,19 @@ public class CardReader : MonoBehaviour
 
     }
     
-    public void LoadRailwayCards(string fileName)
+    public void LoadRailroadCards(string fileName)
     {
         string filePath = Path.Combine(Application.dataPath, fileName);
 
         if (File.Exists(filePath))
         {
             string railwaysJson = File.ReadAllText(filePath);
-            railwayCards = JsonHelper.FromJson<RailwayCard>(railwaysJson);
+            railroadCards = JsonHelper.FromJson<RailroadCard>(railwaysJson);
 
-            Debug.Log(fileName + " data retrieved. " + railwayCards.Length + " cards loaded.");
+            Debug.Log(fileName + " data retrieved. " + railroadCards.Length + " cards loaded.");
 
-            for (int i = 0; i < railwayCards.Length; i++)
-                railwayCards[i].RailwayCardConstructor();
-
-            //for (int i = 0; i < railwayCards.Length; i++)
-                //Debug.Log(railwayCards[i].ToString());
+            for (int i = 0; i < railroadCards.Length; i++)
+                railroadCards[i].RailroadCardConstructor();            
         }
         else
         {
@@ -134,10 +141,7 @@ public class CardReader : MonoBehaviour
             Debug.Log(fileName + " data retrieved. " + utilityCards.Length + " cards loaded.");
 
             for (int i = 0; i < utilityCards.Length; i++)
-                utilityCards[i].UtilityCardConstructor();
-
-            //for (int i = 0; i < utilityCards.Length; i++)
-                //Debug.Log(utilityCards[i].ToString());
+                utilityCards[i].UtilityCardConstructor();            
         }
         else
         {

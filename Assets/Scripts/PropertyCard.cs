@@ -41,7 +41,7 @@ public class PropertyCard : Card
 
     public override void doAction(GameObject player)
     {
-        int ownerId = GameObject.Find("GameManager").GetComponent<GameManager>().propertyCardsOwners[cardIndex];
+        int ownerId = GameObject.Find("GameManager").GetComponent<GameManager>().cardsOwner[cardIndex];
         showCard();
         Debug.Log("Owner's id for " + cardName + " : " + ownerId);
         if (ownerId != -1)
@@ -55,8 +55,10 @@ public class PropertyCard : Card
             else
             { 
                 Debug.Log("Player must pay rent to player " + ownerId);
+                int amountPaid = calculateRent(ownerId);
+                CardReader.payRentButton.transform.GetChild(0).GetComponent<Text>().text = "Pay $" + amountPaid;
                 CardReader.payRentButton.SetActive(true);
-                CardReader.payRentButton.GetComponent<Button>().onClick.AddListener(() => payRent(player,playerScript, ownerId));
+                CardReader.payRentButton.GetComponent<Button>().onClick.AddListener(() => payRent(player,playerScript, ownerId, amountPaid));
             }
         }
         else
@@ -76,7 +78,7 @@ public class PropertyCard : Card
         if (housesBuilt != 0) return false;
         for(int index=0; index < propertiesFromSameGroup.Length; index++)
         {
-            if (GameObject.Find("GameManager").GetComponent<GameManager>().propertyCardsOwners[propertiesFromSameGroup[index]] != ownerId)
+            if (GameObject.Find("GameManager").GetComponent<GameManager>().cardsOwner[propertiesFromSameGroup[index]] != ownerId)
                 return false;
         }
         Debug.Log("Player " + ownerId + " has all properies.");
@@ -128,7 +130,7 @@ public class PropertyCard : Card
         // TO-DO: animation for hotel being built
     }
     
-    public void showOwnedCard(GameObject player)
+    public override void showOwnedCard(GameObject player)
     {
         if (player.GetComponent<Player>().getStage() != 0) 
             return;
@@ -148,6 +150,10 @@ public class PropertyCard : Card
 
     void showCard()
     {
+        CardReader.railroadPanel.SetActive(false);
+        CardReader.utilityPanel.SetActive(false);
+        closeCard();
+
         GameObject cardPanel = CardReader.cardPanel;
         cardPanel.SetActive(true);
 
@@ -215,12 +221,8 @@ public class PropertyCard : Card
         closeCard();
     }
 
-    // player pays rent to player[ownerId]
-    void payRent(GameObject player, Player playerScript, int ownerId) 
-    { 
-        CardReader.payRentButton.GetComponent<Button>().onClick.RemoveAllListeners();
-        CardReader.payRentButton.SetActive(false);
-
+    int calculateRent(int ownerId)
+    {
         int amountPaid = 0;
         if (hasHotel)
             amountPaid = rent[5];
@@ -228,7 +230,15 @@ public class PropertyCard : Card
             amountPaid = 2 * rent[0];
         else
             amountPaid = rent[housesBuilt];
-        
+        return amountPaid;
+    }
+
+    // player pays rent to player[ownerId]
+    void payRent(GameObject player, Player playerScript, int ownerId, int amountPaid) 
+    { 
+        CardReader.payRentButton.GetComponent<Button>().onClick.RemoveAllListeners();
+        CardReader.payRentButton.SetActive(false);
+         
         playerScript.CmdTakeMoney(amountPaid);
         playerScript.CmdGiveMoneyToPlayer(ownerId, amountPaid);
 

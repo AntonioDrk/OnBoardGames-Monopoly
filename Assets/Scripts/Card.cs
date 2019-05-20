@@ -15,8 +15,9 @@ public abstract class Card
     public int Id { get => id; set => id = value; }
     public string CardName { get => cardName; set => cardName = value; }
     public int Price { get => price; set => price = value; }
-    public int Mortgage { get => mortgage; set => mortgage = value; } 
+    public int Mortgage { get => mortgage; set => mortgage = value; }
 
-    public abstract void doAction(GameObject player);  
+    public abstract void doAction(GameObject player);
+    public abstract void showOwnedCard(GameObject player);
 
 }

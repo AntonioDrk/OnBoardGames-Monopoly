@@ -35,7 +35,7 @@ public class Player : NetworkBehaviour
     private bool inJail = false;
     [SerializeField] private int stage = 0;
 
-    [SerializeField] private List<PropertyCard> ownedPropertyCards;
+    [SerializeField] private List<Card> ownedPropertyCards;
     private List<GameObject> ownedPropertyList;
 
     void Start()
@@ -51,7 +51,7 @@ public class Player : NetworkBehaviour
         {
             ownedPropertyList = new List<GameObject>();
             ownedPropertiesPanel = GameObject.Find("OwnedProprietiesPanel");
-            ownedPropertyCards = new List<PropertyCard>();
+            ownedPropertyCards = new List<Card>();
             rollButton = GameObject.Find("RollDice");
             rollButton.GetComponent<Button>().onClick.AddListener(RollTheDice);
             rollButton.SetActive(false);
@@ -191,7 +191,19 @@ public class Player : NetworkBehaviour
             if(diceManager.transform.childCount > 0)
                 CmdSetDiceInactive();
 
-            if(indexPosition == 4) // Income Tax - Pay $200
+            if(indexPosition == 12 || indexPosition == 28) // Utilities
+            {
+                int utilityIndex = (indexPosition - 12) / 16;
+                //Debug.Log(CardReader.utilityCards[utilityIndex].ToString());
+                CardReader.utilityCards[utilityIndex].doAction(this.gameObject);
+            }
+            else if(indexPosition == 5 || indexPosition == 15 || indexPosition == 25 || indexPosition == 35) // Railroads
+            {
+                int railroadIndex = (indexPosition - 5) / 10;
+                //Debug.Log(CardReader.railroadCards[railroadIndex].ToString());
+                CardReader.railroadCards[railroadIndex].doAction(this.gameObject);
+            }
+            else if(indexPosition == 4) // Income Tax - Pay $200
             {
                 CmdTakeMoney(200);
                 endMovement();
@@ -272,27 +284,30 @@ public class Player : NetworkBehaviour
         CmdNextPlayer();
     }
 
-    public void buyProperty(PropertyCard propertyCard)
+    public void buyProperty(Card propertyCard)
     {
-        Debug.Log("Bought " + propertyCard.cardName);
+        Debug.Log("Bought " + propertyCard.CardName);
 
         int numberOfOwnedCards = ownedPropertyCards.Count;
         //Debug.Log("Nr of owned cards: " + numberOfOwnedCards);
 
         GameObject ownedPropertyPanel = Instantiate(ownedPropertyPanelPrefab);
-        ownedPropertyPanel.transform.GetComponent<Image>().color
-            = new Color32((byte)propertyCard.cardColor[0], (byte)propertyCard.cardColor[1], (byte)propertyCard.cardColor[2], 255);
+
+        if(propertyCard.GetType() == typeof(PropertyCard))
+            ownedPropertyPanel.transform.GetComponent<Image>().color = new Color32((byte)((PropertyCard)propertyCard).cardColor[0], 
+                (byte)((PropertyCard)propertyCard).cardColor[1], (byte)((PropertyCard)propertyCard).cardColor[2], 255);
+
         ownedPropertyPanel.transform.SetParent(ownedPropertiesPanel.transform);
         ownedPropertyPanel.transform.position = new Vector3(0, 0, 0);
         ownedPropertyPanel.GetComponent<RectTransform>().localScale = new Vector3(1,1,1);
-        ownedPropertyPanel.transform.GetChild(0).GetComponent<Text>().text = propertyCard.cardName;
+        ownedPropertyPanel.transform.GetChild(0).GetComponent<Text>().text = propertyCard.CardName;
         ownedPropertyPanel.GetComponent<Button>().onClick.AddListener(() => propertyCard.showOwnedCard(this.gameObject));        
         //Debug.LogError("Owned Property Panel List Count: " + ownedPropertyList.Count);
         
         // find the new position in the list
         int newIndex = 0;
         if(numberOfOwnedCards > 0)
-            while (newIndex < numberOfOwnedCards && ownedPropertyCards[newIndex].id < propertyCard.id) newIndex++;
+            while (newIndex < numberOfOwnedCards && ownedPropertyCards[newIndex].Id < propertyCard.Id) newIndex++;
         
         // last position
         if (newIndex == numberOfOwnedCards)
@@ -318,14 +333,14 @@ public class Player : NetworkBehaviour
         ownedPropertyPanel.GetComponent<RectTransform>().offsetMin = new Vector2(0, 363 - 29.7f * position);
     }
 
-    public void sellProperty(PropertyCard propertyCard)
+    public void sellProperty(Card propertyCard)
     {
 
-        Debug.Log("Sold " + propertyCard.cardName);        
+        Debug.Log("Sold " + propertyCard.CardName);        
         int cardIndex = ownedPropertyCards.IndexOf(propertyCard);
         if (cardIndex == -1)
         {
-            Debug.LogError("Tried to delete " + propertyCard.cardName);
+            Debug.LogError("Tried to delete " + propertyCard.CardName);
             return;
         }
         

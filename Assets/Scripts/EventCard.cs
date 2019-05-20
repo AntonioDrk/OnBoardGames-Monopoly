@@ -51,6 +51,11 @@ public class EventCard : Card
                 
     }
 
+    public override void showOwnedCard(GameObject player)
+    {
+
+    }
+
     void activateEventCard(GameObject player)
     {
         hideCard();
