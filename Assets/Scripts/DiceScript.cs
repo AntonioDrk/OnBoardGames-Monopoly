@@ -33,7 +33,7 @@ public class DiceScript : NetworkBehaviour
                 isDouble = false;
 
             gameManager.GetComponent<GameManager>().currentRolledNumber = rolledNumber;
-            //rolledNumber = 12;
+            //rolledNumber = 1;
             rolled = true;
         }
     }

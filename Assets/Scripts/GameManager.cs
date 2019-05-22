@@ -35,6 +35,8 @@ public class GameManager : NetworkBehaviour
     public bool gameStarted = false;
     private GameObject startGameButton;
     public int currentRolledNumber;
+
+    private List<Color> playerColors;
     
     void Start()
     { 
@@ -67,6 +69,10 @@ public class GameManager : NetworkBehaviour
 
         for (int i = 0; i < 28; i++)
             cardsOwner.Add(-1);
+
+        if(isServer)
+            addPlayerColor(new List<Color> { Color.red, Color.yellow, Color.magenta, Color.green, Color.blue, Color.black });
+
     } 
 
     void Update()
@@ -106,6 +112,13 @@ public class GameManager : NetworkBehaviour
         players[0].GetComponent<Player>().RpcChangeColorOnPanel(playerInfo[0], 183, 84, 84, 150);
     }
 
+    private void addPlayerColor(List<Color> colors)
+    {
+        playerColors = new List<Color>();
+        foreach (Color color in colors)
+            playerColors.Add(color);
+    }
+
     // Moves the camera to face the player
     void UpdatePosCamera(GameObject target)
     {
@@ -141,7 +154,9 @@ public class GameManager : NetworkBehaviour
         connectedPlayers++;
 
         // Asign the Color for the player
-        playerScript.setPlyColor(Random.ColorHSV(0, 1, 0, 1, 0.3f, 0.7f));
+        Color randomColor = playerColors[Random.Range(0, playerColors.Count - 1)];
+        playerScript.setPlyColor(randomColor);
+        playerColors.Remove(randomColor);
         playerScript.getRenderer().material.color = playerScript.getPlyColor();
 
         // Update each player for the new color change and the new mesh change
@@ -171,13 +186,22 @@ public class GameManager : NetworkBehaviour
         players[playerTurn].GetComponent<Player>().RpcChangeColorOnPanel(playerInfo[playerTurn],183, 84, 84, 150);
     }
      
-    public void CmdChangeOwner(int cardIndex, int newOwnerId)
+    public void CmdChangeOwner(int cardIndex, int newOwnerId,int id)
     { 
         if (!isServer) return;
         cardsOwner[cardIndex] = newOwnerId;
+
+        for (int i = 0; i < nrOfPlayers; i++)
+        {
+            Color ownerColor = Color.clear;
+            if (newOwnerId != -1)
+                ownerColor = players[newOwnerId].GetComponent<Player>().getPlyColor();
+            players[i].GetComponent<Player>().RpcChangeOwnerPanelColor(newOwnerId, id, ownerColor);
+        }
+
         Debug.Log("Owner changed for " + cardIndex + " : " + newOwnerId);
     }
-        
+    
     public void CmdGiveMoneyToPlayer(int playerId, int amount)
     {
         if (!isServer)

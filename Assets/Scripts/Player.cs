@@ -408,6 +408,7 @@ public class Player : NetworkBehaviour
     public void RpcCreatePlayerInfo(int id, GameObject playerInfo)
     { 
         Debug.Log("Player " + id + " added info");
+        playerInfo.transform.GetChild(0).GetComponent<Text>().color = plyColor;
         playerInfo.transform.GetChild(0).GetComponent<Text>().text = "Player " + id + "\n$" + money;
         playerInfo.transform.SetParent(GameObject.Find("PlayersPanel").transform);
         playerInfo.GetComponent<RectTransform>().offsetMax = new Vector2(-17, -(12 + 58 * id));
@@ -421,10 +422,24 @@ public class Player : NetworkBehaviour
         playerInfo.transform.GetComponent<Image>().color = new Color32(r,g,b,a);
     }
 
-    [Command]
-    public void CmdChangeOwner(int newOwnerId, int cardIndex)
+    [ClientRpc]
+    public void RpcChangeOwnerPanelColor(int newOwnerId, int id, Color ownerColor)
     {
-        gameManagerScript.CmdChangeOwner(cardIndex, newOwnerId);
+        GameObject panel = GameObject.FindGameObjectWithTag("id" + id);
+
+        if (newOwnerId != -1)
+        {
+            panel.GetComponent<Renderer>().enabled = true;
+            panel.GetComponent<Renderer>().material.color = ownerColor;
+        }
+        else
+            panel.GetComponent<Renderer>().enabled = false;
+    }
+
+    [Command]
+    public void CmdChangeOwner(int newOwnerId, int cardIndex, int id)
+    {
+        gameManagerScript.CmdChangeOwner(cardIndex, newOwnerId, id);
     }
 
     [Command]
