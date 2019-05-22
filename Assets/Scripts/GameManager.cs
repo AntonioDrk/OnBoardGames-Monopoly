@@ -71,7 +71,7 @@ public class GameManager : NetworkBehaviour
             cardsOwner.Add(-1);
 
         if(isServer)
-            addPlayerColor(new List<Color> { Color.red, Color.yellow, Color.magenta, Color.green, Color.blue, Color.black });
+            addPlayerColor(new List<Color> { new Color32(0, 108, 0, 255), new Color32(200, 7, 0, 255), new Color32(0, 21, 161, 255), new Color32(224, 224, 0, 255), new Color32(139, 0 , 162, 255), Color.black });
 
     } 
 
