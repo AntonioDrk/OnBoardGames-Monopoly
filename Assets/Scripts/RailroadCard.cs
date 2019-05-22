@@ -5,18 +5,18 @@ using UnityEngine;
 using UnityEngine.UI;
 
 [Serializable]
-public class UtilityCard : Card
+public class RailroadCard  : Card
 {
     public int id;
     public string cardName;
-    public int[] rentMultiplier = { 4, 10 };
+    public int[] rent = { 25, 50, 100, 200 };
 
-    public void UtilityCardConstructor()
+    public void RailroadCardConstructor()
     {
         Id = id;
         CardName = cardName;
-        Price = 150;
-        Mortgage = 75;
+        Price = 200;
+        Mortgage = 100;
     }
 
     public override string ToString()
@@ -26,10 +26,9 @@ public class UtilityCard : Card
                "\nPrice: " + Price.ToString() +
                "\nMortgage: " + Mortgage.ToString();
     }
-    
-    void buyUtility(GameObject player)
+
+    void buyRailroad(GameObject player, int cardIndex)
     {
-        int cardIndex = 26 + (id - 12) / 16;
         Player playerScript = player.GetComponent<Player>();
         playerScript.CmdChangeOwner(playerScript.idPlayer, cardIndex);
         playerScript.CmdTakeMoney(Price);
@@ -43,7 +42,7 @@ public class UtilityCard : Card
         CardReader.cancelButton.GetComponent<Button>().onClick.RemoveAllListeners();
         CardReader.buyPropertyButton.SetActive(false);
         CardReader.cancelButton.SetActive(false);
-        CardReader.utilityPanel.SetActive(false);
+        CardReader.railroadPanel.SetActive(false);
         player.GetComponent<Player>().endMovement();
     }
 
@@ -51,14 +50,14 @@ public class UtilityCard : Card
     {
         CardReader.closeButton.GetComponent<Button>().onClick.RemoveAllListeners();
         CardReader.closeButton.SetActive(false);
-        CardReader.utilityPanel.SetActive(false);
+        CardReader.railroadPanel.SetActive(false);
         player.GetComponent<Player>().endMovement();
     }
-    
+
     public override void doAction(GameObject player)
     {
-        int cardIndex = (id - 12) / 16;
-        int ownerId = GameObject.Find("GameManager").GetComponent<GameManager>().cardsOwner[26 + cardIndex]; // the utilities are 26, 27
+        int cardIndex = (id - 5) / 10;
+        int ownerId = GameObject.Find("GameManager").GetComponent<GameManager>().cardsOwner[22 + cardIndex]; // the railroads are 22,23,24,25
         showCard();
         Debug.Log("Owner's id for " + cardName + " : " + ownerId);
         if (ownerId != -1)
@@ -72,8 +71,7 @@ public class UtilityCard : Card
             else
             {
                 Debug.Log("Player must pay rent to player " + ownerId);
-                int rolledNumber = GameObject.Find("GameManager").GetComponent<GameManager>().currentRolledNumber;
-                int amountPaid = rentMultiplier[numberOfUtilities(ownerId) - 1] * rolledNumber;
+                int amountPaid = rent[numberOfRailroads(ownerId) - 1];
                 CardReader.payRentButton.transform.GetChild(0).GetComponent<Text>().text = "Pay $" + amountPaid;
                 CardReader.payRentButton.SetActive(true);
                 CardReader.payRentButton.GetComponent<Button>().onClick.AddListener(() => payRent(player, playerScript, ownerId, amountPaid));
@@ -81,10 +79,10 @@ public class UtilityCard : Card
         }
         else
         {
-            Debug.Log("Player can buy this utility. Card owner: " + ownerId);
+            Debug.Log("Player can buy this railroad. Card owner: " + ownerId);
             CardReader.buyPropertyButton.SetActive(true);
             CardReader.cancelButton.SetActive(true);
-            CardReader.buyPropertyButton.GetComponent<Button>().onClick.AddListener(() => buyUtility(player));
+            CardReader.buyPropertyButton.GetComponent<Button>().onClick.AddListener(() => buyRailroad(player,22 + cardIndex));
             CardReader.cancelButton.GetComponent<Button>().onClick.AddListener(() => hideCard(player));
         }
         
@@ -94,36 +92,33 @@ public class UtilityCard : Card
     void payRent(GameObject player, Player playerScript, int ownerId, int amountPaid)
     {
         CardReader.payRentButton.GetComponent<Button>().onClick.RemoveAllListeners();
-        CardReader.payRentButton.SetActive(false);       
-
+        CardReader.payRentButton.SetActive(false);
+        
         playerScript.CmdTakeMoney(amountPaid);
         playerScript.CmdGiveMoneyToPlayer(ownerId, amountPaid);
 
-        CardReader.utilityPanel.SetActive(false);
+        CardReader.railroadPanel.SetActive(false);
         player.GetComponent<Player>().endMovement();
     }
 
-    int numberOfUtilities(int ownerId)
+    int numberOfRailroads(int ownerId)
     {
         int count = 0;
-        for (int k = 26; k < 28; k++)
+        for (int k = 22; k < 26; k++)
             if (GameObject.Find("GameManager").GetComponent<GameManager>().cardsOwner[k] == ownerId)
                 count++;
+        Debug.Log("Player " + ownerId + " has " + count + " railroads.");
         return count;
     }
-    
+
     void showCard()
     {
         CardReader.cardPanel.SetActive(false);
-        CardReader.railroadPanel.SetActive(false);
+        CardReader.utilityPanel.SetActive(false);
         closeCard();
 
-        CardReader.utilityPanel.SetActive(true);
-        CardReader.utilityPanel.transform.GetChild(0).GetComponent<Text>().text = cardName;
-        if (id == 12)
-            CardReader.ElectricCompanyLogo.SetActive(true);
-        else
-            CardReader.WaterWorksLogo.SetActive(true);
+        CardReader.railroadPanel.SetActive(true);
+        CardReader.railroadPanel.transform.GetChild(0).GetComponent<Text>().text = cardName;
     }
 
     void closeCard()
@@ -131,7 +126,7 @@ public class UtilityCard : Card
         CardReader.closeButton.GetComponent<Button>().onClick.RemoveAllListeners();
         CardReader.sellPropertyButton.SetActive(false);
         CardReader.closeButton.SetActive(false);
-        CardReader.utilityPanel.SetActive(false);
+        CardReader.railroadPanel.SetActive(false);
     }
 
     public override void showOwnedCard(GameObject player)
@@ -147,13 +142,13 @@ public class UtilityCard : Card
         {
             CardReader.sellPropertyButton.SetActive(true);
             CardReader.sellPropertyButton.GetComponent<Button>().onClick.RemoveAllListeners();
-            CardReader.sellPropertyButton.GetComponent<Button>().onClick.AddListener(() => sellUtility(player));
+            CardReader.sellPropertyButton.GetComponent<Button>().onClick.AddListener(() => sellRailroad(player));
         }
     }
 
-    void sellUtility(GameObject player)
+    void sellRailroad(GameObject player)
     {
-        int cardIndex = 26 + (id - 12) / 16;
+        int cardIndex = 22 + (id - 5) / 10;
         CardReader.sellPropertyButton.GetComponent<Button>().onClick.RemoveAllListeners();
         CardReader.sellPropertyButton.SetActive(false);
         Player playerScript = player.GetComponent<Player>();
@@ -162,4 +157,5 @@ public class UtilityCard : Card
         playerScript.sellProperty(this);
         closeCard();
     }
+
 }

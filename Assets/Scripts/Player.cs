@@ -9,10 +9,8 @@ public class Player : NetworkBehaviour
     [SyncVar] public int idPlayer = 0;
 
     // Serialized just for testing purposes, remove me 
-    [SerializeField][SyncVar]
-    private int indexPosition = 0; // Indicates the position on the board list (the list of cards that are on the board)
-    [SerializeField]
-    private GameObject diceManager, gameManager;
+    [SerializeField] [SyncVar] private int indexPosition = 0; // Indicates the position on the board list (the list of cards that are on the board)
+    [SerializeField] private GameObject diceManager, gameManager;
 
     private Animator anim;
     private DiceScript diceScript;
@@ -20,26 +18,29 @@ public class Player : NetworkBehaviour
     private Vector3 goPosition = new Vector3(2.5f, 0.125f, -6.49f);
     private Vector3 jailPosition = new Vector3(-11f, 0.125f, -6f);
     private Vector3 justVisitingPosition = new Vector3(-11.45854f, 0.125f, -6.49f);
-    private GameObject rollButton, endTurnButton, cardPanel;
+    private GameObject rollButton, endTurnButton, ownedPropertiesPanel;
+    public GameObject ownedPropertyPanelPrefab;// playerInfoPrefab;
     private Text playerMoneyText, idText;
 
     [SyncVar] private Color plyColor;
+    [SyncVar] public int chestJailCardOwner;
+    [SyncVar] public int chanceJailCardOwner;
 
     private Renderer renderer;
-    [SyncVar]
-    private int myMeshIndex;
+    [SyncVar] private int myMeshIndex;
 
-    [SerializeField][SyncVar]
-    private int money = 1500;
+    [SerializeField] [SyncVar] private int money = 1500;
     private int doublesRolled = 0;
     private int roundsInJail = 0;
     private bool inJail = false;
-    [SerializeField] private int stage = -1; // -1 = it's not your turn, 0 = you rolled the dice
+    [SerializeField] private int stage = 0;
+
+    [SerializeField] private List<Card> ownedPropertyCards;
+    private List<GameObject> ownedPropertyList;
 
     void Start()
     {
-
-        gameManager = GameObject.Find("GameManager"); 
+        gameManager = GameObject.Find("GameManager");
         gameManagerScript = gameManager.GetComponent<GameManager>();
         diceManager = GameObject.Find("DiceManager");
         diceScript = diceManager.GetComponent<DiceScript>();
@@ -48,21 +49,22 @@ public class Player : NetworkBehaviour
 
         if (isLocalPlayer)
         {
+            ownedPropertyList = new List<GameObject>();
+            ownedPropertiesPanel = GameObject.Find("OwnedProprietiesPanel");
+            ownedPropertyCards = new List<Card>();
             rollButton = GameObject.Find("RollDice");
             rollButton.GetComponent<Button>().onClick.AddListener(RollTheDice);
+            rollButton.SetActive(false);
             endTurnButton = GameObject.Find("EndTurn");
             endTurnButton.GetComponent<Button>().onClick.AddListener(nextPlayer);
-            rollButton.SetActive(false);
             endTurnButton.SetActive(false);
-            cardPanel = GameObject.Find("Card");
-            cardPanel.SetActive(false);
 
             CmdAddConnectedPlayer(this.gameObject);
             idText = GameObject.Find("idText").GetComponent<Text>();
             playerMoneyText = GameObject.Find("playerMoneyText").GetComponent<Text>();
             transform.position = goPosition;
         }
-
+        
     }
 
     void Update()
@@ -74,24 +76,26 @@ public class Player : NetworkBehaviour
     {
         // exit from update if this is not the local player
         if (!isLocalPlayer)
-            return;
-
-        idText.text = "id: " + idPlayer;
+                return;
         
+        idText.text = "id: " + idPlayer;
+
         // If it's my turn
-        if (gameManagerScript.playerTurn == idPlayer && stage == -1)
-        { 
+        if((isServer && gameManagerScript.gameStarted) || !isServer)
+        if (gameManagerScript.playerTurn == idPlayer && stage == 0)
+        {
             rollButton.SetActive(true);
         }
         else
             rollButton.SetActive(false);
 
+
         // if the diceManager rolled and it's player's turn 
         if (diceScript.rolled == true && gameManagerScript.playerTurn == idPlayer)
-        { 
+        {
             diceScript.rolled = false;
             Debug.Log("Player " + idPlayer + " rolled " + diceScript.rolledNumber);
-            
+
             if (diceScript.isDouble)
                 doublesRolled++;
             else
@@ -104,16 +108,21 @@ public class Player : NetworkBehaviour
                 if (diceScript.isDouble || roundsInJail == 3)
                 {
                     inJail = false;
+                    if (!diceScript.isDouble)
+                        CmdAddMoney(-50);
+                    else
+                        CmdAddMoney(-25);
                     roundsInJail = 0;
                     doublesRolled = 0;
                     diceScript.isDouble = false;
-                    transform.position = justVisitingPosition;
-                    if (!diceScript.isDouble)
-                        CmdAddMoney(-50);
+                    transform.position = justVisitingPosition; 
                 }
 
                 if (roundsInJail < 3 && inJail)
+                {
+                    CmdSetDiceInactive();
                     endTurn();
+                }
             }
 
             if (doublesRolled == 3)
@@ -121,15 +130,19 @@ public class Player : NetworkBehaviour
                 goToJail();
             }
             else if (!inJail)
-                StartCoroutine("animateMovement", diceScript.rolledNumber);
+                moveSpaces(diceScript.rolledNumber);
 
             diceScript.rolledNumber = 0;
         }
 
-
         playerMoneyText.text = "$" + money;
+
     }
 
+    public void moveSpaces(int amount)
+    {
+        StartCoroutine("animateMovement", amount);
+    }
 
     IEnumerator animateMovement(int amountToMove)
     {
@@ -137,12 +150,12 @@ public class Player : NetworkBehaviour
         gameManagerScript.targetPlayer = this.gameObject;
 
         for (int i = 0; i < amountToMove; i++)
-        { 
+        {
             if (indexPosition % 10 == 9 || indexPosition % 10 == 0)
             {
                 anim.Play("StraightMovementToCorner", 0);
                 CmdMovePlayer();
-                
+
                 yield return new WaitForSeconds(anim.GetCurrentAnimatorStateInfo(0).length);
 
                 if (indexPosition == 0)
@@ -154,7 +167,7 @@ public class Player : NetworkBehaviour
 
                 if (indexPosition % 10 == 0)
                 {
-                    transform.eulerAngles += new Vector3(0, 90, 0); 
+                    transform.eulerAngles += new Vector3(0, 90, 0);
                 }
 
             }
@@ -172,68 +185,185 @@ public class Player : NetworkBehaviour
         {
             goToJail();
         }
-        else if (diceScript.isDouble)
+        else
         {
-            CmdSetDiceInactive();
-            stage = -1; 
+            stage = 2;
+            if(diceManager.transform.childCount > 0)
+                CmdSetDiceInactive();
+
+            if(indexPosition == 12 || indexPosition == 28) // Utilities
+            {
+                int utilityIndex = (indexPosition - 12) / 16;
+                //Debug.Log(CardReader.utilityCards[utilityIndex].ToString());
+                CardReader.utilityCards[utilityIndex].doAction(this.gameObject);
+            }
+            else if(indexPosition == 5 || indexPosition == 15 || indexPosition == 25 || indexPosition == 35) // Railroads
+            {
+                int railroadIndex = (indexPosition - 5) / 10;
+                //Debug.Log(CardReader.railroadCards[railroadIndex].ToString());
+                CardReader.railroadCards[railroadIndex].doAction(this.gameObject);
+            }
+            else if(indexPosition == 4) // Income Tax - Pay $200
+            {
+                CmdTakeMoney(200);
+                endMovement();
+            }
+            else if (indexPosition == 38) // Luxury Tax - Pay $100
+            {
+                CmdTakeMoney(100);
+                endMovement();
+            }
+            else if (indexPosition == 2 || indexPosition == 17 || indexPosition == 33) // Comunity Chest
+            {
+                int eventNr = 0;
+                if (chestJailCardOwner == -1)
+                    eventNr = Random.Range(0, 14);
+                else
+                    eventNr = Random.Range(0, 13);
+
+                Debug.Log("Event nr: " + eventNr + " triggered.");
+                Debug.Log(CardReader.chestCards[eventNr].ToString());
+                CardReader.chestCards[eventNr].doAction(this.gameObject);
+            }
+            else if (indexPosition == 7 || indexPosition == 22 || indexPosition == 36) //Chance
+            {
+                int eventNr = 0;
+                if (chanceJailCardOwner == -1)
+                    eventNr = Random.Range(0, 14);
+                else
+                    eventNr = Random.Range(0, 13);
+
+                Debug.Log("Event nr: " + eventNr + " triggered.");
+                Debug.Log(CardReader.chanceCards[eventNr].ToString());
+                CardReader.chanceCards[eventNr].doAction(this.gameObject);
+            }
+            else
+            {
+                int cardIndex = CardReader.getPropertyCardIndex(indexPosition);
+                Debug.Log("Property card index: " + cardIndex);
+                if (cardIndex != -1) // if it's a property card
+                {
+                    CardReader.propertyCards[cardIndex].doAction(this.gameObject);
+                }
+                else
+                    endMovement();
+            }
+        }
+
+    }
+
+    public Renderer getRenderer() { return renderer; }
+    public void setPlyColor(Color value) { plyColor = value; }
+    public Color getPlyColor() { return plyColor; }
+    public int getMyMeshIndex() { return myMeshIndex; }
+    public void setMyMeshIndex(int value) { myMeshIndex = value; }
+    public int getIndexPosition() { return indexPosition; }
+    public int getStage() { return stage;  }
+    public int getMoney() { return money; }
+
+    public void endMovement()
+    {
+        //CmdSetDiceInactive();
+        if (diceScript.isDouble)
+        {
+            stage = 0;
         }
         else
             endTurn();
     }
 
-    public Renderer getRenderer()
-    {
-        return renderer;
-    }
-
-    public void setPlyColor(Color value)
-    {
-        plyColor = value;
-    }
-
-    public Color getPlyColor()
-    {
-        return plyColor;
-    }
-
-    public int getMyMeshIndex(){ return myMeshIndex; }
-    public void setMyMeshIndex(int value) { myMeshIndex = value; }
-
     void endTurn()
     {
-        rollButton.SetActive(false);
-        int cardIndex = CardReader.getPropertyCardIndex(indexPosition);
-        if (cardIndex != -1) // if it's a property card
-        {
-
-            cardPanel.SetActive(true);
-            Debug.Log(CardReader.propertyCards[cardIndex].ToString());
-            cardPanel.transform.GetChild(0).transform.GetChild(0).GetComponent<Text>().text = CardReader.propertyCards[cardIndex].CardName;
-            cardPanel.transform.GetChild(1).GetComponent<Text>().text = "RENT $" + CardReader.propertyCards[cardIndex].rent[0].ToString();
-
-            cardPanel.transform.GetChild(3).GetComponent<Text>().text =
-                "$" + CardReader.propertyCards[cardIndex].rent[1].ToString() + '\n' +
-                "$" + CardReader.propertyCards[cardIndex].rent[2].ToString() + '\n' +
-                "$" + CardReader.propertyCards[cardIndex].rent[3].ToString() + '\n' +
-                "$" + CardReader.propertyCards[cardIndex].rent[4].ToString() + '\n';
-
-            cardPanel.transform.GetChild(4).GetComponent<Text>().text =
-                "With HOTEL $" + CardReader.propertyCards[cardIndex].rent[5].ToString() + '\n' +
-                "Mortgage Value $" + CardReader.propertyCards[cardIndex].mortgageValue.ToString() + '\n' +
-                "Houses cost $" + CardReader.propertyCards[cardIndex].pricePerHouse.ToString() + " each\n" +
-                "Hotels, $" + CardReader.propertyCards[cardIndex].pricePerHouse.ToString() + " plus 4 houses"; 
-
-        }
         endTurnButton.SetActive(true);
+    }
+
+    void nextPlayer()
+    {
+        endTurnButton.SetActive(false);
+        stage = 0;
+        CmdNextPlayer();
+    }
+
+    public void buyProperty(Card propertyCard)
+    {
+        Debug.Log("Bought " + propertyCard.CardName);
+
+        int numberOfOwnedCards = ownedPropertyCards.Count;
+        //Debug.Log("Nr of owned cards: " + numberOfOwnedCards);
+
+        GameObject ownedPropertyPanel = Instantiate(ownedPropertyPanelPrefab);
+
+        if(propertyCard.GetType() == typeof(PropertyCard))
+            ownedPropertyPanel.transform.GetComponent<Image>().color = new Color32((byte)((PropertyCard)propertyCard).cardColor[0], 
+                (byte)((PropertyCard)propertyCard).cardColor[1], (byte)((PropertyCard)propertyCard).cardColor[2], 255);
+
+        ownedPropertyPanel.transform.SetParent(ownedPropertiesPanel.transform);
+        ownedPropertyPanel.transform.position = new Vector3(0, 0, 0);
+        ownedPropertyPanel.GetComponent<RectTransform>().localScale = new Vector3(1,1,1);
+        ownedPropertyPanel.transform.GetChild(0).GetComponent<Text>().text = propertyCard.CardName;
+        ownedPropertyPanel.GetComponent<Button>().onClick.AddListener(() => propertyCard.showOwnedCard(this.gameObject));        
+        //Debug.LogError("Owned Property Panel List Count: " + ownedPropertyList.Count);
+        
+        // find the new position in the list
+        int newIndex = 0;
+        if(numberOfOwnedCards > 0)
+            while (newIndex < numberOfOwnedCards && ownedPropertyCards[newIndex].Id < propertyCard.Id) newIndex++;
+        
+        // last position
+        if (newIndex == numberOfOwnedCards)
+        {
+            ownedPropertyCards.Add(propertyCard);
+            ownedPropertyList.Add(ownedPropertyPanel);
+            changePositionOfPanel(ownedPropertyPanel, newIndex);
+        }
+        else
+        {
+            ownedPropertyCards.Insert(newIndex, propertyCard);
+            ownedPropertyList.Insert(newIndex, ownedPropertyPanel);
+            changePositionOfPanel(ownedPropertyPanel, newIndex);
+            for(int k=newIndex+1; k < numberOfOwnedCards+1; k++)
+                changePositionOfPanel(ownedPropertyList[k], k);
+        }
+
+    }
+
+    void changePositionOfPanel(GameObject ownedPropertyPanel, int position)
+    {
+        ownedPropertyPanel.GetComponent<RectTransform>().offsetMax = new Vector2(0, -29.7f * position);
+        ownedPropertyPanel.GetComponent<RectTransform>().offsetMin = new Vector2(0, 363 - 29.7f * position);
+    }
+
+    public void sellProperty(Card propertyCard)
+    {
+
+        Debug.Log("Sold " + propertyCard.CardName);        
+        int cardIndex = ownedPropertyCards.IndexOf(propertyCard);
+        if (cardIndex == -1)
+        {
+            Debug.LogError("Tried to delete " + propertyCard.CardName);
+            return;
+        }
+        
+        ownedPropertyCards.Remove(propertyCard);
+        
+        // move all the cards under the removed one
+        for(int k = cardIndex + 1; k < ownedPropertyList.Count; k++)
+        {
+            changePositionOfPanel(ownedPropertyList[k], k - 1);
+        }
+
+        Destroy(ownedPropertyList[cardIndex]);
+        ownedPropertyList.RemoveAt(cardIndex);
+        
     }
 
     // This function is to make the link between the button on click event and sending a command
     void RollTheDice()
     {
-        //Debug.Log("You have clicked the button!");
-        stage = 0;
+        stage = 1;
         rollButton.SetActive(false);
         diceScript.diceCounter = 0;
+        //Debug.LogError("Dice counter becomes 0.");
         diceScript.rolledNumber = 0;
         CmdRollDice();
     }
@@ -245,16 +375,7 @@ public class Player : NetworkBehaviour
         diceScript.CmdRollDice();
     }
 
-    void nextPlayer()
-    {
-        cardPanel.SetActive(false);
-        endTurnButton.SetActive(false);
-        stage = -1;
-        CmdSetDiceInactive();
-        CmdNextPlayer();
-    }
-
-    void goToJail()
+    public void goToJail()
     {
         indexPosition = 10;
         doublesRolled = 0;
@@ -262,6 +383,10 @@ public class Player : NetworkBehaviour
         inJail = true;
         transform.position = jailPosition;
         transform.eulerAngles = new Vector3(0, 90, 0);
+
+        if (diceManager.transform.childCount > 0)
+            CmdSetDiceInactive();
+
         endTurn();
     }
 
@@ -279,10 +404,54 @@ public class Player : NetworkBehaviour
         myMeshIndex = newMeshIndex;
     }
 
+    [ClientRpc]
+    public void RpcCreatePlayerInfo(int id, GameObject playerInfo)
+    { 
+        Debug.Log("Player " + id + " added info");
+        playerInfo.transform.GetChild(0).GetComponent<Text>().text = "Player " + id + "\n$" + money;
+        playerInfo.transform.SetParent(GameObject.Find("PlayersPanel").transform);
+        playerInfo.GetComponent<RectTransform>().offsetMax = new Vector2(-17, -(12 + 58 * id));
+        playerInfo.GetComponent<RectTransform>().offsetMin = new Vector2(21, 260 - 60 * id);
+        playerInfo.GetComponent<RectTransform>().localScale = new Vector3(1, 1, 1);
+    }
+
+    [ClientRpc]
+    public void RpcChangeColorOnPanel(GameObject playerInfo,byte r,byte g,byte b,byte a)
+    {
+        playerInfo.transform.GetComponent<Image>().color = new Color32(r,g,b,a);
+    }
+
+    [Command]
+    public void CmdChangeOwner(int newOwnerId, int cardIndex)
+    {
+        gameManagerScript.CmdChangeOwner(cardIndex, newOwnerId);
+    }
+
+    [Command]
+    public void CmdGiveMoneyToPlayer(int ownerId, int amountPaid)
+    {
+        gameManagerScript.CmdGiveMoneyToPlayer(ownerId, amountPaid);
+    }
+     
+    [ClientRpc]
+    public void RpcChangeMoneyOnPanel(GameObject playerInfo)
+    {
+        playerInfo.transform.GetChild(0).GetComponent<Text>().text = "Player " + idPlayer + "\n$" + money;
+    }
+     
     [Command]
     public void CmdAddMoney(int amount)
     {
         money += amount;
+        //gameManagerScript.CmdChangeMoneyOnPanel(idPlayer, money);
+    }
+
+    [Command]
+    public void CmdTakeMoney(int amount)
+    {
+        Debug.Log("Took $" + amount);
+        money -= amount;
+        //gameManagerScript.CmdChangeMoneyOnPanel(idPlayer, money);
     }
 
     [Command]

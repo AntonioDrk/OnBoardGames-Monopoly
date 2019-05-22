@@ -2,11 +2,15 @@
 using System.Collections.Generic;
 using System;
 using UnityEngine;
+using UnityEngine.UI;
+using UnityEngine.Networking;
 
 [Serializable]
 public class PropertyCard : Card
 {
     public int id;
+    public int cardIndex;
+    public int[] cardColor = new int[3];
     public string cardName;
     public int priceValue;
     public int mortgageValue;
@@ -19,54 +23,66 @@ public class PropertyCard : Card
 
     public void PropertyCardConstructor()
     {
-        //Debug.Log(id);
         Id = id;
         CardName = cardName;
         Price = priceValue;
         Mortgage = mortgageValue;
-        OwnerId = -1;
-        propertiesFromSameGroup = new int[cardsInGroup - 1];
-    }
-
-    // Start is called before the first frame update
-    void Start()
-    {
-
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-
     }
 
     public override string ToString()
-    { 
-        return Id.ToString() + ": " + cardName.ToString() + " " +
-            priceValue.ToString() + " " + mortgageValue.ToString() + " " +
-            hasHotel.ToString() + " " +
-            housesBuilt.ToString();
+    {
+        return "Id: " + Id.ToString() +
+               "\nName: " + cardName.ToString() +
+               "\nPrice: " + priceValue.ToString() +
+               "\nMortgage: " + mortgageValue.ToString() +
+               "\nHotel: " + hasHotel.ToString() +
+               "\nHouses: " + housesBuilt.ToString();
     }
 
-    public override void doAction(int playerId)
+    public override void doAction(GameObject player)
     {
-        if (OwnerId > 0)
+        int ownerId = GameObject.Find("GameManager").GetComponent<GameManager>().cardsOwner[cardIndex];
+        showCard();
+        Debug.Log("Owner's id for " + cardName + " : " + ownerId);
+        if (ownerId != -1)
         {
-            if (OwnerId != playerId)
+            Player playerScript = player.GetComponent<Player>();
+            if (ownerId == playerScript.idPlayer)
             {
-                Debug.Log("Player must pay rent.");
-                /*if (hasHotel)
-                    Player.money -= rent[6];
-                else
-                    Player.money -= rent[housesBuilt];*/
-                //Debug.Log("Player + " Player.idPlayer + " paid $" + rent + " to player " + OwnerId);
+                CardReader.closeButton.SetActive(true);
+                CardReader.closeButton.GetComponent<Button>().onClick.AddListener(() => closeCard(player));
+            }
+            else
+            { 
+                Debug.Log("Player must pay rent to player " + ownerId);
+                int amountPaid = calculateRent(ownerId);
+                CardReader.payRentButton.transform.GetChild(0).GetComponent<Text>().text = "Pay $" + amountPaid;
+                CardReader.payRentButton.SetActive(true);
+                CardReader.payRentButton.GetComponent<Button>().onClick.AddListener(() => payRent(player,playerScript, ownerId, amountPaid));
             }
         }
         else
         {
-            Debug.Log("Player must buy this property.");
-            // TO-DO: print card on the screen and buttons to buy the property or auction it
+            Debug.Log("Player can buy this property. Card owner: " + ownerId);
+            CardReader.buyPropertyButton.SetActive(true);
+            CardReader.cancelButton.SetActive(true);
+            CardReader.buyPropertyButton.GetComponent<Button>().onClick.AddListener(() => buyProperty(player));
+            CardReader.cancelButton.GetComponent<Button>().onClick.AddListener(() => hideCard(player));
         }
+
+    }
+
+    //  verifies if the player has all properties in the same colour group but no houses on the property he landed on
+    bool hasAllProperties(int ownerId)
+    {
+        if (housesBuilt != 0) return false;
+        for(int index=0; index < propertiesFromSameGroup.Length; index++)
+        {
+            if (GameObject.Find("GameManager").GetComponent<GameManager>().cardsOwner[propertiesFromSameGroup[index]] != ownerId)
+                return false;
+        }
+        Debug.Log("Player " + ownerId + " has all properies.");
+        return true;
     }
 
     //  verifies if the all properties in the same colour group are equally developed
@@ -92,7 +108,7 @@ public class PropertyCard : Card
 
         return true;
     }
-    
+
     public void buildHouse()
     {
         if (!hasHotel && housesBuilt <= 3 && propertiesAreEquallyDeveloped())
@@ -113,4 +129,121 @@ public class PropertyCard : Card
         hasHotel = true;
         // TO-DO: animation for hotel being built
     }
+    
+    public override void showOwnedCard(GameObject player)
+    {
+        if (player.GetComponent<Player>().getStage() != 0) 
+            return;
+        showCard();
+        CardReader.closeButton.SetActive(true);
+        CardReader.closeButton.GetComponent<Button>().onClick.AddListener(closeCard);
+
+        // if it's your turn you can sell/buy houses and sell the property
+        if (GameObject.Find("GameManager").GetComponent<GameManager>().playerTurn == player.GetComponent<Player>().idPlayer)
+        {
+            CardReader.sellPropertyButton.SetActive(true);
+            CardReader.sellPropertyButton.GetComponent<Button>().onClick.RemoveAllListeners();
+            CardReader.sellPropertyButton.GetComponent<Button>().onClick.AddListener(() => sellProperty(player));
+        }
+
+    }
+
+    void showCard()
+    {
+        CardReader.railroadPanel.SetActive(false);
+        CardReader.utilityPanel.SetActive(false);
+        closeCard();
+
+        GameObject cardPanel = CardReader.cardPanel;
+        cardPanel.SetActive(true);
+
+        cardPanel.transform.GetChild(0).transform.GetComponent<Image>().color
+            = new Color32((byte)cardColor[0], (byte)cardColor[1], (byte)cardColor[2], 255);
+        cardPanel.transform.GetChild(0).transform.GetChild(0).GetComponent<Text>().text = cardName;
+        cardPanel.transform.GetChild(1).GetComponent<Text>().text = "RENT $" + rent[0].ToString();
+
+        cardPanel.transform.GetChild(3).GetComponent<Text>().text =
+            "$" + rent[1].ToString() + '\n' +
+            "$" + rent[2].ToString() + '\n' +
+            "$" + rent[3].ToString() + '\n' +
+            "$" + rent[4].ToString() + '\n';
+
+        cardPanel.transform.GetChild(4).GetComponent<Text>().text =
+            "With HOTEL $" + rent[5].ToString() + '\n' +
+            "Mortgage Value $" + mortgageValue.ToString() + '\n' +
+            "Houses cost $" + pricePerHouse.ToString() + " each\n" +
+            "Hotels, $" + pricePerHouse.ToString() + " plus 4 houses";
+    }
+
+    void closeCard()
+    {
+        CardReader.closeButton.GetComponent<Button>().onClick.RemoveAllListeners();
+        CardReader.sellPropertyButton.SetActive(false);
+        CardReader.closeButton.SetActive(false);
+        CardReader.cardPanel.SetActive(false);
+    }
+
+    void closeCard(GameObject player)
+    {
+        CardReader.closeButton.GetComponent<Button>().onClick.RemoveAllListeners();
+        CardReader.closeButton.SetActive(false);
+        CardReader.cardPanel.SetActive(false);
+        player.GetComponent<Player>().endMovement();
+    }
+
+    void hideCard(GameObject player)
+    {
+        CardReader.buyPropertyButton.GetComponent<Button>().onClick.RemoveAllListeners();
+        CardReader.cancelButton.GetComponent<Button>().onClick.RemoveAllListeners();
+        CardReader.buyPropertyButton.SetActive(false);
+        CardReader.cancelButton.SetActive(false);
+        CardReader.cardPanel.SetActive(false);
+        player.GetComponent<Player>().endMovement();
+    }
+
+    void buyProperty(GameObject player)
+    {
+        Player playerScript = player.GetComponent<Player>();
+        playerScript.CmdChangeOwner(playerScript.idPlayer, cardIndex); 
+        playerScript.CmdTakeMoney(priceValue);
+        playerScript.buyProperty(this);
+        hideCard(player);
+    }
+
+    void sellProperty(GameObject player)
+    {
+        CardReader.sellPropertyButton.GetComponent<Button>().onClick.RemoveAllListeners();
+        CardReader.sellPropertyButton.SetActive(false);
+        Player playerScript = player.GetComponent<Player>();
+        playerScript.CmdChangeOwner(-1, cardIndex);
+        playerScript.CmdAddMoney(mortgageValue); // players get in return the card's mortgage value
+        playerScript.sellProperty(this);
+        closeCard();
+    }
+
+    int calculateRent(int ownerId)
+    {
+        int amountPaid = 0;
+        if (hasHotel)
+            amountPaid = rent[5];
+        else if (hasAllProperties(ownerId)) //daca are toate din color group si fara case=> rent[0]x2
+            amountPaid = 2 * rent[0];
+        else
+            amountPaid = rent[housesBuilt];
+        return amountPaid;
+    }
+
+    // player pays rent to player[ownerId]
+    void payRent(GameObject player, Player playerScript, int ownerId, int amountPaid) 
+    { 
+        CardReader.payRentButton.GetComponent<Button>().onClick.RemoveAllListeners();
+        CardReader.payRentButton.SetActive(false);
+         
+        playerScript.CmdTakeMoney(amountPaid);
+        playerScript.CmdGiveMoneyToPlayer(ownerId, amountPaid);
+
+        CardReader.cardPanel.SetActive(false);
+        player.GetComponent<Player>().endMovement();
+    }
+
 }

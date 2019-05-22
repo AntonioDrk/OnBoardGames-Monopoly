@@ -21,15 +21,20 @@ public class DiceScript : NetworkBehaviour
 
     public void addDice(int rolledValue)
     {
-        //Debug.Log("Dice counter: " + diceCounter);
         diceCounter++;
         rolledNumber += rolledValue;
+        //Debug.LogError("Dice counter: " + diceCounter);// + ". Dice value: " + rolledValue);
         if (diceCounter == 2)
         {
+            //Debug.LogError("Dice counter: " + diceCounter);
             if (rolledValue == rolledNumber - rolledValue)
                 isDouble = true;
             else
                 isDouble = false;
+
+            gameManager.GetComponent<GameManager>().currentRolledNumber = rolledNumber;
+            //rolledNumber = 12;
+
             rolled = true;
         }
     }

@@ -9,15 +9,69 @@ public class CardReader : MonoBehaviour
     string propertiesFile = "Data files/Properties.json";
     string railroadsFile = "Data files/Railroads.json";
     string utilitiesFile = "Data files/Utilities.json";
-    
+    string chanceFile = "Data files/Chance.json";
+    string chestFile = "Data files/CommunityChest.json";
+
     static public PropertyCard[] propertyCards;
+    static public RailroadCard[] railroadCards;
+    static public UtilityCard[] utilityCards;
+    static public EventCard[] chanceCards;
+    static public EventCard[] chestCards;
+
+    static public GameObject cardPanel, buyPropertyButton, cancelButton, payRentButton, closeButton, closeEventButton, eventPanel,
+                                ComunityChestLogo, ChanceLogo, sellPropertyButton, sellHouseButton, buyHouseButton, railroadPanel,
+                                utilityPanel, ElectricCompanyLogo, WaterWorksLogo;
 
     // Start is called before the first frame update
     void Start()
     {
         LoadPropertyCards(propertiesFile);
-        LoadRailwayCards(railroadsFile);
+        LoadRailroadCards(railroadsFile);
         LoadUtilityCards(utilitiesFile);
+        LoadChanceCards(chanceFile);
+        LoadChestCards(chestFile);
+
+        // Utilities
+        utilityPanel = GameObject.Find("UtilityCard");
+        ElectricCompanyLogo = GameObject.Find("ElectricCompanyLogo");
+        ElectricCompanyLogo.SetActive(false);
+        WaterWorksLogo = GameObject.Find("WaterWorksLogo");
+        WaterWorksLogo.SetActive(false);
+        utilityPanel.SetActive(false);
+
+        // Railroad Card
+        railroadPanel = GameObject.Find("RailroadCard");
+        railroadPanel.SetActive(false);
+
+        // Property Card
+        cardPanel = GameObject.Find("Card");
+        buyPropertyButton = GameObject.Find("BuyProperty");
+        buyPropertyButton.SetActive(false);
+        cancelButton = GameObject.Find("Cancel");
+        cancelButton.SetActive(false);
+        closeButton = GameObject.Find("Close");
+        closeButton.SetActive(false);
+        payRentButton = GameObject.Find("PayRent");
+        payRentButton.SetActive(false);
+
+        // Owned Card
+        sellPropertyButton = GameObject.Find("SellProperty");
+        sellPropertyButton.SetActive(false);
+        sellHouseButton = GameObject.Find("SellHouse");
+        sellHouseButton.SetActive(false);
+        buyHouseButton = GameObject.Find("BuyHouse");
+        buyHouseButton.SetActive(false);
+        cardPanel.SetActive(false);
+
+        // Event Card
+        eventPanel = GameObject.Find("EventCard");
+        closeEventButton = GameObject.Find("CloseEvent");
+        //closeEventButton.SetActive(false);
+        ComunityChestLogo = GameObject.Find("ComunityChestLogo");
+        ComunityChestLogo.SetActive(false);
+        ChanceLogo = GameObject.Find("ChanceLogo");
+        ChanceLogo.SetActive(false);
+        eventPanel.SetActive(false);
     }
 
     // Update is called once per frame
@@ -47,9 +101,6 @@ public class CardReader : MonoBehaviour
             
             for (int i = 0; i < propertyCards.Length; i++)
                 propertyCards[i].PropertyCardConstructor();
-
-            /*for (int i = 0; i < propertyCards.Length; i++)
-                Debug.Log(propertyCards[i].ToString());*/
         }
         else
         {
@@ -57,20 +108,20 @@ public class CardReader : MonoBehaviour
         }
 
     }
-
-    public void LoadRailwayCards(string fileName)
+    
+    public void LoadRailroadCards(string fileName)
     {
         string filePath = Path.Combine(Application.dataPath, fileName);
 
         if (File.Exists(filePath))
         {
             string railwaysJson = File.ReadAllText(filePath);
-            RailwayCard[] loadedData = JsonHelper.FromJson<RailwayCard>(railwaysJson);
+            railroadCards = JsonHelper.FromJson<RailroadCard>(railwaysJson);
 
-            Debug.Log(fileName + " data retrieved. " + loadedData.Length + " cards loaded.");
+            Debug.Log(fileName + " data retrieved. " + railroadCards.Length + " cards loaded.");
 
-            /*for (int i = 0; i < loadedData.Length; i++)
-                Debug.Log(loadedData[i].ToString());*/
+            for (int i = 0; i < railroadCards.Length; i++)
+                railroadCards[i].RailroadCardConstructor();            
         }
         else
         {
@@ -85,12 +136,58 @@ public class CardReader : MonoBehaviour
         if (File.Exists(filePath))
         {
             string utilitiesJson = File.ReadAllText(filePath);
-            UtilityCard[] loadedData = JsonHelper.FromJson<UtilityCard>(utilitiesJson);
-             
-            Debug.Log(fileName + " data retrieved. " + loadedData.Length + " cards loaded.");
+            utilityCards = JsonHelper.FromJson<UtilityCard>(utilitiesJson);
 
-            /*for (int i = 0; i < loadedData.Length; i++)
-                Debug.Log(loadedData[i].ToString());*/
+            Debug.Log(fileName + " data retrieved. " + utilityCards.Length + " cards loaded.");
+
+            for (int i = 0; i < utilityCards.Length; i++)
+                utilityCards[i].UtilityCardConstructor();            
+        }
+        else
+        {
+            Debug.LogError("Cannot load file:" + fileName);
+        }
+    }
+
+    public void LoadChanceCards(string fileName)
+    {
+        string filePath = Path.Combine(Application.dataPath, fileName);
+
+        if (File.Exists(filePath))
+        {
+            string chanceJson = File.ReadAllText(filePath);
+            chanceCards = JsonHelper.FromJson<EventCard>(chanceJson);
+
+            Debug.Log(fileName + " data retrieved. " + chanceCards.Length + " cards loaded.");
+
+            for (int i = 0; i < chanceCards.Length; i++)
+                chanceCards[i].EventCardConstructor();
+
+            //for (int i = 0; i < chanceCards.Length; i++)
+               // Debug.Log(chanceCards[i].ToString());
+        }
+        else
+        {
+            Debug.LogError("Cannot load file:" + fileName);
+        }
+    }
+
+    public void LoadChestCards(string fileName)
+    {
+        string filePath = Path.Combine(Application.dataPath, fileName);
+
+        if (File.Exists(filePath))
+        {
+            string chestJson = File.ReadAllText(filePath);
+            chestCards = JsonHelper.FromJson<EventCard>(chestJson);
+
+            Debug.Log(fileName + " data retrieved. " + chestCards.Length + " cards loaded.");
+
+            for (int i = 0; i < chestCards.Length; i++)
+                chestCards[i].EventCardConstructor();
+
+            //for (int i = 0; i < chestCards.Length; i++)
+               // Debug.Log(chestCards[i].ToString());
         }
         else
         {

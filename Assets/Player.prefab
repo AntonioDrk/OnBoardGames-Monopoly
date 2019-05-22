@@ -50,8 +50,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   idPlayer: 0
   indexPosition: 0
-  dice: {fileID: 0}
+  diceManager: {fileID: 0}
   gameManager: {fileID: 0}
+  ownedPropertyPanelPrefab: {fileID: 3958510613029917670, guid: a9de705e55292124f9ecd76ebbe07d4d,
+    type: 3}
+  playerInfoPrefab: {fileID: 1957596252967745488, guid: c81b5de9ee728444d8cd4990e86b8d39,
+    type: 3}
+  money: 1500
+  stage: 0
+  ownedPropertyCards: []
 --- !u!95 &5493900274388599887
 Animator:
   serializedVersion: 3

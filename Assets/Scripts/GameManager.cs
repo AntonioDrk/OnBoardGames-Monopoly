@@ -5,8 +5,8 @@ using UnityEngine.UI;
 using UnityEngine.Networking;
 
 public class GameManager : NetworkBehaviour
-{  
-
+{
+    public int nrOfPlayers = 0;
     public bool targetPlayerIsMoving = false;
     public GameObject targetPlayer; 
 
@@ -26,20 +26,29 @@ public class GameManager : NetworkBehaviour
     [SyncVar] public int playerTurn = 0; 
     [SyncVar] public int connectedPlayers = 0;
     public List<GameObject> players;
+    public SyncListInt cardsOwner;
 
-    [SerializeField]
-    private List<Mesh> meshes; // Set them at startup in the editor!!
+    [SerializeField] private List<Mesh> meshes; // Set them at startup in the editor!!
     private List<int> meshesIndexes; // Indexes of the meshes to use
-
-
+    public GameObject playerInfoPrefab;
+    private GameObject[] playerInfo = new GameObject[6];
+    public bool gameStarted = false;
+    private GameObject startGameButton;
+    public int currentRolledNumber;
+    
     void Start()
     { 
-        
-        mainCamera = Camera.main;
 
+        mainCamera = Camera.main;
+        
         connectedPlayersText = GameObject.Find("connectedPlayersText").GetComponent<Text>();
         playerTurnText = GameObject.Find("playerTurnText").GetComponent<Text>(); 
         playerTurnText.text = "Turn: Player " + playerTurn;
+        startGameButton = GameObject.Find("StartGame");
+        startGameButton.GetComponent<Button>().onClick.AddListener(startGame);
+
+        if (!isServer)
+            startGameButton.SetActive(false);
 
         players = new List<GameObject>();
 
@@ -55,20 +64,46 @@ public class GameManager : NetworkBehaviour
         {
             meshesIndexes.Add(i);
         }
+
+        for (int i = 0; i < 28; i++)
+            cardsOwner.Add(-1);
     } 
-     
+
     void Update()
     {
         playerTurnText.text = "Turn: Player " + playerTurn;
         connectedPlayersText.text = connectedPlayers + " players";
+        
+        if(gameStarted && isServer)
+            for (int i = 0; i < connectedPlayers; i++)
+                CmdChangeMoneyOnPanel(i, players[i].GetComponent<Player>().getMoney());
 
-        if (targetPlayerIsMoving)
+            if (targetPlayerIsMoving)
             UpdatePosCamera(targetPlayer);
         else
         {
             mainCamera.transform.position = cameraPosition;
             mainCamera.transform.eulerAngles = new Vector3(90, 0, 0);
         }
+    }
+    
+    void startGame()
+    {
+        nrOfPlayers = connectedPlayers;
+        Debug.Log("Nr of players: " + nrOfPlayers);
+        gameStarted = true;
+        startGameButton.GetComponent<Button>().onClick.RemoveAllListeners();
+        startGameButton.SetActive(false);
+
+        Debug.Log("GAME STARTED");
+        for (int i = 0; i < nrOfPlayers; i++)
+        {
+            Debug.Log("Server creates info for player " + i);
+            playerInfo[i] = Instantiate(playerInfoPrefab);
+            NetworkServer.Spawn(playerInfo[i]);
+            players[i].GetComponent<Player>().RpcCreatePlayerInfo(i, playerInfo[i]);
+        }
+        players[0].GetComponent<Player>().RpcChangeColorOnPanel(playerInfo[0], 183, 84, 84, 150);
     }
 
     // Moves the camera to face the player
@@ -115,15 +150,43 @@ public class GameManager : NetworkBehaviour
             players[i].GetComponent<Player>().RpcUpdateColor(players[i].GetComponent<Player>().getPlyColor());
             players[i].GetComponent<Player>().RpcUpdateMesh(players[i].GetComponent<Player>().getMyMeshIndex());
         }
+        
+    }
+
+    [Command]
+    public void CmdChangeMoneyOnPanel(int i, int money)
+    {
+        players[i].GetComponent<Player>().RpcChangeMoneyOnPanel(playerInfo[i]);
     }
 
     public void CmdNextPlayer()
     {
         // Make sure this is run only on the server to not fuck up something
-        if (!isServer) return;
+        if (!isServer)
+            return;
 
+        players[playerTurn].GetComponent<Player>().RpcChangeColorOnPanel(playerInfo[playerTurn],255,255,255,150);
         playerTurn = (playerTurn + 1) % connectedPlayers;
         Debug.Log("playerTurn: " + playerTurn);
+        players[playerTurn].GetComponent<Player>().RpcChangeColorOnPanel(playerInfo[playerTurn],183, 84, 84, 150);
+    }
+     
+    public void CmdChangeOwner(int cardIndex, int newOwnerId)
+    { 
+        if (!isServer) return;
+        cardsOwner[cardIndex] = newOwnerId;
+        Debug.Log("Owner changed for " + cardIndex + " : " + newOwnerId);
+    }
+        
+    public void CmdGiveMoneyToPlayer(int playerId, int amount)
+    {
+        if (!isServer)
+        {
+            Debug.LogError("Clientul a incercat sa intre in cmd");
+            return; // ?
+        }
+        players[playerId].GetComponent<Player>().CmdAddMoney(amount);
+        //Debug.LogError("Added " + amount + " to " + playerId);
     }
 
     [Command]
@@ -142,6 +205,8 @@ public class GameManager : NetworkBehaviour
         players.Remove(playerDisconnected);
         NetworkServer.Destroy(playerDisconnected);
         connectedPlayers--;
+        // DESTROY PANEL OF DISCONNECTED PLAYER
+        // SELL HIS PROPERTIES TO THE BANK
     }
 
 //   ----------------  Getters and Setters   ----------------  
