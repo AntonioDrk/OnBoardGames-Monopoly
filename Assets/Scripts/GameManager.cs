@@ -37,9 +37,14 @@ public class GameManager : NetworkBehaviour
     public int currentRolledNumber;
 
     private List<Color> playerColors;
-    
+
+    [SyncVar] public int chestJailCardOwner;
+    [SyncVar] public int chanceJailCardOwner;
+
     void Start()
-    { 
+    {
+        chestJailCardOwner = -1;
+        chanceJailCardOwner = -1;
 
         mainCamera = Camera.main;
         
@@ -166,6 +171,14 @@ public class GameManager : NetworkBehaviour
             players[i].GetComponent<Player>().RpcUpdateMesh(players[i].GetComponent<Player>().getMyMeshIndex());
         }
         
+    }
+
+    public void CmdChangeCardJailOwner(int ownerId, string type)
+    {
+        if (type == "Chest")
+            chestJailCardOwner = ownerId;
+        else
+            chanceJailCardOwner = ownerId;
     }
 
     [Command]

@@ -21,7 +21,7 @@ public class CardReader : MonoBehaviour
 
     static public GameObject cardPanel, buyPropertyButton, cancelButton, payRentButton, closeButton, closeEventButton, eventPanel,
                                 ComunityChestLogo, ChanceLogo, sellPropertyButton, sellHouseButton, buyHouseButton, railroadPanel,
-                                utilityPanel, ElectricCompanyLogo, WaterWorksLogo, buttonInfo;
+                                utilityPanel, ElectricCompanyLogo, WaterWorksLogo, buttonInfo, canvas, inJailCardPanel;
 
     // Start is called before the first frame update
     void Start()
@@ -31,6 +31,10 @@ public class CardReader : MonoBehaviour
         LoadUtilityCards(utilitiesFile);
         LoadChanceCards(chanceFile);
         LoadChestCards(chestFile);
+
+        //In Jail Card
+        inJailCardPanel = GameObject.Find("InJailCard");
+        inJailCardPanel.SetActive(false);
 
         // Button info
         buttonInfo = GameObject.Find("ButtonInfo");
@@ -77,6 +81,9 @@ public class CardReader : MonoBehaviour
         ChanceLogo = GameObject.Find("ChanceLogo");
         ChanceLogo.SetActive(false);
         eventPanel.SetActive(false);
+
+        canvas = GameObject.Find("Canvas");
+
     }
 
     // Update is called once per frame

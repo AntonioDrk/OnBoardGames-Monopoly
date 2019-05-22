@@ -115,7 +115,7 @@ public class EventCard : Card
                     isMoving = true;
                     break;
                 case 14:
-                    Debug.Log(description); //get out of jail
+                    player.GetComponent<Player>().CmdChangeCardJailOwner(0,"Chance"); //get out of jail
                     break;
             }
         }
@@ -168,7 +168,7 @@ public class EventCard : Card
                     giveMoneyToPlayer(player, 100);
                     break;
                 case 14:
-                    Debug.Log(description); //get out of jail
+                    player.GetComponent<Player>().CmdChangeCardJailOwner(0,"Chest");
                     break;
             }
         }
