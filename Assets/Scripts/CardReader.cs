@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class CardReader : MonoBehaviour
 {
@@ -20,7 +21,7 @@ public class CardReader : MonoBehaviour
 
     static public GameObject cardPanel, buyPropertyButton, cancelButton, payRentButton, closeButton, closeEventButton, eventPanel,
                                 ComunityChestLogo, ChanceLogo, sellPropertyButton, sellHouseButton, buyHouseButton, railroadPanel,
-                                utilityPanel, ElectricCompanyLogo, WaterWorksLogo;
+                                utilityPanel, ElectricCompanyLogo, WaterWorksLogo, buttonInfo, canvas, inJailCardPanel;
 
     // Start is called before the first frame update
     void Start()
@@ -30,6 +31,14 @@ public class CardReader : MonoBehaviour
         LoadUtilityCards(utilitiesFile);
         LoadChanceCards(chanceFile);
         LoadChestCards(chestFile);
+
+        //In Jail Card
+        inJailCardPanel = GameObject.Find("InJailCard");
+        inJailCardPanel.SetActive(false);
+
+        // Button info
+        buttonInfo = GameObject.Find("ButtonInfo");
+        buttonInfo.SetActive(false);
 
         // Utilities
         utilityPanel = GameObject.Find("UtilityCard");
@@ -72,6 +81,9 @@ public class CardReader : MonoBehaviour
         ChanceLogo = GameObject.Find("ChanceLogo");
         ChanceLogo.SetActive(false);
         eventPanel.SetActive(false);
+
+        canvas = GameObject.Find("Canvas");
+
     }
 
     // Update is called once per frame
@@ -193,5 +205,16 @@ public class CardReader : MonoBehaviour
         {
             Debug.LogError("Cannot load file:" + fileName);
         }
+    }
+
+    public void writeButtonInfo(string info)
+    {
+        buttonInfo.SetActive(true);
+        buttonInfo.transform.GetChild(0).GetComponent<Text>().text = info;
+    }
+
+    public void removeButtonInfo()
+    {
+        buttonInfo.SetActive(false);
     }
 }

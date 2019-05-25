@@ -23,8 +23,6 @@ public class Player : NetworkBehaviour
     private Text playerMoneyText, idText;
 
     [SyncVar] private Color plyColor;
-    [SyncVar] public int chestJailCardOwner;
-    [SyncVar] public int chanceJailCardOwner;
 
     private Renderer renderer;
     [SyncVar] private int myMeshIndex;
@@ -33,7 +31,7 @@ public class Player : NetworkBehaviour
     private int doublesRolled = 0;
     private int roundsInJail = 0;
     private bool inJail = false;
-    [SerializeField] private int stage = 0;
+    [SerializeField] private int stage = 0; // 0 = player can roll the dice/ 1 = player rolled / 2 = the player ended his movement
 
     [SerializeField] private List<Card> ownedPropertyCards;
     private List<GameObject> ownedPropertyList;
@@ -59,6 +57,12 @@ public class Player : NetworkBehaviour
             endTurnButton.GetComponent<Button>().onClick.AddListener(nextPlayer);
             endTurnButton.SetActive(false);
 
+            // the listeners for the buttons from jail panel
+            CardReader.inJailCardPanel.transform.GetChild(0).GetChild(0).GetComponent<Button>().onClick.AddListener(() => useCardInJail("Chance")); // chance
+            CardReader.inJailCardPanel.transform.GetChild(0).GetChild(1).GetComponent<Button>().onClick.AddListener(() => useCardInJail("Chest")); // chest
+            CardReader.inJailCardPanel.transform.GetChild(0).GetChild(2).GetComponent<Button>().onClick.AddListener(payFine); // pay fine
+            CardReader.inJailCardPanel.transform.GetChild(0).GetChild(3).GetComponent<Button>().onClick.AddListener(rollDoubles); // roll doubles
+            
             CmdAddConnectedPlayer(this.gameObject);
             idText = GameObject.Find("idText").GetComponent<Text>();
             playerMoneyText = GameObject.Find("playerMoneyText").GetComponent<Text>();
@@ -71,7 +75,7 @@ public class Player : NetworkBehaviour
     { 
         localPlayerUpdate();
     }
-
+    
     void localPlayerUpdate()
     {
         // exit from update if this is not the local player
@@ -81,13 +85,21 @@ public class Player : NetworkBehaviour
         idText.text = "id: " + idPlayer;
 
         // If it's my turn
-        if((isServer && gameManagerScript.gameStarted) || !isServer)
-        if (gameManagerScript.playerTurn == idPlayer && stage == 0)
-        {
-            rollButton.SetActive(true);
-        }
-        else
-            rollButton.SetActive(false);
+        if ((isServer && gameManagerScript.gameStarted) || !isServer)
+            if (gameManagerScript.playerTurn == idPlayer && stage == 0)
+            {
+                if (inJail)
+                {
+                    playerInJail();
+                }
+                else
+                    rollButton.SetActive(true);
+            }
+            else
+            {
+                rollButton.SetActive(false);
+                CardReader.inJailCardPanel.SetActive(false);
+            }
 
 
         // if the diceManager rolled and it's player's turn 
@@ -95,38 +107,38 @@ public class Player : NetworkBehaviour
         {
             diceScript.rolled = false;
             Debug.Log("Player " + idPlayer + " rolled " + diceScript.rolledNumber);
-
-            if (diceScript.isDouble)
-                doublesRolled++;
-            else
-                doublesRolled = 0;
-
+            
             if (inJail)
             {
-                roundsInJail += 1;
-
-                if (diceScript.isDouble || roundsInJail == 3)
+                if (diceScript.isDouble)
                 {
-                    inJail = false;
-                    if (!diceScript.isDouble)
-                        CmdAddMoney(-50);
-                    else
-                        CmdAddMoney(-25);
-                    roundsInJail = 0;
-                    doublesRolled = 0;
                     diceScript.isDouble = false;
-                    transform.position = justVisitingPosition; 
+                    inJail = false;
+                    roundsInJail = 0;
+                    transform.position = justVisitingPosition;
                 }
-
-                if (roundsInJail < 3 && inJail)
+                else if (roundsInJail == 3)
+                {
+                    CmdTakeMoney(50);
+                    inJail = false;
+                    roundsInJail = 0;
+                    transform.position = justVisitingPosition;
+                }
+                else // the player is still in jail
                 {
                     CmdSetDiceInactive();
                     endTurn();
                 }
             }
 
+            if (diceScript.isDouble)
+                doublesRolled++;
+            else
+                doublesRolled = 0;
+            
             if (doublesRolled == 3)
             {
+                Debug.LogError("PLAYER GOES TO JAIL");
                 goToJail();
             }
             else if (!inJail)
@@ -148,6 +160,7 @@ public class Player : NetworkBehaviour
     {
         gameManagerScript.targetPlayerIsMoving = true;
         gameManagerScript.targetPlayer = this.gameObject;
+        CardReader.canvas.SetActive(false);
 
         for (int i = 0; i < amountToMove; i++)
         {
@@ -158,17 +171,18 @@ public class Player : NetworkBehaviour
 
                 yield return new WaitForSeconds(anim.GetCurrentAnimatorStateInfo(0).length);
 
-                if (indexPosition == 0)
-                {
-                    transform.position = goPosition;
-                    CmdAddMoney(200);
-                    Debug.Log("Money " + money);
-                }
-
                 if (indexPosition % 10 == 0)
                 {
                     transform.eulerAngles += new Vector3(0, 90, 0);
                 }
+
+                if (indexPosition == 0)
+                {
+                    transform.eulerAngles = new Vector3(0, 0, 0);
+                    transform.position = goPosition;
+                    CmdAddMoney(200);
+                }
+
 
             }
             else
@@ -180,7 +194,9 @@ public class Player : NetworkBehaviour
             }
         }
 
+        CardReader.canvas.SetActive(true);
         gameManagerScript.targetPlayerIsMoving = false;
+
         if (indexPosition == 30)
         {
             goToJail();
@@ -194,13 +210,11 @@ public class Player : NetworkBehaviour
             if(indexPosition == 12 || indexPosition == 28) // Utilities
             {
                 int utilityIndex = (indexPosition - 12) / 16;
-                //Debug.Log(CardReader.utilityCards[utilityIndex].ToString());
                 CardReader.utilityCards[utilityIndex].doAction(this.gameObject);
             }
             else if(indexPosition == 5 || indexPosition == 15 || indexPosition == 25 || indexPosition == 35) // Railroads
             {
                 int railroadIndex = (indexPosition - 5) / 10;
-                //Debug.Log(CardReader.railroadCards[railroadIndex].ToString());
                 CardReader.railroadCards[railroadIndex].doAction(this.gameObject);
             }
             else if(indexPosition == 4) // Income Tax - Pay $200
@@ -216,11 +230,11 @@ public class Player : NetworkBehaviour
             else if (indexPosition == 2 || indexPosition == 17 || indexPosition == 33) // Comunity Chest
             {
                 int eventNr = 0;
-                if (chestJailCardOwner == -1)
+                if (gameManagerScript.chestJailCardOwner == -1)
                     eventNr = Random.Range(0, 14);
                 else
                     eventNr = Random.Range(0, 13);
-
+                
                 Debug.Log("Event nr: " + eventNr + " triggered.");
                 Debug.Log(CardReader.chestCards[eventNr].ToString());
                 CardReader.chestCards[eventNr].doAction(this.gameObject);
@@ -228,11 +242,11 @@ public class Player : NetworkBehaviour
             else if (indexPosition == 7 || indexPosition == 22 || indexPosition == 36) //Chance
             {
                 int eventNr = 0;
-                if (chanceJailCardOwner == -1)
+                if (gameManagerScript.chanceJailCardOwner == -1)
                     eventNr = Random.Range(0, 14);
                 else
                     eventNr = Random.Range(0, 13);
-
+                
                 Debug.Log("Event nr: " + eventNr + " triggered.");
                 Debug.Log(CardReader.chanceCards[eventNr].ToString());
                 CardReader.chanceCards[eventNr].doAction(this.gameObject);
@@ -375,20 +389,59 @@ public class Player : NetworkBehaviour
         diceScript.CmdRollDice();
     }
 
+    // ----------- jail related functions
+
+    void useCardInJail(string type)
+    {
+        CmdChangeCardJailOwner(-1, type);
+        CardReader.inJailCardPanel.SetActive(false);
+        inJail = false;
+        roundsInJail = 0;
+        transform.position = justVisitingPosition;
+        RollTheDice();
+
+    }
+
+    void payFine()
+    {
+        CmdTakeMoney(50);
+        CardReader.inJailCardPanel.SetActive(false);
+        inJail = false;
+        roundsInJail = 0;
+        transform.position = justVisitingPosition;
+        RollTheDice();
+    }
+
+    void rollDoubles()
+    {
+        CardReader.inJailCardPanel.SetActive(false);
+        roundsInJail += 1;
+        RollTheDice();
+    }
+
+    void playerInJail()
+    {
+        CardReader.inJailCardPanel.SetActive(true);
+        if (gameManagerScript.chanceJailCardOwner != idPlayer)
+            CardReader.inJailCardPanel.transform.GetChild(0).GetChild(0).gameObject.SetActive(false);
+        if (gameManagerScript.chestJailCardOwner != idPlayer)
+            CardReader.inJailCardPanel.transform.GetChild(0).GetChild(1).gameObject.SetActive(false);
+    }
+            
     public void goToJail()
     {
         indexPosition = 10;
         doublesRolled = 0;
         roundsInJail = 0;
         inJail = true;
-        transform.position = jailPosition;
-        transform.eulerAngles = new Vector3(0, 90, 0);
-
         if (diceManager.transform.childCount > 0)
             CmdSetDiceInactive();
-
+        transform.position = jailPosition;
+        transform.eulerAngles = new Vector3(0, 90, 0);
         endTurn();
     }
+
+    // ----------- 
 
     [ClientRpc]
     public void RpcUpdateColor(Color col)
@@ -408,6 +461,7 @@ public class Player : NetworkBehaviour
     public void RpcCreatePlayerInfo(int id, GameObject playerInfo)
     { 
         Debug.Log("Player " + id + " added info");
+        playerInfo.transform.GetChild(0).GetComponent<Text>().color = plyColor;
         playerInfo.transform.GetChild(0).GetComponent<Text>().text = "Player " + id + "\n$" + money;
         playerInfo.transform.SetParent(GameObject.Find("PlayersPanel").transform);
         playerInfo.GetComponent<RectTransform>().offsetMax = new Vector2(-17, -(12 + 58 * id));
@@ -421,10 +475,24 @@ public class Player : NetworkBehaviour
         playerInfo.transform.GetComponent<Image>().color = new Color32(r,g,b,a);
     }
 
-    [Command]
-    public void CmdChangeOwner(int newOwnerId, int cardIndex)
+    [ClientRpc]
+    public void RpcChangeOwnerPanelColor(int newOwnerId, int id, Color ownerColor)
     {
-        gameManagerScript.CmdChangeOwner(cardIndex, newOwnerId);
+        GameObject panel = GameObject.FindGameObjectWithTag("id" + id);
+
+        if (newOwnerId != -1)
+        {
+            panel.GetComponent<Renderer>().enabled = true;
+            panel.GetComponent<Renderer>().material.color = ownerColor;
+        }
+        else
+            panel.GetComponent<Renderer>().enabled = false;
+    }
+
+    [Command]
+    public void CmdChangeOwner(int newOwnerId, int cardIndex, int id)
+    {
+        gameManagerScript.CmdChangeOwner(cardIndex, newOwnerId, id);
     }
 
     [Command]
@@ -438,7 +506,16 @@ public class Player : NetworkBehaviour
     {
         playerInfo.transform.GetChild(0).GetComponent<Text>().text = "Player " + idPlayer + "\n$" + money;
     }
-     
+
+    [Command]
+    public void CmdChangeCardJailOwner(int ownerId, string type)
+    {
+        if(ownerId == 0)
+            gameManagerScript.CmdChangeCardJailOwner(idPlayer, type);
+        else
+            gameManagerScript.CmdChangeCardJailOwner(-1, type);
+    }
+
     [Command]
     public void CmdAddMoney(int amount)
     {
