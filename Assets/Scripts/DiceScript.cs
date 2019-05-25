@@ -19,22 +19,14 @@ public class DiceScript : NetworkBehaviour
            gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
     } 
 
-    public void addDice(int rolledValue)
+    [Command]
+    public void CmdAddDice(int rolledValue)
     {
         diceCounter++;
         rolledNumber += rolledValue;
-        //Debug.LogError("Dice counter: " + diceCounter);// + ". Dice value: " + rolledValue);
         if (diceCounter == 2)
         {
-            //Debug.LogError("Dice counter: " + diceCounter);
-            if (rolledValue == rolledNumber - rolledValue)
-                isDouble = true;
-            else
-                isDouble = false;
-
-            //rolledNumber = 2;
-            gameManager.GetComponent<GameManager>().currentRolledNumber = rolledNumber;
-            rolled = true;
+            gameManager.players[gameManager.playerTurn].GetComponent<Player>().RpcMovePlayer(rolledNumber,rolledValue);
         }
     }
 
@@ -44,17 +36,17 @@ public class DiceScript : NetworkBehaviour
         // Make sure this is run only on the server to not fuck up something
         if (!isServer) return;
 
-        Debug.Log("(ServerSide) Entered CmdRollDice");
-
         if (transform.childCount > 0)
         {
             return;
         }
 
+        diceCounter = 0;
+        rolledNumber = 0;
+
         GameObject go = Instantiate(dice);
         dice.transform.GetChild(0).transform.eulerAngles = new Vector3(90 * Random.Range(0, 4), 90 * Random.Range(0, 4), 90 * Random.Range(0, 4));
         dice.transform.GetChild(1).transform.eulerAngles = new Vector3(90 * Random.Range(0, 4), 90 * Random.Range(0, 4), 90 * Random.Range(0, 4));
-        //go.transform.parent = diceScript.transform;
         NetworkServer.Spawn(go);
     }
 
