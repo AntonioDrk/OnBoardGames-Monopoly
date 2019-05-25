@@ -34,6 +34,7 @@ public class DiceScript : NetworkBehaviour
 
             //rolledNumber = 2;
             gameManager.GetComponent<GameManager>().currentRolledNumber = rolledNumber;
+
             rolled = true;
         }
     }
