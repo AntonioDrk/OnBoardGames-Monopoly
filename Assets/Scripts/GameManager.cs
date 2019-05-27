@@ -181,6 +181,25 @@ public class GameManager : NetworkBehaviour
             chanceJailCardOwner = ownerId;
     }
 
+    public void CmdJailAnimation()
+    {
+        for (int i = 0; i < connectedPlayers; i++)
+            players[i].GetComponent<Player>().RpcJailAnimation();
+    }
+
+
+    public void CmdGetOutOfJail(int id)
+    {
+        int ok = 0;
+        for (int i = 0; i < connectedPlayers; i++)
+            if (players[i].transform.position == new Vector3(-11f, 0.125f, -6f) && i != id)
+                ok = 1;
+
+        if (ok == 0)
+            for (int i = 0; i < connectedPlayers; i++)
+                players[i].GetComponent<Player>().RpcGetOutOfJail();
+    }
+
     [Command]
     public void CmdChangeMoneyOnPanel(int i, int money)
     {
