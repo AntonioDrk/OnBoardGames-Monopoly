@@ -106,7 +106,7 @@ public class Player : NetworkBehaviour
         if (diceScript.rolled == true && gameManagerScript.playerTurn == idPlayer)
         {
             diceScript.rolled = false;
-            Debug.Log("Player " + idPlayer + " rolled " + diceScript.rolledNumber);
+            Debug.Log("Player " + idPlayer + " rolled " + gameManager.GetComponent<GameManager>().currentRolledNumber);
             
             if (inJail)
             {
@@ -138,13 +138,11 @@ public class Player : NetworkBehaviour
             
             if (doublesRolled == 3)
             {
-                Debug.LogError("PLAYER GOES TO JAIL");
                 goToJail();
             }
             else if (!inJail)
-                moveSpaces(diceScript.rolledNumber);
-
-            diceScript.rolledNumber = 0;
+                moveSpaces(gameManager.GetComponent<GameManager>().currentRolledNumber);
+            
         }
 
         playerMoneyText.text = "$" + money;
@@ -167,7 +165,7 @@ public class Player : NetworkBehaviour
             if (indexPosition % 10 == 9 || indexPosition % 10 == 0)
             {
                 anim.Play("StraightMovementToCorner", 0);
-                CmdMovePlayer();
+                CmdMovePlayer(indexPosition + 1);
 
                 yield return new WaitForSeconds(anim.GetCurrentAnimatorStateInfo(0).length);
 
@@ -188,7 +186,7 @@ public class Player : NetworkBehaviour
             else
             {
                 anim.Play("StraightMovement", 0);
-                CmdMovePlayer();
+                CmdMovePlayer(indexPosition + 1);
                 yield return new WaitForSeconds(anim.GetCurrentAnimatorStateInfo(0).length);
 
             }
@@ -376,9 +374,6 @@ public class Player : NetworkBehaviour
     {
         stage = 1;
         rollButton.SetActive(false);
-        diceScript.diceCounter = 0;
-        //Debug.LogError("Dice counter becomes 0.");
-        diceScript.rolledNumber = 0;
         CmdRollDice();
     }
 
@@ -387,6 +382,21 @@ public class Player : NetworkBehaviour
     public void CmdRollDice()
     {
         diceScript.CmdRollDice();
+    }
+
+    [ClientRpc]
+    public void RpcMovePlayer(int rolledNumber, int rolledValue)
+    {
+        if (!isLocalPlayer) return;
+        Debug.Log("Move player: " + idPlayer);
+
+        if (rolledValue == rolledNumber - rolledValue)
+            diceScript.isDouble = true;
+        else
+            diceScript.isDouble = false;
+
+        gameManager.GetComponent<GameManager>().currentRolledNumber = rolledNumber;
+        diceScript.rolled = true;
     }
 
     // ----------- jail related functions
@@ -430,7 +440,7 @@ public class Player : NetworkBehaviour
             
     public void goToJail()
     {
-        indexPosition = 10;
+        CmdMovePlayer(10);
         doublesRolled = 0;
         roundsInJail = 0;
         inJail = true;
@@ -532,9 +542,9 @@ public class Player : NetworkBehaviour
     }
 
     [Command]
-    public void CmdMovePlayer()
+    public void CmdMovePlayer(int newIndex)
     {
-        indexPosition = (indexPosition + 1) % 40;
+        indexPosition = (newIndex) % 40;
     }
 
     [Command]
