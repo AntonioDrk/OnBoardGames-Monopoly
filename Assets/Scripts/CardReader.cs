@@ -21,7 +21,8 @@ public class CardReader : MonoBehaviour
 
     static public GameObject cardPanel, buyPropertyButton, cancelButton, payRentButton, closeButton, closeEventButton, eventPanel,
                                 ComunityChestLogo, ChanceLogo, sellPropertyButton, sellHouseButton, buyHouseButton, railroadPanel,
-                                utilityPanel, ElectricCompanyLogo, WaterWorksLogo, buttonInfo, canvas, inJailCardPanel;
+                                utilityPanel, ElectricCompanyLogo, WaterWorksLogo, buttonInfo, canvas, inJailCardPanel, playerTradePanel,
+                                tradeButton;
 
     // Start is called before the first frame update
     void Start()
@@ -83,12 +84,31 @@ public class CardReader : MonoBehaviour
         eventPanel.SetActive(false);
 
         canvas = GameObject.Find("Canvas");
+        tradeButton = GameObject.Find("TradeButton");
+        tradeButton.GetComponent<Button>().onClick.AddListener(openPlayerTradePanel);
+        tradeButton.SetActive(false);
+        playerTradePanel = GameObject.Find("playerTradePanel");
+        playerTradePanel.SetActive(false);
 
+    }
+
+    static public void openPlayerTradePanel()
+    {
+        tradeButton.GetComponent<Button>().onClick.RemoveAllListeners();
+        tradeButton.GetComponent<Button>().onClick.AddListener(closePlayerTradePanel);
+        playerTradePanel.SetActive(true);
+    }
+
+    static public void closePlayerTradePanel()
+    {
+        tradeButton.GetComponent<Button>().onClick.RemoveAllListeners();
+        tradeButton.GetComponent<Button>().onClick.AddListener(openPlayerTradePanel);
+        playerTradePanel.SetActive(false);
     }
 
     // Update is called once per frame
     void Update()
-    { 
+    {
 
     }
 
@@ -110,7 +130,7 @@ public class CardReader : MonoBehaviour
             propertyCards = JsonHelper.FromJson<PropertyCard>(propertiesJson);
 
             Debug.Log(fileName + " data retrieved. " + propertyCards.Length + " cards loaded.");
-            
+
             for (int i = 0; i < propertyCards.Length; i++)
                 propertyCards[i].PropertyCardConstructor();
         }
@@ -120,7 +140,7 @@ public class CardReader : MonoBehaviour
         }
 
     }
-    
+
     public void LoadRailroadCards(string fileName)
     {
         string filePath = Path.Combine(Application.dataPath, fileName);
@@ -133,7 +153,7 @@ public class CardReader : MonoBehaviour
             Debug.Log(fileName + " data retrieved. " + railroadCards.Length + " cards loaded.");
 
             for (int i = 0; i < railroadCards.Length; i++)
-                railroadCards[i].RailroadCardConstructor();            
+                railroadCards[i].RailroadCardConstructor();
         }
         else
         {
@@ -153,7 +173,7 @@ public class CardReader : MonoBehaviour
             Debug.Log(fileName + " data retrieved. " + utilityCards.Length + " cards loaded.");
 
             for (int i = 0; i < utilityCards.Length; i++)
-                utilityCards[i].UtilityCardConstructor();            
+                utilityCards[i].UtilityCardConstructor();
         }
         else
         {
@@ -176,7 +196,7 @@ public class CardReader : MonoBehaviour
                 chanceCards[i].EventCardConstructor();
 
             //for (int i = 0; i < chanceCards.Length; i++)
-               // Debug.Log(chanceCards[i].ToString());
+            // Debug.Log(chanceCards[i].ToString());
         }
         else
         {
@@ -199,7 +219,7 @@ public class CardReader : MonoBehaviour
                 chestCards[i].EventCardConstructor();
 
             //for (int i = 0; i < chestCards.Length; i++)
-               // Debug.Log(chestCards[i].ToString());
+            // Debug.Log(chestCards[i].ToString());
         }
         else
         {

@@ -1,6 +1,6 @@
 Win64
 PlayerPath?
-E:/Unity/TEST BUILD/Monopoly.exe
+C:/Users/Ema/Desktop/tests/4/Monopoly.exe
 SceneListBegin?
 Assets/Scenes/OFFLINE_SCENE.unity
 Assets/Scenes/GAME_SCENE.unity
@@ -159,7 +159,7 @@ fb6a1ea36b4f6ef5948d283d93760765 UnityEngine.GoogleAudioSpatializer.dll:UnityEng
 5b0391b7e3d9ea9db6c0a8fbd0ca23f6 UnityEngine.GoogleAudioSpatializer.dll:UnityEngine.Experimental.Audio.Google.GvrAudioSourceExtension
 a4f0a4f62100f1a4fb5cbe0e00dde83f Unity.TextMeshPro.dll:TMPro.TextMeshProUGUI
 5fc094978ce3e3591a7500ed380d854a Unity.Analytics.DataPrivacy.dll:UnityEngine.Analytics.DataPrivacyButton
-8bc9af4e2ea679f775b446952972196a Assembly-CSharp.dll:.GameManager
+10590ead10c3f4961b1900cf1d7a7b55 Assembly-CSharp.dll:.GameManager
 d251bf88db6c95a6b1aa0b69298da9ef UnityEngine.SpatialTracking.dll:UnityEngine.SpatialTracking.TrackedPoseDriver
 6f4483d4f9cd6d8ba8f6c860d74fa945 Assembly-CSharp.dll:.Die
 d791aa6007fa3640be1164ea75bb087d Unity.TextMeshPro.dll:TMPro.TMP_StyleSheet
