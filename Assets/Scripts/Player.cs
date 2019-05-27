@@ -19,6 +19,7 @@ public class Player : NetworkBehaviour
     private Vector3 jailPosition = new Vector3(-11f, 0.125f, -6f);
     private Vector3 justVisitingPosition = new Vector3(-11.45854f, 0.125f, -6.49f);
     private GameObject rollButton, endTurnButton, ownedPropertiesPanel;
+    private GameObject jail;
     public GameObject ownedPropertyPanelPrefab;// playerInfoPrefab;
     private Text playerMoneyText, idText;
 
@@ -56,6 +57,8 @@ public class Player : NetworkBehaviour
             endTurnButton = GameObject.Find("EndTurn");
             endTurnButton.GetComponent<Button>().onClick.AddListener(nextPlayer);
             endTurnButton.SetActive(false);
+            jail = GameObject.Find("Jail");
+            jail.SetActive(false);
 
             // the listeners for the buttons from jail panel
             CardReader.inJailCardPanel.transform.GetChild(0).GetChild(0).GetComponent<Button>().onClick.AddListener(() => useCardInJail("Chance")); // chance
@@ -114,6 +117,7 @@ public class Player : NetworkBehaviour
                 {
                     diceScript.isDouble = false;
                     inJail = false;
+                    CmdGetOutOfJail(idPlayer);
                     roundsInJail = 0;
                     transform.position = justVisitingPosition;
                 }
@@ -121,6 +125,7 @@ public class Player : NetworkBehaviour
                 {
                     CmdTakeMoney(50);
                     inJail = false;
+                    CmdGetOutOfJail(idPlayer);
                     roundsInJail = 0;
                     transform.position = justVisitingPosition;
                 }
@@ -406,6 +411,7 @@ public class Player : NetworkBehaviour
         CmdChangeCardJailOwner(-1, type);
         CardReader.inJailCardPanel.SetActive(false);
         inJail = false;
+        CmdGetOutOfJail(idPlayer);
         roundsInJail = 0;
         transform.position = justVisitingPosition;
         RollTheDice();
@@ -417,6 +423,7 @@ public class Player : NetworkBehaviour
         CmdTakeMoney(50);
         CardReader.inJailCardPanel.SetActive(false);
         inJail = false;
+        CmdGetOutOfJail(idPlayer);
         roundsInJail = 0;
         transform.position = justVisitingPosition;
         RollTheDice();
@@ -437,9 +444,39 @@ public class Player : NetworkBehaviour
         if (gameManagerScript.chestJailCardOwner != idPlayer)
             CardReader.inJailCardPanel.transform.GetChild(0).GetChild(1).gameObject.SetActive(false);
     }
-            
+    
+    [ClientRpc]
+    public void RpcJailAnimation()
+    {
+        if (!isLocalPlayer)
+            return;
+        jail.SetActive(true);
+        jail.GetComponent<Animator>().Play("JailAnimation", 0);
+    }
+
+    [Command]
+    void CmdJailAnimation()
+    {
+        gameManagerScript.CmdJailAnimation();
+    }
+
+    [ClientRpc]
+    public void RpcGetOutOfJail()
+    {
+        if (!isLocalPlayer)
+            return;
+        jail.SetActive(false);
+    }
+
+    [Command]
+    void CmdGetOutOfJail(int id)
+    {
+        gameManagerScript.CmdGetOutOfJail(id);
+    }
+
     public void goToJail()
     {
+        CmdJailAnimation();
         CmdMovePlayer(10);
         doublesRolled = 0;
         roundsInJail = 0;
