@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System;
 using UnityEngine;
-using UnityEngine.UI;
 
 [Serializable]
 public class UtilityCard : Card
@@ -19,6 +18,18 @@ public class UtilityCard : Card
         Mortgage = 75;
     }
 
+    // Start is called before the first frame update
+    void Start()
+    {
+
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+
+    }
+
     public override string ToString()
     {
         return "Id: " + Id.ToString() +
@@ -26,142 +37,22 @@ public class UtilityCard : Card
                "\nPrice: " + Price.ToString() +
                "\nMortgage: " + Mortgage.ToString();
     }
-    
-    void buyUtility(GameObject player)
-    {
-        int cardIndex = 26 + (id - 12) / 16;
-        Player playerScript = player.GetComponent<Player>();
-        playerScript.CmdChangeOwner(playerScript.idPlayer, cardIndex,id);
-        playerScript.CmdTakeMoney(Price);
-        playerScript.buyProperty(this);
-        hideCard(player);
-    }
 
-    void hideCard(GameObject player)
-    {
-        CardReader.buyPropertyButton.GetComponent<Button>().onClick.RemoveAllListeners();
-        CardReader.cancelButton.GetComponent<Button>().onClick.RemoveAllListeners();
-        CardReader.buyPropertyButton.SetActive(false);
-        CardReader.cancelButton.SetActive(false);
-        CardReader.utilityPanel.SetActive(false);
-        player.GetComponent<Player>().endMovement();
-    }
-
-    void closeCard(GameObject player)
-    {
-        CardReader.closeButton.GetComponent<Button>().onClick.RemoveAllListeners();
-        CardReader.closeButton.SetActive(false);
-        CardReader.utilityPanel.SetActive(false);
-        player.GetComponent<Player>().endMovement();
-    }
-    
     public override void doAction(GameObject player)
     {
-        int cardIndex = (id - 12) / 16;
-        int ownerId = GameObject.Find("GameManager").GetComponent<GameManager>().cardsOwner[26 + cardIndex]; // the utilities are 26, 27
-        showCard();
-        Debug.Log("Owner's id for " + cardName + " : " + ownerId);
-        if (ownerId != -1)
+        /*if (OwnerId > 0)
         {
-            Player playerScript = player.GetComponent<Player>();
-            if (ownerId == playerScript.idPlayer)
+            if (OwnerId != playerId)
             {
-                CardReader.closeButton.SetActive(true);
-                CardReader.closeButton.GetComponent<Button>().onClick.AddListener(() => closeCard(player));
-            }
-            else
-            {
-                Debug.Log("Player must pay rent to player " + ownerId);
-                int rolledNumber = GameObject.Find("GameManager").GetComponent<GameManager>().currentRolledNumber;
-                int amountPaid = rentMultiplier[numberOfUtilities(ownerId) - 1] * rolledNumber;
-                CardReader.payRentButton.transform.GetChild(0).GetComponent<Text>().text = "Pay $" + amountPaid;
-                CardReader.payRentButton.SetActive(true);
-                CardReader.payRentButton.GetComponent<Button>().onClick.AddListener(() => payRent(player, playerScript, ownerId, amountPaid));
+                Debug.Log("Player must pay rent.");
+                //Player.money -= DiceScript.rolledNumber * rentMultiplier[Owner.utilitiesOwned];
+                //Debug.Log("Player + " Player.idPlayer + " paid $" + rent + " to player " + OwnerId);
             }
         }
         else
         {
-            Debug.Log("Player can buy this utility. Card owner: " + ownerId);
-            CardReader.buyPropertyButton.SetActive(true);
-            CardReader.cancelButton.SetActive(true);
-            CardReader.buyPropertyButton.GetComponent<Button>().onClick.AddListener(() => buyUtility(player));
-            CardReader.cancelButton.GetComponent<Button>().onClick.AddListener(() => hideCard(player));
-        }
-        
-    }
-
-    // player pays rent to player[ownerId]
-    void payRent(GameObject player, Player playerScript, int ownerId, int amountPaid)
-    {
-        CardReader.payRentButton.GetComponent<Button>().onClick.RemoveAllListeners();
-        CardReader.payRentButton.SetActive(false);       
-
-        playerScript.CmdTakeMoney(amountPaid);
-        playerScript.CmdGiveMoneyToPlayer(ownerId, amountPaid);
-
-        CardReader.utilityPanel.SetActive(false);
-        player.GetComponent<Player>().endMovement();
-    }
-
-    int numberOfUtilities(int ownerId)
-    {
-        int count = 0;
-        for (int k = 26; k < 28; k++)
-            if (GameObject.Find("GameManager").GetComponent<GameManager>().cardsOwner[k] == ownerId)
-                count++;
-        return count;
-    }
-    
-    void showCard()
-    {
-        CardReader.cardPanel.SetActive(false);
-        CardReader.railroadPanel.SetActive(false);
-        closeCard();
-
-        CardReader.utilityPanel.SetActive(true);
-        CardReader.utilityPanel.transform.GetChild(0).GetComponent<Text>().text = cardName;
-        if (id == 12)
-            CardReader.ElectricCompanyLogo.SetActive(true);
-        else
-            CardReader.WaterWorksLogo.SetActive(true);
-    }
-
-    void closeCard()
-    {
-        CardReader.closeButton.GetComponent<Button>().onClick.RemoveAllListeners();
-        CardReader.sellPropertyButton.SetActive(false);
-        CardReader.closeButton.SetActive(false);
-        CardReader.ElectricCompanyLogo.SetActive(false);
-        CardReader.WaterWorksLogo.SetActive(false);
-        CardReader.utilityPanel.SetActive(false);
-    }
-
-    public override void showOwnedCard(GameObject player)
-    {
-        if (player.GetComponent<Player>().getStage() != 0)
-            return;
-        showCard();
-        CardReader.closeButton.SetActive(true);
-        CardReader.closeButton.GetComponent<Button>().onClick.AddListener(closeCard);
-
-        // if it's your turn you can sell the property
-        if (GameObject.Find("GameManager").GetComponent<GameManager>().playerTurn == player.GetComponent<Player>().idPlayer)
-        {
-            CardReader.sellPropertyButton.SetActive(true);
-            CardReader.sellPropertyButton.GetComponent<Button>().onClick.RemoveAllListeners();
-            CardReader.sellPropertyButton.GetComponent<Button>().onClick.AddListener(() => sellUtility(player));
-        }
-    }
-
-    void sellUtility(GameObject player)
-    {
-        int cardIndex = 26 + (id - 12) / 16;
-        CardReader.sellPropertyButton.GetComponent<Button>().onClick.RemoveAllListeners();
-        CardReader.sellPropertyButton.SetActive(false);
-        Player playerScript = player.GetComponent<Player>();
-        playerScript.CmdChangeOwner(-1, cardIndex,id);
-        playerScript.CmdAddMoney(Mortgage); // players get in return the card's mortgage value
-        playerScript.sellProperty(this);
-        closeCard();
+            Debug.Log("Player must buy this property.");
+            // TO-DO: print card on the screen and buttons to buy the property or auction it
+        }*/
     }
 }

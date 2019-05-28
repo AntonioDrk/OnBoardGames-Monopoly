@@ -26,25 +26,17 @@ public class GameManager : NetworkBehaviour
     [SyncVar] public int playerTurn = 0;
     [SyncVar] public int connectedPlayers = 0;
     public List<GameObject> players;
-    public SyncListInt cardsOwner;
+    public SyncListInt propertyCardsOwners;
 
     [SerializeField] private List<Mesh> meshes; // Set them at startup in the editor!!
     private List<int> meshesIndexes; // Indexes of the meshes to use
-    public GameObject playerInfoPrefab, tradePanelPrefab, propertyTradePanelPrefab;
+    public GameObject playerInfoPrefab;
     private GameObject[] playerInfo = new GameObject[6];
     public bool gameStarted = false;
     private GameObject startGameButton;
-    public int currentRolledNumber;
-
-    private List<Color> playerColors;
-
-    [SyncVar] public int chestJailCardOwner;
-    [SyncVar] public int chanceJailCardOwner;
 
     void Start()
     {
-        chestJailCardOwner = -1;
-        chanceJailCardOwner = -1;
 
         mainCamera = Camera.main;
 
@@ -72,12 +64,8 @@ public class GameManager : NetworkBehaviour
             meshesIndexes.Add(i);
         }
 
-        for (int i = 0; i < 28; i++)
-            cardsOwner.Add(-1);
-
-        if (isServer)
-            addPlayerColor(new List<Color> { new Color32(0, 108, 0, 255), new Color32(200, 7, 0, 255), new Color32(0, 21, 161, 255), new Color32(160, 130, 0, 255), new Color32(139, 0, 162, 255), Color.black });
-
+        for (int i = 0; i < 22; i++)
+            propertyCardsOwners.Add(-1);
     }
 
     void Update()
@@ -113,77 +101,8 @@ public class GameManager : NetworkBehaviour
             playerInfo[i] = Instantiate(playerInfoPrefab);
             NetworkServer.Spawn(playerInfo[i]);
             players[i].GetComponent<Player>().RpcCreatePlayerInfo(i, playerInfo[i]);
-
-            GameObject playerTradePanel = Instantiate(playerInfoPrefab);
-            NetworkServer.Spawn(playerTradePanel);
-            players[i].GetComponent<Player>().RpcCreatePlayerTradeInfo(i, playerTradePanel);
-
         }
-        players[0].GetComponent<Player>().RpcChangeColorOnPanel(playerInfo[0], 255, 190, 190, 190);
-
-        for (int i = 0; i < nrOfPlayers; i++)
-            players[i].GetComponent<Player>().RpcAddButtonToPlayerTradeInfo();
-
-    }
-
-    public void CmdSendTrade(int sourceId, int destinationId, int[] sourceProperties, int sourcePropertiesLength, int[] destinationProperties, int destinationPropertiesLength)
-    {
-            players[destinationId].GetComponent<Player>().RpcReceiveTrade(sourceId, destinationId, sourceProperties, sourcePropertiesLength, destinationProperties, destinationPropertiesLength);
-    }
-
-    public void CmdRefusedTrade(int sourceId)
-    {
-        players[sourceId].GetComponent<Player>().RpcRefusedTrade();
-    }
-
-    public void CmdExecuteTrade(int sourceId, int destinationId, int[] sourceProperties, int sourcePropertiesLength, int[] destinationProperties, int destinationPropertiesLength)
-    {
-
-        //Debug.Log("Execute trade from " + sourceId + " to " + destinationId);        
-        for(int k=0; k< sourcePropertiesLength; k++)
-        {
-            int i = sourceProperties[k];
-            int idOnBoard = -1; 
-            if (i < 22)
-                idOnBoard = CardReader.propertyCards[i].id;
-            else if (i < 26)
-                idOnBoard = CardReader.railroadCards[i - 22].id;
-            else
-                idOnBoard = CardReader.utilityCards[i - 26].id;
-            
-            CmdChangeOwner(i, destinationId, idOnBoard);
-            // the source sells it and the destination buys it
-            players[destinationId].GetComponent<Player>().RpcBuyProperty(i);
-            players[sourceId].GetComponent<Player>().RpcSellProperty(i);
-
-        }
-
-        for (int k = 0; k < destinationPropertiesLength; k++)
-        {
-            int i = destinationProperties[k];
-            int idOnBoard = -1;
-            if (i < 22)
-                idOnBoard = CardReader.propertyCards[i].id;
-            else if (i < 26)
-                idOnBoard = CardReader.railroadCards[i - 22].id;
-            else
-                idOnBoard = CardReader.utilityCards[i - 26].id;
-            
-            CmdChangeOwner(i, sourceId, idOnBoard);
-            // the destination sells it and the source buys it
-            players[sourceId].GetComponent<Player>().RpcBuyProperty(i);
-            players[destinationId].GetComponent<Player>().RpcSellProperty(i);
-        }
-
-        players[sourceId].GetComponent<Player>().RpcAcceptedTrade();
-
-    }
-    
-    private void addPlayerColor(List<Color> colors)
-    {
-        playerColors = new List<Color>();
-        foreach (Color color in colors)
-            playerColors.Add(color);
+        players[0].GetComponent<Player>().RpcChangeColorOnPanel(playerInfo[0], 183, 84, 84, 150);
     }
 
     // Moves the camera to face the player
@@ -221,9 +140,7 @@ public class GameManager : NetworkBehaviour
         connectedPlayers++;
 
         // Asign the Color for the player
-        Color randomColor = playerColors[Random.Range(0, playerColors.Count - 1)];
-        playerScript.setPlyColor(randomColor);
-        playerColors.Remove(randomColor);
+        playerScript.setPlyColor(Random.ColorHSV(0, 1, 0, 1, 0.3f, 0.7f));
         playerScript.getRenderer().material.color = playerScript.getPlyColor();
 
         // Update each player for the new color change and the new mesh change
@@ -235,37 +152,10 @@ public class GameManager : NetworkBehaviour
 
     }
 
-    public void CmdChangeCardJailOwner(int ownerId, string type)
-    {
-        if (type == "Chest")
-            chestJailCardOwner = ownerId;
-        else
-            chanceJailCardOwner = ownerId;
-    }
-
     [Command]
     public void CmdChangeMoneyOnPanel(int i, int money)
     {
         players[i].GetComponent<Player>().RpcChangeMoneyOnPanel(playerInfo[i]);
-    }
-    
-    public void CmdJailAnimation()
-    {
-        for (int i = 0; i < connectedPlayers; i++)
-            players[i].GetComponent<Player>().RpcJailAnimation();
-    }
-
-
-    public void CmdGetOutOfJail(int id)
-    {
-        int ok = 0;
-        for (int i = 0; i < connectedPlayers; i++)
-            if (players[i].transform.position == new Vector3(-11f, 0.125f, -6f) && i != id)
-                ok = 1;
-
-        if (ok == 0)
-            for (int i = 0; i < connectedPlayers; i++)
-                players[i].GetComponent<Player>().RpcGetOutOfJail();
     }
 
     public void CmdNextPlayer()
@@ -274,25 +164,16 @@ public class GameManager : NetworkBehaviour
         if (!isServer)
             return;
 
-        players[playerTurn].GetComponent<Player>().RpcChangeColorOnPanel(playerInfo[playerTurn], 255, 255, 255, 190);
+        players[playerTurn].GetComponent<Player>().RpcChangeColorOnPanel(playerInfo[playerTurn], 255, 255, 255, 150);
         playerTurn = (playerTurn + 1) % connectedPlayers;
         Debug.Log("playerTurn: " + playerTurn);
-        players[playerTurn].GetComponent<Player>().RpcChangeColorOnPanel(playerInfo[playerTurn], 255, 190, 190, 190);
+        players[playerTurn].GetComponent<Player>().RpcChangeColorOnPanel(playerInfo[playerTurn], 183, 84, 84, 150);
     }
 
-    public void CmdChangeOwner(int cardIndex, int newOwnerId, int id)
+    public void CmdChangeOwner(int cardIndex, int newOwnerId)
     {
         if (!isServer) return;
-        cardsOwner[cardIndex] = newOwnerId;
-
-        for (int i = 0; i < nrOfPlayers; i++)
-        {
-            Color ownerColor = Color.clear;
-            if (newOwnerId != -1)
-                ownerColor = players[newOwnerId].GetComponent<Player>().getPlyColor();
-            players[i].GetComponent<Player>().RpcChangeOwnerPanelColor(newOwnerId, id, ownerColor);
-        }
-
+        propertyCardsOwners[cardIndex] = newOwnerId;
         Debug.Log("Owner changed for " + cardIndex + " : " + newOwnerId);
     }
 
@@ -304,7 +185,141 @@ public class GameManager : NetworkBehaviour
             return; // ?
         }
         players[playerId].GetComponent<Player>().CmdAddMoney(amount);
-        //Debug.LogError("Added " + amount + " to " + playerId);
+        Debug.LogError("Added " + amount + " to " + playerId);
+    }
+    
+
+    public void CmdConstructHouse(string housePrefabPath, Vector3 position, int cardIndex)
+    {
+        // Instantiate in world
+        GameObject go = Instantiate(Resources.Load<GameObject>(housePrefabPath), position, Quaternion.identity);
+
+        NetworkServer.Spawn(go);
+
+        // Update the number of houses on the property for all the clients
+        RpcUpdateHouses(cardIndex, go.GetComponent<NetworkIdentity>().netId);
+    }
+
+
+    public void CmdConstructHotel(string hotelPrefabPath, Vector3 position, int cardIndex)
+    {
+        if (!isServer)
+        {
+            Debug.LogError("Client tried to run CmdConstructHotel");
+            return;
+        }
+
+        foreach (NetworkInstanceId objectNetId in CardReader.propertyCards[cardIndex].buildings)
+        {
+            NetworkServer.Destroy(NetworkServer.FindLocalObject(objectNetId));
+
+        }
+
+        Debug.Log("In cmd construct hotel");
+        RpcRemoveHouses(cardIndex);
+
+        // Instantiate in world
+        GameObject go = Instantiate(Resources.Load<GameObject>(hotelPrefabPath), position, Quaternion.identity);
+
+        NetworkServer.Spawn(go);
+
+        // Update the number of houses on the property for all the clients
+        RpcUpdateHouses(cardIndex, go.GetComponent<NetworkIdentity>().netId);
+
+    }
+
+    public void CmdDeconstructHotel(int cardIndex)
+    {
+        NetworkInstanceId lastBuilding = CardReader.propertyCards[cardIndex].buildings[CardReader.propertyCards[cardIndex].buildings.Count - 1];
+        NetworkServer.Destroy(NetworkServer.FindLocalObject(lastBuilding));
+        RpcRemoveHotel(cardIndex);
+    }
+
+    public void CmdDeconstructHouse(int cardIndex)
+    {
+        NetworkInstanceId lastBuilding = CardReader.propertyCards[cardIndex].buildings[CardReader.propertyCards[cardIndex].buildings.Count - 1];
+        NetworkServer.Destroy(NetworkServer.FindLocalObject(lastBuilding));
+        RpcRemoveHouse(cardIndex);
+    }
+
+    //public void CmdDeconstructHouse(int cardIndex, GameObject player)
+    //{
+    //    if (!isServer)
+    //    {
+    //        Debug.LogError("Client tried to run CmdDeconstructHouse");
+    //        return;
+    //    }
+
+    //    int tmpbuildHouses = CardReader.propertyCards[cardIndex].housesBuilt;
+
+    //    List<NetworkInstanceId> propertyBuildings = CardReader.propertyCards[cardIndex].buildings;
+
+    //    // Remove last object
+    //    NetworkServer.Destroy(NetworkServer.FindLocalObject(propertyBuildings[propertyBuildings.Count - 1]));
+
+    //    // Remove on all the clients the data about the last house
+    //    RpcRemoveLastPropertyHouse(cardIndex, player);
+
+    //    if (tmpbuildHouses == 5)
+    //    {
+    //        Debug.LogError("I am selling a hotel, now reconstructing the 4 houses");
+    //        CardReader.propertyCards[cardIndex].hasHotel = false;
+    //        for (int i = 0; i < 4; i++)
+    //        {
+    //            Debug.LogWarning("Building the " + i + " house. \t\t Houses built atm: " + CardReader.propertyCards[cardIndex].housesBuilt);
+    //            CardReader.propertyCards[cardIndex].buildHouse(player, true, i);
+    //        }
+    //    }
+
+    //}
+
+    [ClientRpc]
+    public void RpcUpdateHouses(int cardIndex, NetworkInstanceId netId)
+    {
+        CardReader.propertyCards[cardIndex].housesBuilt += 1;
+        if (CardReader.propertyCards[cardIndex].housesBuilt == 5)
+            CardReader.propertyCards[cardIndex].hasHotel = true;
+        CardReader.propertyCards[cardIndex].addHouseObject(netId);
+    }
+
+    [ClientRpc]
+    public void RpcRemoveHotel(int cardIndex)
+    {
+        CardReader.propertyCards[cardIndex].housesBuilt = 0;
+        CardReader.propertyCards[cardIndex].hasHotel = false;
+        CardReader.propertyCards[cardIndex].removeLastHouse();
+    }
+
+    [ClientRpc]
+    public void RpcRemoveHouse(int cardIndex)
+    {
+        CardReader.propertyCards[cardIndex].housesBuilt -= 1;
+        CardReader.propertyCards[cardIndex].hasHotel = false;
+        CardReader.propertyCards[cardIndex].removeLastHouse();
+    }
+
+    [ClientRpc]
+    public void RpcRemoveLastPropertyHouse(int cardIndex, GameObject player)
+    {
+        CardReader.propertyCards[cardIndex].removeLastHouse();
+        if (CardReader.propertyCards[cardIndex].housesBuilt == 5)
+        {
+            Debug.LogWarning("Has hotel then I remove 5 houses from housesBuilt");
+            CardReader.propertyCards[cardIndex].housesBuilt = 0;
+        }
+        else
+        {
+            Debug.LogWarning("Doesn't have hotel then I remove only one house from housesBuilt");
+            CardReader.propertyCards[cardIndex].housesBuilt -= 1;
+        }
+        CardReader.propertyCards[cardIndex].hasHotel = false;
+        
+    }
+
+    [ClientRpc]
+    public void RpcRemoveHouses(int cardIndex)
+    {
+        CardReader.propertyCards[cardIndex].removeHouses();
     }
 
     [Command]
@@ -312,7 +327,7 @@ public class GameManager : NetworkBehaviour
     {
         Debug.Log("REMOVING DCED PLAYER");
         GameObject playerDisconnected = NetworkServer.FindLocalObject(id);
-        if (playerDisconnected == null)
+        if(playerDisconnected == null)
         {
             Debug.LogError("The player disconnected object is null for some reason!");
             return;
@@ -323,12 +338,10 @@ public class GameManager : NetworkBehaviour
         players.Remove(playerDisconnected);
         NetworkServer.Destroy(playerDisconnected);
         connectedPlayers--;
-        // DESTROY PANEL OF DISCONNECTED PLAYER
-        // SELL HIS PROPERTIES TO THE BANK
     }
 
-    //   ----------------  Getters and Setters   ----------------  
+//   ----------------  Getters and Setters   ----------------  
     public List<Mesh> getMeshes() { return meshes; }
 
-    //   ----------------                        ----------------  
+//   ----------------                        ----------------  
 }
