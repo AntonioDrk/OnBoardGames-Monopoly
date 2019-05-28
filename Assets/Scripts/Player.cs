@@ -161,7 +161,7 @@ public class Player : NetworkBehaviour
 
     public void moveSpaces(int amount)
     {
-        StartCoroutine("animateMovement", 1);
+        StartCoroutine("animateMovement", amount);
     }
 
     IEnumerator animateMovement(int amountToMove)
@@ -417,6 +417,7 @@ public class Player : NetworkBehaviour
         if (GameObject.Find("TradePanel") || waitingForTrade) return;
         stage = 1;
         rollButton.SetActive(false);
+        CardReader.closePlayerTradePanel();
         CmdRollDice();
     }
 
@@ -603,7 +604,6 @@ public class Player : NetworkBehaviour
         createPanelsForPlayerProperties(tradePanel, 1, destinationId, destinationProperties);
 
         // the button
-        tradePanel.transform.GetChild(2).transform.GetChild(0).GetComponent<Text>().text = "Trade";
         tradePanel.transform.GetChild(2).GetComponent<Button>().onClick.AddListener(() => 
                     sendTrade(tradePanel, idPlayer, destinationId, sourceProperties, destinationProperties));
         tradePanel.transform.GetChild(3).GetComponent<Button>().onClick.AddListener(() =>
@@ -639,7 +639,6 @@ public class Player : NetworkBehaviour
         }
         
         // the button
-        tradePanel.transform.GetChild(2).transform.GetChild(0).GetComponent<Text>().text = "Accept";
         tradePanel.transform.GetChild(2).GetComponent<Button>().onClick.AddListener(() => 
                     executeTrade(tradePanel, sourceId, destinationId, sourceProperties, sourcePropertiesLength, destinationProperties, destinationPropertiesLength));
         tradePanel.transform.GetChild(3).GetComponent<Button>().onClick.AddListener(() =>

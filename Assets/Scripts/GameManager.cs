@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Networking;
+using UnityEngine.EventSystems;
 
 public class GameManager : NetworkBehaviour
 {
@@ -55,7 +56,11 @@ public class GameManager : NetworkBehaviour
         startGameButton.GetComponent<Button>().onClick.AddListener(startGame);
 
         if (!isServer)
+        {
             startGameButton.SetActive(false);
+            GameObject.Find("Console").SetActive(false);
+        }
+            
 
         players = new List<GameObject>();
 
@@ -95,6 +100,23 @@ public class GameManager : NetworkBehaviour
         {
             mainCamera.transform.position = cameraPosition;
             mainCamera.transform.eulerAngles = new Vector3(90, 0, 0);
+        }
+
+        if (Input.GetKeyDown(KeyCode.BackQuote) && isServer)
+        {
+            bool consoleState = CardReader.console.activeInHierarchy;
+
+            if (!consoleState)
+            {
+
+                CardReader.console.SetActive(true);
+                InputField input = GameObject.Find("ConsoleInput").GetComponent<InputField>();
+                input.text = "";
+                EventSystem.current.SetSelectedGameObject(input.gameObject, null);
+                input.OnPointerClick(null);
+            }
+            else
+                CardReader.console.SetActive(false);
         }
     }
 

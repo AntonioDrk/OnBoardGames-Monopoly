@@ -23,7 +23,7 @@ public class CardReader : MonoBehaviour
     static public GameObject cardPanel, buyPropertyButton, cancelButton, payRentButton, closeButton, closeEventButton, eventPanel,
                                 ComunityChestLogo, ChanceLogo, sellPropertyButton, sellHouseButton, buyHouseButton, railroadPanel,
                                 utilityPanel, ElectricCompanyLogo, WaterWorksLogo, buttonInfo, canvas, inJailCardPanel, playerTradePanel,
-                                tradeButton;
+                                tradeButton, console;
 
     static public GameObject housePrefab, hotelPrefab;
 
@@ -88,11 +88,17 @@ public class CardReader : MonoBehaviour
         eventPanel.SetActive(false);
 
         canvas = GameObject.Find("Canvas");
+
+        // Trade
         tradeButton = GameObject.Find("TradeButton");
         tradeButton.GetComponent<Button>().onClick.AddListener(openPlayerTradePanel);
         tradeButton.SetActive(false);
         playerTradePanel = GameObject.Find("playerTradePanel");
         playerTradePanel.SetActive(false);
+
+        // Console
+        console = GameObject.Find("Console");
+        console.SetActive(false);
 
     }
 
