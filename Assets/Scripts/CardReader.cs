@@ -94,6 +94,7 @@ public class CardReader : MonoBehaviour
 
     static public void openPlayerTradePanel()
     {
+        if (GameObject.Find("TradePanel")) return;
         tradeButton.GetComponent<Button>().onClick.RemoveAllListeners();
         tradeButton.GetComponent<Button>().onClick.AddListener(closePlayerTradePanel);
         playerTradePanel.SetActive(true);

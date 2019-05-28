@@ -32,6 +32,7 @@ public class Player : NetworkBehaviour
     private int doublesRolled = 0;
     private int roundsInJail = 0;
     private bool inJail = false;
+    private bool waitingForTrade = false;
     [SerializeField] private int stage = 0; // 0 = player can roll the dice/ 1 = player rolled / 2 = the player ended his movement
 
     [SerializeField] private List<Card> ownedPropertyCards;
@@ -74,7 +75,7 @@ public class Player : NetworkBehaviour
 
     }
 
-    void Update()
+    void FixedUpdate()
     {
         localPlayerUpdate();
     }
@@ -413,6 +414,7 @@ public class Player : NetworkBehaviour
     // This function is to make the link between the button on click event and sending a command
     void RollTheDice()
     {
+        if (GameObject.Find("TradePanel") || waitingForTrade) return;
         stage = 1;
         rollButton.SetActive(false);
         CmdRollDice();
@@ -582,10 +584,14 @@ public class Player : NetworkBehaviour
     // create trade panel
     void playerWantsTrade(int destinationId)
     {
+
+        if (waitingForTrade) return;
+
         CardReader.closePlayerTradePanel();
         GameObject tradePanel = Instantiate(gameManagerScript.tradePanelPrefab);
         tradePanel.transform.SetParent(CardReader.canvas.transform);
         tradePanel.transform.localPosition = new Vector3(0, 0, 0);
+        tradePanel.name = "TradePanel";
 
         List<int> sourceProperties = new List<int>();
         List<int> destinationProperties = new List<int>();
@@ -637,7 +643,19 @@ public class Player : NetworkBehaviour
         tradePanel.transform.GetChild(2).GetComponent<Button>().onClick.AddListener(() => 
                     executeTrade(tradePanel, sourceId, destinationId, sourceProperties, sourcePropertiesLength, destinationProperties, destinationPropertiesLength));
         tradePanel.transform.GetChild(3).GetComponent<Button>().onClick.AddListener(() =>
-                    destroyGameObject(tradePanel)); // refuse button
+                    refuseTrade(tradePanel,sourceId)); 
+    }
+
+    void refuseTrade(GameObject tradePanel, int sourceId)
+    {
+        CmdRefusedTrade(sourceId);
+        destroyGameObject(tradePanel);
+    }
+
+    [Command]
+    void CmdRefusedTrade(int sourceId)
+    {
+        gameManagerScript.CmdRefusedTrade(sourceId);
     }
 
     void destroyGameObject(GameObject go)
@@ -698,6 +716,9 @@ public class Player : NetworkBehaviour
 
     void sendTrade(GameObject tradePanel, int sourceId, int destinationId, List<int> sourcePropertiesList, List<int> destinationPropertiesList)
     {
+
+        if (sourcePropertiesList.Count == 0 && destinationPropertiesList.Count == 0) return;
+
         Destroy(tradePanel);
 
         int[] sourceProperties = sourcePropertiesList.ToArray();
@@ -718,6 +739,7 @@ public class Player : NetworkBehaviour
             Debug.Log(id + " ");
         }
 
+        waitingForTrade = true;
         CmdSendTrade(idPlayer, destinationId, sourceProperties, sourcePropertiesLength, destinationProperties, destinationPropertiesLength);
     }
 
@@ -746,6 +768,20 @@ public class Player : NetworkBehaviour
     void CmdExecuteTrade(int sourceId, int destinationId, int[] sourceProperties, int sourcePropertiesLength, int[] destinationProperties, int destinationPropertiesLength)
     {
         gameManagerScript.CmdExecuteTrade(sourceId, destinationId, sourceProperties, sourcePropertiesLength, destinationProperties, destinationPropertiesLength);
+    }
+
+    [ClientRpc]
+    public void RpcAcceptedTrade()
+    {
+        if (!isLocalPlayer) return;
+        waitingForTrade = false;
+    }
+    
+    [ClientRpc]
+    public void RpcRefusedTrade()
+    {
+        if (!isLocalPlayer) return;
+        waitingForTrade = false;
     }
 
     // ---------------------------------

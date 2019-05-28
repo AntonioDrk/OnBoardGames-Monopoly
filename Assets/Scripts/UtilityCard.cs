@@ -131,6 +131,8 @@ public class UtilityCard : Card
         CardReader.closeButton.GetComponent<Button>().onClick.RemoveAllListeners();
         CardReader.sellPropertyButton.SetActive(false);
         CardReader.closeButton.SetActive(false);
+        CardReader.ElectricCompanyLogo.SetActive(false);
+        CardReader.WaterWorksLogo.SetActive(false);
         CardReader.utilityPanel.SetActive(false);
     }
 

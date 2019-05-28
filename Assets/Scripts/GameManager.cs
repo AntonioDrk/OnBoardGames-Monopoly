@@ -76,7 +76,7 @@ public class GameManager : NetworkBehaviour
             cardsOwner.Add(-1);
 
         if (isServer)
-            addPlayerColor(new List<Color> { new Color32(0, 108, 0, 255), new Color32(200, 7, 0, 255), new Color32(0, 21, 161, 255), new Color32(224, 224, 0, 255), new Color32(139, 0, 162, 255), Color.black });
+            addPlayerColor(new List<Color> { new Color32(0, 108, 0, 255), new Color32(200, 7, 0, 255), new Color32(0, 21, 161, 255), new Color32(160, 130, 0, 255), new Color32(139, 0, 162, 255), Color.black });
 
     }
 
@@ -119,7 +119,7 @@ public class GameManager : NetworkBehaviour
             players[i].GetComponent<Player>().RpcCreatePlayerTradeInfo(i, playerTradePanel);
 
         }
-        players[0].GetComponent<Player>().RpcChangeColorOnPanel(playerInfo[0], 183, 84, 84, 150);
+        players[0].GetComponent<Player>().RpcChangeColorOnPanel(playerInfo[0], 255, 190, 190, 190);
 
         for (int i = 0; i < nrOfPlayers; i++)
             players[i].GetComponent<Player>().RpcAddButtonToPlayerTradeInfo();
@@ -131,10 +131,15 @@ public class GameManager : NetworkBehaviour
             players[destinationId].GetComponent<Player>().RpcReceiveTrade(sourceId, destinationId, sourceProperties, sourcePropertiesLength, destinationProperties, destinationPropertiesLength);
     }
 
+    public void CmdRefusedTrade(int sourceId)
+    {
+        players[sourceId].GetComponent<Player>().RpcRefusedTrade();
+    }
+
     public void CmdExecuteTrade(int sourceId, int destinationId, int[] sourceProperties, int sourcePropertiesLength, int[] destinationProperties, int destinationPropertiesLength)
     {
-        Debug.LogError("Execute trade from " + sourceId + " to " + destinationId);
-        
+
+        //Debug.Log("Execute trade from " + sourceId + " to " + destinationId);        
         for(int k=0; k< sourcePropertiesLength; k++)
         {
             int i = sourceProperties[k];
@@ -169,7 +174,9 @@ public class GameManager : NetworkBehaviour
             players[sourceId].GetComponent<Player>().RpcBuyProperty(i);
             players[destinationId].GetComponent<Player>().RpcSellProperty(i);
         }
-        
+
+        players[sourceId].GetComponent<Player>().RpcAcceptedTrade();
+
     }
     
     private void addPlayerColor(List<Color> colors)
@@ -267,10 +274,10 @@ public class GameManager : NetworkBehaviour
         if (!isServer)
             return;
 
-        players[playerTurn].GetComponent<Player>().RpcChangeColorOnPanel(playerInfo[playerTurn], 255, 255, 255, 150);
+        players[playerTurn].GetComponent<Player>().RpcChangeColorOnPanel(playerInfo[playerTurn], 255, 255, 255, 190);
         playerTurn = (playerTurn + 1) % connectedPlayers;
         Debug.Log("playerTurn: " + playerTurn);
-        players[playerTurn].GetComponent<Player>().RpcChangeColorOnPanel(playerInfo[playerTurn], 183, 84, 84, 150);
+        players[playerTurn].GetComponent<Player>().RpcChangeColorOnPanel(playerInfo[playerTurn], 255, 190, 190, 190);
     }
 
     public void CmdChangeOwner(int cardIndex, int newOwnerId, int id)
