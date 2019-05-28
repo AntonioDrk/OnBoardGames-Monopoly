@@ -45,7 +45,7 @@ public class PropertyCard : Card
 
     public override void doAction(GameObject player)
     {
-        int ownerId = GameObject.Find("GameManager").GetComponent<GameManager>().propertyCardsOwners[cardIndex];
+        int ownerId = GameObject.Find("GameManager").GetComponent<GameManager>().cardsOwner[cardIndex];
         showCard();
         Debug.Log("Owner's id for " + cardName + " : " + ownerId);
         if (ownerId != -1)
@@ -59,8 +59,10 @@ public class PropertyCard : Card
             else
             { 
                 Debug.Log("Player must pay rent to player " + ownerId);
+                int amountPaid = calculateRent(ownerId);
+                CardReader.payRentButton.transform.GetChild(0).GetComponent<Text>().text = "Pay $" + amountPaid;
                 CardReader.payRentButton.SetActive(true);
-                CardReader.payRentButton.GetComponent<Button>().onClick.AddListener(() => payRent(player,playerScript, ownerId));
+                CardReader.payRentButton.GetComponent<Button>().onClick.AddListener(() => payRent(player,playerScript, ownerId, amountPaid));
             }
         }
         else
@@ -79,10 +81,8 @@ public class PropertyCard : Card
     {
         for(int index=0; index < propertiesFromSameGroup.Length; index++)
         {
-            if (GameObject.Find("GameManager").GetComponent<GameManager>().propertyCardsOwners[propertiesFromSameGroup[index]] != ownerId)
-            {
+            if (GameObject.Find("GameManager").GetComponent<GameManager>().cardsOwner[propertiesFromSameGroup[index]] != ownerId)
                 return false;
-            }
         }
         Debug.Log("Player " + ownerId + " has all properies.");
         return true;
@@ -120,7 +120,8 @@ public class PropertyCard : Card
         if (!hasHotel && housesBuilt < 4 && propertiesAreEquallyDeveloped())
         {
             Debug.Log("Player built a house.");
-            player.GetComponent<Player>().CmdAddMoney(-pricePerHouse);
+            if(!useManual)
+                player.GetComponent<Player>().CmdAddMoney(-pricePerHouse);
 
             int leftRight, downUp;
             leftRight = downUp = 0;
@@ -210,34 +211,18 @@ public class PropertyCard : Card
         else
             Debug.LogError("Tried to delete a house that wasn't in the buildings list");
     }
-
-
-    //public void reconstructBuildings(GameObject player)
-    //{
-    //    GameManager gameManagerScript = GameObject.Find("GameManager").GetComponent<GameManager>();
-    //    hasHotel = false;
-    //    for (int i = 0; i < 4; i++)
-    //    {
-    //        Debug.LogWarning("Building the " + i + " house. \t\t Houses built atm: " + housesBuilt);
-    //        buildHouse(player, true , i);
-    //    }
-
-    //    Debug.LogWarning("After the for we have " + housesBuilt + " housesBuilt");
-    //    Debug.LogWarning("Number of buildings on property " + buildings.Count);
-    //}
-
-    public void showOwnedCard(GameObject player)
+    
+    public override void showOwnedCard(GameObject player)
     {
         closeCard();
         if (player.GetComponent<Player>().getStage() != 0) 
             return;
         showCard();
-
         CardReader.closeButton.SetActive(true);
         CardReader.closeButton.GetComponent<Button>().onClick.AddListener(closeCard);
 
         // if it's your turn you can sell/buy houses and sell the property
-        if (GameObject.Find("GameManager").GetComponent<GameManager>().playerTurn == player.GetComponent<Player>().idPlayer)
+         if (GameObject.Find("GameManager").GetComponent<GameManager>().playerTurn == player.GetComponent<Player>().idPlayer)
         {
             // Sell property button
             CardReader.sellPropertyButton.SetActive(true);
@@ -266,6 +251,10 @@ public class PropertyCard : Card
 
     void showCard()
     {
+        CardReader.railroadPanel.SetActive(false);
+        CardReader.utilityPanel.SetActive(false);
+        closeCard();
+
         GameObject cardPanel = CardReader.cardPanel;
         cardPanel.SetActive(true);
 
@@ -295,7 +284,6 @@ public class PropertyCard : Card
         CardReader.sellPropertyButton.SetActive(false);
         CardReader.closeButton.SetActive(false);
         CardReader.cardPanel.SetActive(false);
-
     }
 
     void closeCard(GameObject player)
@@ -319,7 +307,7 @@ public class PropertyCard : Card
     void buyProperty(GameObject player)
     {
         Player playerScript = player.GetComponent<Player>();
-        playerScript.CmdChangeOwner(playerScript.idPlayer, cardIndex); 
+        playerScript.CmdChangeOwner(playerScript.idPlayer, cardIndex,id); 
         playerScript.CmdTakeMoney(priceValue);
         playerScript.buyProperty(this);
         hideCard(player);
@@ -328,21 +316,18 @@ public class PropertyCard : Card
     void sellProperty(GameObject player)
     {
         // TODO: SELL ALL THE HOUSES OR THE HOTEL AS WELL 
+        if(housesBuilt > 0) return;
         CardReader.sellPropertyButton.GetComponent<Button>().onClick.RemoveAllListeners();
         CardReader.sellPropertyButton.SetActive(false);
         Player playerScript = player.GetComponent<Player>();
-        playerScript.CmdChangeOwner(-1, cardIndex);
+        playerScript.CmdChangeOwner(-1, cardIndex,id);
         playerScript.CmdAddMoney(mortgageValue); // players get in return the card's mortgage value
         playerScript.sellProperty(this);
         closeCard();
     }
 
-    // player pays rent to player[ownerId]
-    void payRent(GameObject player, Player playerScript, int ownerId) 
-    { 
-        CardReader.payRentButton.GetComponent<Button>().onClick.RemoveAllListeners();
-        CardReader.payRentButton.SetActive(false);
-
+    int calculateRent(int ownerId)
+    {
         int amountPaid = rent[0];
         if (hasHotel == true)
         {
@@ -358,8 +343,15 @@ public class PropertyCard : Card
         {   // Daca are toate proprietatile din color group si fara case=> rent[0]x2
             amountPaid = 2 * rent[0];
         }
-       
-        
+        return amountPaid;
+    }
+
+    // player pays rent to player[ownerId]
+    void payRent(GameObject player, Player playerScript, int ownerId, int amountPaid) 
+    { 
+        CardReader.payRentButton.GetComponent<Button>().onClick.RemoveAllListeners();
+        CardReader.payRentButton.SetActive(false);
+         
         playerScript.CmdTakeMoney(amountPaid);
         playerScript.CmdGiveMoneyToPlayer(ownerId, amountPaid);
 

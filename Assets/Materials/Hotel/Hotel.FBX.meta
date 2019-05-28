@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 42350cecc2959a246a2afc7215b375c5
+guid: 57f072cac87a8544eae370d261e0f50c
 ModelImporter:
   serializedVersion: 23
   fileIDToRecycleName:
@@ -21,7 +21,12 @@ ModelImporter:
     4300002: House_4_lod_1
     4300004: House_4_lod_2
     9500000: //RootNode
-  externalObjects: {}
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: House_4
+    second: {fileID: 2100000, guid: 844fc2a9581c65e41b00fb7cfdbe1a80, type: 2}
   materials:
     importMaterials: 1
     materialName: 1
@@ -74,7 +79,7 @@ ModelImporter:
     secondaryUVPackMargin: 4
     useFileScale: 0
     previousCalculatedGlobalScale: 1
-    hasPreviousCalculatedGlobalScale: 0
+    hasPreviousCalculatedGlobalScale: 1
   tangentSpace:
     normalSmoothAngle: 60
     normalImportMode: 0

@@ -1,26 +1,26 @@
-{  
-   "Items":[  
-      {  
-         "id":1,
-		 "cardIndex":0,
-         "cardColor":[  
+{
+   "Items": [
+      {
+         "id": 1,
+         "cardIndex": 0,
+         "cardColor": [
             171,
-			131,
-			112
+            131,
+            112
          ],
-         "cardName":"Mediterranean Avenue",
-         "priceValue":60,
-         "mortgageValue":30,
-         "pricePerHouse":50,
-         "housesBuilt":0,
-         "houseCoordinates":[  
+         "cardName": "Mediterranean Avenue",
+         "priceValue": 60,
+         "mortgageValue": 30,
+         "pricePerHouse": 50,
+         "housesBuilt": 0,
+         "houseCoordinates": [
             0.865,
             0,
-			-5.26
+            -5.26
          ],
-         "cardsInGroup":2,
-         "hasHotel":false,
-         "rent":[  
+         "cardsInGroup": 2,
+         "hasHotel": false,
+         "rent": [
             2,
             10,
             30,
@@ -28,31 +28,31 @@
             160,
             250
          ],
-         "propertiesFromSameGroup":[  
+         "propertiesFromSameGroup": [
             1
          ]
       },
-      {  
-         "id":"3",
-		 "cardIndex":1,
-         "cardColor":[  
+      {
+         "id": "3",
+         "cardIndex": 1,
+         "cardColor": [
             171,
-			131,
-			112
+            131,
+            112
          ],
-         "cardName":"Baltic Avenue",
-         "priceValue":"60",
-         "mortgageValue":"30",
-         "pricePerHouse":"50",
-         "housesBuilt":"0",
-         "houseCoordinates":[  
+         "cardName": "Baltic Avenue",
+         "priceValue": "60",
+         "mortgageValue": "30",
+         "pricePerHouse": "50",
+         "housesBuilt": "0",
+         "houseCoordinates": [
             -1.59,
             0,
-			-5.26
+            -5.26
          ],
-         "cardsInGroup":"2",
-         "hasHotel":"false",
-         "rent":[  
+         "cardsInGroup": "2",
+         "hasHotel": "false",
+         "rent": [
             5,
             20,
             60,
@@ -60,31 +60,31 @@
             320,
             450
          ],
-         "propertiesFromSameGroup":[  
+         "propertiesFromSameGroup": [
             0
          ]
       },
-      {  
-         "id":"6",
-		 "cardIndex":2,
-         "cardColor":[  
+      {
+         "id": "6",
+         "cardIndex": 2,
+         "cardColor": [
             189,
-			245,
-			255
+            245,
+            255
          ],
-         "cardName":"Oriental Avenue",
-         "priceValue":"100",
-         "mortgageValue":"50",
-         "pricePerHouse":"50",
-         "housesBuilt":"0",
-         "houseCoordinates":[  
+         "cardName": "Oriental Avenue",
+         "priceValue": "100",
+         "mortgageValue": "50",
+         "pricePerHouse": "50",
+         "housesBuilt": "0",
+         "houseCoordinates": [
             -5.29,
             0,
-			-5.26
+            -5.26
          ],
-         "cardsInGroup":"3",
-         "hasHotel":"false",
-         "rent":[  
+         "cardsInGroup": "3",
+         "hasHotel": "false",
+         "rent": [
             6,
             30,
             90,
@@ -92,32 +92,32 @@
             400,
             550
          ],
-         "propertiesFromSameGroup":[  
+         "propertiesFromSameGroup": [
             3,
-			4
+            4
          ]
       },
-      {  
-         "id":"8",
-		 "cardIndex":3,
-         "cardColor":[  
+      {
+         "id": "8",
+         "cardIndex": 3,
+         "cardColor": [
             189,
-			245,
-			255
+            245,
+            255
          ],
-         "cardName":"Vermont Avenue",
-         "priceValue":"100",
-         "mortgageValue":"50",
-         "pricePerHouse":"50",
-         "housesBuilt":"0",
-         "houseCoordinates":[  
+         "cardName": "Vermont Avenue",
+         "priceValue": "100",
+         "mortgageValue": "50",
+         "pricePerHouse": "50",
+         "housesBuilt": "0",
+         "houseCoordinates": [
             -7.745,
             0,
-			-5.26
+            -5.26
          ],
-         "cardsInGroup":"3",
-         "hasHotel":"false",
-         "rent":[  
+         "cardsInGroup": "3",
+         "hasHotel": "false",
+         "rent": [
             6,
             30,
             90,
@@ -125,32 +125,32 @@
             400,
             550
          ],
-         "propertiesFromSameGroup":[  
+         "propertiesFromSameGroup": [
             2,
-			4
+            4
          ]
       },
-      {  
-         "id":"9",
-		 "cardIndex":4,
-         "cardColor":[  
+      {
+         "id": "9",
+         "cardIndex": 4,
+         "cardColor": [
             189,
-			245,
-			255
+            245,
+            255
          ],
-         "cardName":"Connecticut Avenue",
-         "priceValue":"120",
-         "mortgageValue":"60",
-         "pricePerHouse":"50",
-         "housesBuilt":"0",
-         "houseCoordinates":[  
+         "cardName": "Connecticut Avenue",
+         "priceValue": "120",
+         "mortgageValue": "60",
+         "pricePerHouse": "50",
+         "housesBuilt": "0",
+         "houseCoordinates": [
             -8.96,
             0,
-			-5.26
+            -5.26
          ],
-         "cardsInGroup":"3",
-         "hasHotel":"false",
-         "rent":[  
+         "cardsInGroup": "3",
+         "hasHotel": "false",
+         "rent": [
             8,
             40,
             100,
@@ -158,32 +158,32 @@
             450,
             600
          ],
-         "propertiesFromSameGroup":[  
+         "propertiesFromSameGroup": [
             2,
-			3
+            3
          ]
       },
-      {  
-         "id":"11",
-		 "cardIndex":5,
-         "cardColor":[  
+      {
+         "id": "11",
+         "cardIndex": 5,
+         "cardColor": [
             225,
-			114,
-			201
+            114,
+            201
          ],
-         "cardName":"St. Charles Place",
-         "priceValue":"140",
-         "mortgageValue":"70",
-         "pricePerHouse":"100",
-         "housesBuilt":"0",
-         "houseCoordinates":[  
+         "cardName": "St. Charles Place",
+         "priceValue": "140",
+         "mortgageValue": "70",
+         "pricePerHouse": "100",
+         "housesBuilt": "0",
+         "houseCoordinates": [
             -10.26,
-			0,
-			-4.875
+            0,
+            -4.875
          ],
-         "cardsInGroup":"3",
-         "hasHotel":"false",
-         "rent":[  
+         "cardsInGroup": "3",
+         "hasHotel": "false",
+         "rent": [
             10,
             50,
             150,
@@ -191,32 +191,32 @@
             625,
             750
          ],
-         "propertiesFromSameGroup":[  
+         "propertiesFromSameGroup": [
             6,
-			7
+            7
          ]
       },
-      {  
-         "id":"13",
-		 "cardIndex":6,
-         "cardColor":[  
+      {
+         "id": "13",
+         "cardIndex": 6,
+         "cardColor": [
             225,
-			114,
-			201
+            114,
+            201
          ],
-         "cardName":"States Avenue",
-         "priceValue":"140",
-         "mortgageValue":"70",
-         "pricePerHouse":"100",
-         "housesBuilt":"0",
-         "houseCoordinates":[  
+         "cardName": "States Avenue",
+         "priceValue": "140",
+         "mortgageValue": "70",
+         "pricePerHouse": "100",
+         "housesBuilt": "0",
+         "houseCoordinates": [
             -10.26,
-			0,
-			-2.415
+            0,
+            -2.415
          ],
-         "cardsInGroup":"3",
-         "hasHotel":"false",
-         "rent":[  
+         "cardsInGroup": "3",
+         "hasHotel": "false",
+         "rent": [
             10,
             50,
             150,
@@ -224,32 +224,32 @@
             625,
             750
          ],
-         "propertiesFromSameGroup":[  
+         "propertiesFromSameGroup": [
             5,
-			7
+            7
          ]
       },
-      {  
-         "id":"14",
-		 "cardIndex":7,
-         "cardColor":[  
+      {
+         "id": "14",
+         "cardIndex": 7,
+         "cardColor": [
             225,
-			114,
-			201
+            114,
+            201
          ],
-         "cardName":"Virginia Avenue",
-         "priceValue":"180",
-         "mortgageValue":"80",
-         "pricePerHouse":"100",
-         "housesBuilt":"0",
-         "houseCoordinates":[  
+         "cardName": "Virginia Avenue",
+         "priceValue": "180",
+         "mortgageValue": "80",
+         "pricePerHouse": "100",
+         "housesBuilt": "0",
+         "houseCoordinates": [
             -10.26,
-			0,
-			-1.19
+            0,
+            -1.19
          ],
-         "cardsInGroup":"3",
-         "hasHotel":"false",
-         "rent":[  
+         "cardsInGroup": "3",
+         "hasHotel": "false",
+         "rent": [
             12,
             60,
             180,
@@ -257,32 +257,32 @@
             700,
             900
          ],
-         "propertiesFromSameGroup":[  
+         "propertiesFromSameGroup": [
             5,
-			6
+            6
          ]
       },
-      {  
-         "id":"16",
-		 "cardIndex":8,
-         "cardColor":[  
+      {
+         "id": "16",
+         "cardIndex": 8,
+         "cardColor": [
             251,
-			191,
-			98
+            191,
+            98
          ],
-         "cardName":"St. James Place",
-         "priceValue":"180",
-         "mortgageValue":"90",
-         "pricePerHouse":"100",
-         "housesBuilt":"0",
-         "houseCoordinates":[  
+         "cardName": "St. James Place",
+         "priceValue": "180",
+         "mortgageValue": "90",
+         "pricePerHouse": "100",
+         "housesBuilt": "0",
+         "houseCoordinates": [
             -10.26,
-			0,
-			1.285
+            0,
+            1.285
          ],
-         "cardsInGroup":"3",
-         "hasHotel":"false",
-         "rent":[  
+         "cardsInGroup": "3",
+         "hasHotel": "false",
+         "rent": [
             14,
             70,
             200,
@@ -290,32 +290,32 @@
             700,
             900
          ],
-         "propertiesFromSameGroup":[  
+         "propertiesFromSameGroup": [
             9,
-			10
+            10
          ]
       },
-      {  
-         "id":"18",
-		 "cardIndex":9,
-         "cardColor":[  
+      {
+         "id": "18",
+         "cardIndex": 9,
+         "cardColor": [
             251,
-			191,
-			98
+            191,
+            98
          ],
-         "cardName":"Tennessee Avenue",
-         "priceValue":"180",
-         "mortgageValue":"90",
-         "pricePerHouse":"100",
-         "housesBuilt":"0",
-         "houseCoordinates":[  
+         "cardName": "Tennessee Avenue",
+         "priceValue": "180",
+         "mortgageValue": "90",
+         "pricePerHouse": "100",
+         "housesBuilt": "0",
+         "houseCoordinates": [
             -10.26,
-			0,
-			3.735
+            0,
+            3.735
          ],
-         "cardsInGroup":"3",
-         "hasHotel":"false",
-         "rent":[  
+         "cardsInGroup": "3",
+         "hasHotel": "false",
+         "rent": [
             14,
             70,
             200,
@@ -323,32 +323,32 @@
             700,
             950
          ],
-         "propertiesFromSameGroup":[  
+         "propertiesFromSameGroup": [
             8,
-			10
+            10
          ]
       },
-      {  
-         "id":"19",
-		 "cardIndex":10,
-         "cardColor":[  
+      {
+         "id": "19",
+         "cardIndex": 10,
+         "cardColor": [
             251,
-			191,
-			98
+            191,
+            98
          ],
-         "cardName":"New York Avenue",
-         "priceValue":"200",
-         "mortgageValue":"100",
-         "pricePerHouse":"100",
-         "housesBuilt":"0",
-         "houseCoordinates":[  
+         "cardName": "New York Avenue",
+         "priceValue": "200",
+         "mortgageValue": "100",
+         "pricePerHouse": "100",
+         "housesBuilt": "0",
+         "houseCoordinates": [
             -10.26,
-			0,
-			4.965
+            0,
+            4.965
          ],
-         "cardsInGroup":"3",
-         "hasHotel":"false",
-         "rent":[  
+         "cardsInGroup": "3",
+         "hasHotel": "false",
+         "rent": [
             16,
             80,
             220,
@@ -356,32 +356,32 @@
             800,
             1000
          ],
-         "propertiesFromSameGroup":[  
+         "propertiesFromSameGroup": [
             8,
-			9
+            9
          ]
       },
-      {  
-         "id":"21",
-		 "cardIndex":11,
-         "cardColor":[  
+      {
+         "id": "21",
+         "cardIndex": 11,
+         "cardColor": [
             238,
-			87,
-			99
+            87,
+            99
          ],
-         "cardName":"Kentucky Avenue",
-         "priceValue":"220",
-         "mortgageValue":"110",
-         "pricePerHouse":"150",
-         "housesBuilt":"0",
-         "houseCoordinates":[  
+         "cardName": "Kentucky Avenue",
+         "priceValue": "220",
+         "mortgageValue": "110",
+         "pricePerHouse": "150",
+         "housesBuilt": "0",
+         "houseCoordinates": [
             -9.865,
-			0,
-			6.26
+            0,
+            6.26
          ],
-         "cardsInGroup":"3",
-         "hasHotel":"false",
-         "rent":[  
+         "cardsInGroup": "3",
+         "hasHotel": "false",
+         "rent": [
             18,
             90,
             250,
@@ -389,32 +389,32 @@
             875,
             1050
          ],
-         "propertiesFromSameGroup":[  
+         "propertiesFromSameGroup": [
             12,
-			13
+            13
          ]
       },
-      {  
-         "id":"23",
-		 "cardIndex":12,
-         "cardColor":[  
+      {
+         "id": "23",
+         "cardIndex": 12,
+         "cardColor": [
             238,
-			87,
-			99
+            87,
+            99
          ],
-         "cardName":"Indiana Avenue",
-         "priceValue":"220",
-         "mortgageValue":"110",
-         "pricePerHouse":"150",
-         "housesBuilt":"0",
-         "houseCoordinates":[  
+         "cardName": "Indiana Avenue",
+         "priceValue": "220",
+         "mortgageValue": "110",
+         "pricePerHouse": "150",
+         "housesBuilt": "0",
+         "houseCoordinates": [
             -7.425,
-			0,
-			6.26
+            0,
+            6.26
          ],
-         "cardsInGroup":"3",
-         "hasHotel":"false",
-         "rent":[  
+         "cardsInGroup": "3",
+         "hasHotel": "false",
+         "rent": [
             18,
             90,
             250,
@@ -422,32 +422,32 @@
             875,
             1050
          ],
-         "propertiesFromSameGroup":[  
+         "propertiesFromSameGroup": [
             11,
-			13
+            13
          ]
       },
-      {  
-         "id":"24",
-		 "cardIndex":13,
-         "cardColor":[  
+      {
+         "id": "24",
+         "cardIndex": 13,
+         "cardColor": [
             238,
-			87,
-			99
+            87,
+            99
          ],
-         "cardName":"Illinois Avenue",
-         "priceValue":"240",
-         "mortgageValue":"120",
-         "pricePerHouse":"150",
-         "housesBuilt":"0",
-         "houseCoordinates":[  
+         "cardName": "Illinois Avenue",
+         "priceValue": "240",
+         "mortgageValue": "120",
+         "pricePerHouse": "150",
+         "housesBuilt": "0",
+         "houseCoordinates": [
             -6.195,
-			0,
-			6.26
+            0,
+            6.26
          ],
-         "cardsInGroup":"3",
-         "hasHotel":"false",
-         "rent":[  
+         "cardsInGroup": "3",
+         "hasHotel": "false",
+         "rent": [
             20,
             100,
             300,
@@ -455,32 +455,32 @@
             925,
             1100
          ],
-         "propertiesFromSameGroup":[  
+         "propertiesFromSameGroup": [
             11,
-			12
+            12
          ]
       },
-      {  
-         "id":"26",
-		 "cardIndex":14,
-         "cardColor":[  
+      {
+         "id": "26",
+         "cardIndex": 14,
+         "cardColor": [
             255,
-			255,
-			73
+            255,
+            73
          ],
-         "cardName":"Atlantic Avenue",
-         "priceValue":"260",
-         "mortgageValue":"130",
-         "pricePerHouse":"150",
-         "housesBuilt":"0",
-         "houseCoordinates":[  
+         "cardName": "Atlantic Avenue",
+         "priceValue": "260",
+         "mortgageValue": "130",
+         "pricePerHouse": "150",
+         "housesBuilt": "0",
+         "houseCoordinates": [
             -3.72,
-			0,
-			6.26
+            0,
+            6.26
          ],
-         "cardsInGroup":"3",
-         "hasHotel":"false",
-         "rent":[  
+         "cardsInGroup": "3",
+         "hasHotel": "false",
+         "rent": [
             22,
             110,
             330,
@@ -488,32 +488,32 @@
             975,
             1150
          ],
-         "propertiesFromSameGroup":[  
+         "propertiesFromSameGroup": [
             15,
-			16
+            16
          ]
       },
-      {  
-         "id":"27",
-		 "cardIndex":15,
-         "cardColor":[  
+      {
+         "id": "27",
+         "cardIndex": 15,
+         "cardColor": [
             255,
-			255,
-			73
+            255,
+            73
          ],
-         "cardName":"Ventnor Avenue",
-         "priceValue":"260",
-         "mortgageValue":"130",
-         "pricePerHouse":"150",
-         "housesBuilt":"0",
-         "houseCoordinates":[  
+         "cardName": "Ventnor Avenue",
+         "priceValue": "260",
+         "mortgageValue": "130",
+         "pricePerHouse": "150",
+         "housesBuilt": "0",
+         "houseCoordinates": [
             -2.495,
-			0,
-			6.26
+            0,
+            6.26
          ],
-         "cardsInGroup":"3",
-         "hasHotel":"false",
-         "rent":[  
+         "cardsInGroup": "3",
+         "hasHotel": "false",
+         "rent": [
             22,
             110,
             330,
@@ -521,32 +521,32 @@
             975,
             1150
          ],
-         "propertiesFromSameGroup":[  
+         "propertiesFromSameGroup": [
             14,
-			16
+            16
          ]
       },
-      {  
-         "id":"29",
-		 "cardIndex":16,
-         "cardColor":[  
+      {
+         "id": "29",
+         "cardIndex": 16,
+         "cardColor": [
             255,
-			255,
-			73
+            255,
+            73
          ],
-         "cardName":"Marvin Gardens",
-         "priceValue":"280",
-         "mortgageValue":"140",
-         "pricePerHouse":"150",
-         "housesBuilt":"0",
-         "houseCoordinates":[  
+         "cardName": "Marvin Gardens",
+         "priceValue": "280",
+         "mortgageValue": "140",
+         "pricePerHouse": "150",
+         "housesBuilt": "0",
+         "houseCoordinates": [
             -0.035,
-			0,
-			6.26
+            0,
+            6.26
          ],
-         "cardsInGroup":"3",
-         "hasHotel":"false",
-         "rent":[  
+         "cardsInGroup": "3",
+         "hasHotel": "false",
+         "rent": [
             24,
             120,
             360,
@@ -554,32 +554,32 @@
             1025,
             1200
          ],
-         "propertiesFromSameGroup":[  
+         "propertiesFromSameGroup": [
             14,
-			15
+            15
          ]
       },
-      {  
-         "id":"31",
-		 "cardIndex":17,
-         "cardColor":[  
+      {
+         "id": "31",
+         "cardIndex": 17,
+         "cardColor": [
             83,
-			206,
-			145
+            206,
+            145
          ],
-         "cardName":"Pacific Avenue",
-         "priceValue":"300",
-         "mortgageValue":"150",
-         "pricePerHouse":"200",
-         "housesBuilt":"0",
-         "houseCoordinates":[  
+         "cardName": "Pacific Avenue",
+         "priceValue": "300",
+         "mortgageValue": "150",
+         "pricePerHouse": "200",
+         "housesBuilt": "0",
+         "houseCoordinates": [
             1.26,
-			0,
-			5.865
+            0,
+            5.865
          ],
-         "cardsInGroup":"3",
-         "hasHotel":"false",
-         "rent":[  
+         "cardsInGroup": "3",
+         "hasHotel": "false",
+         "rent": [
             26,
             130,
             390,
@@ -587,32 +587,32 @@
             1100,
             1275
          ],
-         "propertiesFromSameGroup":[  
+         "propertiesFromSameGroup": [
             18,
-			19
+            19
          ]
       },
-      {  
-         "id":"32",
-		 "cardIndex":18,
-         "cardColor":[  
+      {
+         "id": "32",
+         "cardIndex": 18,
+         "cardColor": [
             83,
-			206,
-			145
+            206,
+            145
          ],
-         "cardName":"North Carolina Avenue",
-         "priceValue":"300",
-         "mortgageValue":"150",
-         "pricePerHouse":"200",
-         "housesBuilt":"0",
-         "houseCoordinates":[  
+         "cardName": "North Carolina Avenue",
+         "priceValue": "300",
+         "mortgageValue": "150",
+         "pricePerHouse": "200",
+         "housesBuilt": "0",
+         "houseCoordinates": [
             1.26,
-			0,
-			4.635
+            0,
+            4.635
          ],
-         "cardsInGroup":"3",
-         "hasHotel":"false",
-         "rent":[  
+         "cardsInGroup": "3",
+         "hasHotel": "false",
+         "rent": [
             26,
             130,
             390,
@@ -620,32 +620,32 @@
             1100,
             1275
          ],
-         "propertiesFromSameGroup":[  
+         "propertiesFromSameGroup": [
             17,
-			19
+            19
          ]
       },
-      {  
-         "id":"34",
-		 "cardIndex":19,
-         "cardColor":[  
+      {
+         "id": "34",
+         "cardIndex": 19,
+         "cardColor": [
             83,
-			206,
-			145
+            206,
+            145
          ],
-         "cardName":"Pennsylvania Avenue",
-         "priceValue":"240",
-         "mortgageValue":"120",
-         "pricePerHouse":"150",
-         "housesBuilt":"0",
-         "houseCoordinates":[  
+         "cardName": "Pennsylvania Avenue",
+         "priceValue": "240",
+         "mortgageValue": "120",
+         "pricePerHouse": "150",
+         "housesBuilt": "0",
+         "houseCoordinates": [
             1.26,
-			0,
-			2.19
+            0,
+            2.19
          ],
-         "cardsInGroup":"3",
-         "hasHotel":"false",
-         "rent":[  
+         "cardsInGroup": "3",
+         "hasHotel": "false",
+         "rent": [
             28,
             150,
             450,
@@ -653,32 +653,32 @@
             1200,
             1400
          ],
-         "propertiesFromSameGroup":[  
+         "propertiesFromSameGroup": [
             17,
-			18
+            18
          ]
       },
-      {  
-         "id":"37",
-		 "cardIndex":20,
-         "cardColor":[  
+      {
+         "id": "37",
+         "cardIndex": 20,
+         "cardColor": [
             65,
-			159,
-			233
+            159,
+            233
          ],
-         "cardName":"Park Place",
-         "priceValue":"350",
-         "mortgageValue":"175",
-         "pricePerHouse":"200",
-         "housesBuilt":"0",
-         "houseCoordinates":[  
+         "cardName": "Park Place",
+         "priceValue": "350",
+         "mortgageValue": "175",
+         "pricePerHouse": "200",
+         "housesBuilt": "0",
+         "houseCoordinates": [
             1.26,
-			0,
-			-1.515
+            0,
+            -1.515
          ],
-         "cardsInGroup":"2",
-         "hasHotel":"false",
-         "rent":[  
+         "cardsInGroup": "2",
+         "hasHotel": "false",
+         "rent": [
             35,
             175,
             500,
@@ -686,31 +686,31 @@
             1300,
             1500
          ],
-         "propertiesFromSameGroup":[  
+         "propertiesFromSameGroup": [
             21
          ]
       },
-      {  
-         "id":"39",
-		 "cardIndex":21,
-         "cardColor":[  
+      {
+         "id": "39",
+         "cardIndex": 21,
+         "cardColor": [
             65,
-			159,
-			233
+            159,
+            233
          ],
-         "cardName":"Boardwalk",
-         "priceValue":"400",
-         "mortgageValue":"200",
-         "pricePerHouse":"200",
-         "housesBuilt":"0",
-         "houseCoordinates":[  
+         "cardName": "Boardwalk",
+         "priceValue": "400",
+         "mortgageValue": "200",
+         "pricePerHouse": "200",
+         "housesBuilt": "0",
+         "houseCoordinates": [
             1.26,
-			0,
-			-3.965
+            0,
+            -3.965
          ],
-         "cardsInGroup":"2",
-         "hasHotel":"false",
-         "rent":[  
+         "cardsInGroup": "2",
+         "hasHotel": "false",
+         "rent": [
             50,
             200,
             600,
@@ -718,7 +718,7 @@
             1700,
             2000
          ],
-         "propertiesFromSameGroup":[  
+         "propertiesFromSameGroup": [
             20
          ]
       }
