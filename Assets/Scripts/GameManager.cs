@@ -108,12 +108,13 @@ public class GameManager : NetworkBehaviour
 
             if (!consoleState)
             {
-
                 CardReader.console.SetActive(true);
                 InputField input = GameObject.Find("ConsoleInput").GetComponent<InputField>();
+                input.Select();
+                input.ActivateInputField();
                 input.text = "";
                 EventSystem.current.SetSelectedGameObject(input.gameObject, null);
-                input.OnPointerClick(null);
+                input.OnPointerClick(null);   
             }
             else
                 CardReader.console.SetActive(false);
@@ -329,10 +330,10 @@ public class GameManager : NetworkBehaviour
         //Debug.LogError("Added " + amount + " to " + playerId);
     }
 
-    public void CmdConstructHouse(string housePrefabPath, Vector3 position, int cardIndex)
+    public void CmdConstructHouse(string housePrefabPath, Vector3 position, Vector3 rotation, int cardIndex)
     {
         // Instantiate in world
-        GameObject go = Instantiate(Resources.Load<GameObject>(housePrefabPath), position, Quaternion.identity);
+        GameObject go = Instantiate(Resources.Load<GameObject>(housePrefabPath), position, Quaternion.Euler(rotation));
 
         NetworkServer.Spawn(go);
 
@@ -341,7 +342,7 @@ public class GameManager : NetworkBehaviour
     }
 
 
-    public void CmdConstructHotel(string hotelPrefabPath, Vector3 position, int cardIndex)
+    public void CmdConstructHotel(string hotelPrefabPath, Vector3 position, Vector3 rotation, int cardIndex)
     {
         if (!isServer)
         {
@@ -359,7 +360,7 @@ public class GameManager : NetworkBehaviour
         RpcRemoveHouses(cardIndex);
 
         // Instantiate in world
-        GameObject go = Instantiate(Resources.Load<GameObject>(hotelPrefabPath), position, Quaternion.identity);
+        GameObject go = Instantiate(Resources.Load<GameObject>(hotelPrefabPath), position, Quaternion.Euler(rotation));
 
         NetworkServer.Spawn(go);
 

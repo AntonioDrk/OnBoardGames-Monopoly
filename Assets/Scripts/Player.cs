@@ -792,15 +792,15 @@ public class Player : NetworkBehaviour
     }
 
     [Command]
-    public void CmdConstructHouse(string housePrefabPath, Vector3 vector3, int cardIndex)
+    public void CmdConstructHouse(string housePrefabPath, Vector3 position, Vector3 rotation, int cardIndex)
     {
-        gameManagerScript.CmdConstructHouse(housePrefabPath, vector3, cardIndex);
+        gameManagerScript.CmdConstructHouse(housePrefabPath, position, rotation, cardIndex);
     }
 
     [Command]
-    public void CmdConstructHotel(string housePrefabPath, Vector3 vector3, int cardIndex)
+    public void CmdConstructHotel(string housePrefabPath, Vector3 position, Vector3 rotation, int cardIndex)
     {
-        gameManagerScript.CmdConstructHotel(housePrefabPath, vector3, cardIndex);
+        gameManagerScript.CmdConstructHotel(housePrefabPath, position, rotation, cardIndex);
     }
 
     [Command]

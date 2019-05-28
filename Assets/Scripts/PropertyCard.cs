@@ -133,10 +133,14 @@ public class PropertyCard : Card
             if (30 < id && id <= 39) downUp = -1;
 
             Vector3 offsetVector = new Vector3(houseOffset * leftRight, 0, houseOffset * downUp);
-            if(useManual)
-                player.GetComponent<Player>().CmdConstructHouse("House", houseStartPosition + (offsetVector * manualIndexOffset), cardIndex);
+
+            // Would've been prettier with multiple if statements
+            Vector3 rotation = new Vector3(0, 180 * (Mathf.Abs((1 - leftRight) / 2)) + (-downUp * 90), 0);
+
+            if (useManual)
+                player.GetComponent<Player>().CmdConstructHouse("House", houseStartPosition + (offsetVector * manualIndexOffset), rotation,cardIndex);
             else
-                player.GetComponent<Player>().CmdConstructHouse("House", houseStartPosition + (offsetVector * housesBuilt), cardIndex);
+                player.GetComponent<Player>().CmdConstructHouse("House", houseStartPosition + (offsetVector * housesBuilt), rotation, cardIndex);
         }
         else if (housesBuilt == 4)
             buildHotel(player);
@@ -161,7 +165,10 @@ public class PropertyCard : Card
 
         Vector3 offsetVector = new Vector3(houseOffset * leftRight, 0, houseOffset * downUp);
 
-        player.GetComponent<Player>().CmdConstructHotel("Hotel", houseStartPosition + offsetVector, cardIndex);
+        // Would've been prettier with multiple if statements
+        Vector3 rotation = new Vector3(0, 180 * (Mathf.Abs((1 - leftRight) / 2)) + (-downUp * 90), 0);
+
+        player.GetComponent<Player>().CmdConstructHotel("Hotel", houseStartPosition + (3 * offsetVector / 2), rotation, cardIndex);
 
     }
 
