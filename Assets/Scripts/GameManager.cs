@@ -307,6 +307,108 @@ public class GameManager : NetworkBehaviour
         //Debug.LogError("Added " + amount + " to " + playerId);
     }
 
+    public void CmdConstructHouse(string housePrefabPath, Vector3 position, int cardIndex)
+    {
+        // Instantiate in world
+        GameObject go = Instantiate(Resources.Load<GameObject>(housePrefabPath), position, Quaternion.identity);
+
+        NetworkServer.Spawn(go);
+
+        // Update the number of houses on the property for all the clients
+        RpcUpdateHouses(cardIndex, go.GetComponent<NetworkIdentity>().netId);
+    }
+
+
+    public void CmdConstructHotel(string hotelPrefabPath, Vector3 position, int cardIndex)
+    {
+        if (!isServer)
+        {
+            Debug.LogError("Client tried to run CmdConstructHotel");
+            return;
+        }
+
+        foreach (NetworkInstanceId objectNetId in CardReader.propertyCards[cardIndex].buildings)
+        {
+            NetworkServer.Destroy(NetworkServer.FindLocalObject(objectNetId));
+
+        }
+
+        Debug.Log("In cmd construct hotel");
+        RpcRemoveHouses(cardIndex);
+
+        // Instantiate in world
+        GameObject go = Instantiate(Resources.Load<GameObject>(hotelPrefabPath), position, Quaternion.identity);
+
+        NetworkServer.Spawn(go);
+
+        // Update the number of houses on the property for all the clients
+        RpcUpdateHouses(cardIndex, go.GetComponent<NetworkIdentity>().netId);
+
+    }
+
+    public void CmdDeconstructHotel(int cardIndex)
+    {
+        NetworkInstanceId lastBuilding = CardReader.propertyCards[cardIndex].buildings[CardReader.propertyCards[cardIndex].buildings.Count - 1];
+        NetworkServer.Destroy(NetworkServer.FindLocalObject(lastBuilding));
+        RpcRemoveHotel(cardIndex);
+    }
+
+    public void CmdDeconstructHouse(int cardIndex)
+    {
+        NetworkInstanceId lastBuilding = CardReader.propertyCards[cardIndex].buildings[CardReader.propertyCards[cardIndex].buildings.Count - 1];
+        NetworkServer.Destroy(NetworkServer.FindLocalObject(lastBuilding));
+        RpcRemoveHouse(cardIndex);
+    }
+
+    [ClientRpc]
+    public void RpcUpdateHouses(int cardIndex, NetworkInstanceId netId)
+    {
+        CardReader.propertyCards[cardIndex].housesBuilt += 1;
+        if (CardReader.propertyCards[cardIndex].housesBuilt == 5)
+            CardReader.propertyCards[cardIndex].hasHotel = true;
+        CardReader.propertyCards[cardIndex].addHouseObject(netId);
+    }
+
+    [ClientRpc]
+    public void RpcRemoveHotel(int cardIndex)
+    {
+        CardReader.propertyCards[cardIndex].housesBuilt = 0;
+        CardReader.propertyCards[cardIndex].hasHotel = false;
+        CardReader.propertyCards[cardIndex].removeLastHouse();
+    }
+
+    [ClientRpc]
+    public void RpcRemoveHouse(int cardIndex)
+    {
+        CardReader.propertyCards[cardIndex].housesBuilt -= 1;
+        CardReader.propertyCards[cardIndex].hasHotel = false;
+        CardReader.propertyCards[cardIndex].removeLastHouse();
+    }
+
+    [ClientRpc]
+    public void RpcRemoveLastPropertyHouse(int cardIndex, GameObject player)
+    {
+        CardReader.propertyCards[cardIndex].removeLastHouse();
+        if (CardReader.propertyCards[cardIndex].housesBuilt == 5)
+        {
+            Debug.LogWarning("Has hotel then I remove 5 houses from housesBuilt");
+            CardReader.propertyCards[cardIndex].housesBuilt = 0;
+        }
+        else
+        {
+            Debug.LogWarning("Doesn't have hotel then I remove only one house from housesBuilt");
+            CardReader.propertyCards[cardIndex].housesBuilt -= 1;
+        }
+        CardReader.propertyCards[cardIndex].hasHotel = false;
+        
+    }
+
+    [ClientRpc]
+    public void RpcRemoveHouses(int cardIndex)
+    {
+        CardReader.propertyCards[cardIndex].removeHouses();
+    }
+
     [Command]
     public void CmdOnPlayerDisconnect(NetworkInstanceId id)
     {

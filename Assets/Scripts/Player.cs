@@ -161,7 +161,7 @@ public class Player : NetworkBehaviour
 
     public void moveSpaces(int amount)
     {
-        StartCoroutine("animateMovement", amount);
+        StartCoroutine("animateMovement", 1);
     }
 
     IEnumerator animateMovement(int amountToMove)
@@ -784,7 +784,39 @@ public class Player : NetworkBehaviour
         waitingForTrade = false;
     }
 
-    // ---------------------------------
+    // ----------------- BUILDINGS ----------------
+
+     [ClientRpc]
+    public void RpcConstructHouse(GameObject housePrefab, Vector3 position)
+    {
+        Instantiate(housePrefab, position, Quaternion.identity);
+    }
+
+    [Command]
+    public void CmdConstructHouse(string housePrefabPath, Vector3 vector3, int cardIndex)
+    {
+        gameManagerScript.CmdConstructHouse(housePrefabPath, vector3, cardIndex);
+    }
+
+    [Command]
+    public void CmdConstructHotel(string housePrefabPath, Vector3 vector3, int cardIndex)
+    {
+        gameManagerScript.CmdConstructHotel(housePrefabPath, vector3, cardIndex);
+    }
+
+    [Command]
+    public void CmdDeconstructHouse(int cardIndex)
+    {
+        gameManagerScript.CmdDeconstructHouse(cardIndex);
+    }
+
+    [Command]
+    public void CmdDeconstructHotel(int cardIndex)
+    {
+        gameManagerScript.CmdDeconstructHotel(cardIndex);
+    }
+
+    // -----------------------
 
     [ClientRpc]
     public void RpcChangeColorOnPanel(GameObject playerInfo, byte r, byte g, byte b, byte a)
