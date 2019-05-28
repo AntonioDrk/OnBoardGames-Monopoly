@@ -31,7 +31,7 @@ public class UtilityCard : Card
     {
         int cardIndex = 26 + (id - 12) / 16;
         Player playerScript = player.GetComponent<Player>();
-        playerScript.CmdChangeOwner(playerScript.idPlayer, cardIndex);
+        playerScript.CmdChangeOwner(playerScript.idPlayer, cardIndex,id);
         playerScript.CmdTakeMoney(Price);
         playerScript.buyProperty(this);
         hideCard(player);
@@ -131,6 +131,8 @@ public class UtilityCard : Card
         CardReader.closeButton.GetComponent<Button>().onClick.RemoveAllListeners();
         CardReader.sellPropertyButton.SetActive(false);
         CardReader.closeButton.SetActive(false);
+        CardReader.ElectricCompanyLogo.SetActive(false);
+        CardReader.WaterWorksLogo.SetActive(false);
         CardReader.utilityPanel.SetActive(false);
     }
 
@@ -157,7 +159,7 @@ public class UtilityCard : Card
         CardReader.sellPropertyButton.GetComponent<Button>().onClick.RemoveAllListeners();
         CardReader.sellPropertyButton.SetActive(false);
         Player playerScript = player.GetComponent<Player>();
-        playerScript.CmdChangeOwner(-1, cardIndex);
+        playerScript.CmdChangeOwner(-1, cardIndex,id);
         playerScript.CmdAddMoney(Mortgage); // players get in return the card's mortgage value
         playerScript.sellProperty(this);
         closeCard();
