@@ -31,6 +31,7 @@ public class RailroadCard  : Card
     {
         Player playerScript = player.GetComponent<Player>();
         playerScript.CmdChangeOwner(playerScript.idPlayer, cardIndex,id);
+        SoundManager.Instance.PlaySound(SoundManager.Instance.payMoney);
         playerScript.CmdTakeMoney(Price);
         playerScript.buyProperty(this);
         hideCard(player);
@@ -66,7 +67,7 @@ public class RailroadCard  : Card
             if (ownerId == playerScript.idPlayer)
             {
                 CardReader.closeButton.SetActive(true);
-                CardReader.closeButton.GetComponent<Button>().onClick.AddListener(() => closeCard(player));
+                CardReader.closeButton.GetComponent<Button>().onClick.AddListener(() => closeCardSound(player));
             }
             else
             {
@@ -83,7 +84,7 @@ public class RailroadCard  : Card
             CardReader.buyPropertyButton.SetActive(true);
             CardReader.cancelButton.SetActive(true);
             CardReader.buyPropertyButton.GetComponent<Button>().onClick.AddListener(() => buyRailroad(player,22 + cardIndex));
-            CardReader.cancelButton.GetComponent<Button>().onClick.AddListener(() => hideCard(player));
+            CardReader.cancelButton.GetComponent<Button>().onClick.AddListener(() => hideCardSound(player));
         }
         
     }
@@ -94,6 +95,7 @@ public class RailroadCard  : Card
         CardReader.payRentButton.GetComponent<Button>().onClick.RemoveAllListeners();
         CardReader.payRentButton.SetActive(false);
         
+        SoundManager.Instance.PlaySound(SoundManager.Instance.payMoney);
         playerScript.CmdTakeMoney(amountPaid);
         playerScript.CmdGiveMoneyToPlayer(ownerId, amountPaid);
 
@@ -129,13 +131,31 @@ public class RailroadCard  : Card
         CardReader.railroadPanel.SetActive(false);
     }
 
+    void closeCardSound()
+    {
+        SoundManager.Instance.PlaySound(SoundManager.Instance.close);
+        closeCard();
+    }
+
+    void closeCardSound(GameObject plr)
+    {
+        SoundManager.Instance.PlaySound(SoundManager.Instance.close);
+        closeCard(plr);
+    }
+
+    void hideCardSound(GameObject plr)
+    {
+        SoundManager.Instance.PlaySound(SoundManager.Instance.close);
+        hideCard(plr);
+    }
+
     public override void showOwnedCard(GameObject player)
     {
         if (player.GetComponent<Player>().getStage() != 0)
             return;
         showCard();
         CardReader.closeButton.SetActive(true);
-        CardReader.closeButton.GetComponent<Button>().onClick.AddListener(closeCard);
+        CardReader.closeButton.GetComponent<Button>().onClick.AddListener(closeCardSound);
 
         // if it's your turn you can sell the property
         if (GameObject.Find("GameManager").GetComponent<GameManager>().playerTurn == player.GetComponent<Player>().idPlayer)

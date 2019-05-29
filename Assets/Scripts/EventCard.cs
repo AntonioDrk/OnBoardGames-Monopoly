@@ -47,6 +47,7 @@ public class EventCard : Card
             CardReader.ChanceLogo.SetActive(true);
         else
             CardReader.ComunityChestLogo.SetActive(true);
+        SoundManager.Instance.PlaySound(SoundManager.Instance.openEvent);
         CardReader.closeEventButton.GetComponent<Button>().onClick.AddListener(() => activateEventCard(player));
                 
     }
@@ -65,7 +66,7 @@ public class EventCard : Card
             switch (id)
             {
                 case 0:
-                    Debug.Log(description); // move back 3 spaces -> isMoving = true;
+                    Debug.Log(description); // move back 3 spaces -> isMoving = true;  
                     break;
                 case 1:
                     takeMoneyFromPlayer(player, 15);
@@ -75,14 +76,14 @@ public class EventCard : Card
                     isMoving = true;
                     break;
                 case 3:
-                    Debug.Log(description);// case si hoteluri
+                    player.GetComponent<Player>().payForBuildings(25,100);
                     break;
                 case 4:
                     movePlayerToIndex(player, 24);
                     isMoving = true;
                     break;
                 case 5:
-                    Debug.Log(description); // pay each player
+                    player.GetComponent<Player>().payEachPlayer(50);
                     break;
                 case 6:
                     movePlayerToRailroad(player);
@@ -115,7 +116,7 @@ public class EventCard : Card
                     isMoving = true;
                     break;
                 case 14:
-                    player.GetComponent<Player>().CmdChangeCardJailOwner(0,"Chance"); //get out of jail
+                    getPlayerOutOfJail(player, "Chance");
                     break;
             }
         }
@@ -127,7 +128,7 @@ public class EventCard : Card
                     giveMoneyToPlayer(player, 20);
                     break;
                 case 1:
-                    Debug.Log(description); //collect from every player
+                    player.GetComponent<Player>().collectFromEachPlayer(50);
                     break;
                 case 2:
                     takeMoneyFromPlayer(player, 100);
@@ -142,7 +143,7 @@ public class EventCard : Card
                     giveMoneyToPlayer(player, 25);
                     break;
                 case 6:
-                    Debug.Log(description); //case si hoteluri
+                    player.GetComponent<Player>().payForBuildings(40, 115);
                     break;
                 case 7:
                     takeMoneyFromPlayer(player, 50);
@@ -168,7 +169,7 @@ public class EventCard : Card
                     giveMoneyToPlayer(player, 100);
                     break;
                 case 14:
-                    player.GetComponent<Player>().CmdChangeCardJailOwner(0,"Chest");
+                    getPlayerOutOfJail(player, "Chest");
                     break;
             }
         }
@@ -179,11 +180,13 @@ public class EventCard : Card
 
     public void takeMoneyFromPlayer(GameObject player, int value)
     {
+        SoundManager.Instance.PlaySound(SoundManager.Instance.payMoney);
         player.GetComponent<Player>().CmdTakeMoney(value);
     }
 
     public void giveMoneyToPlayer(GameObject player, int value)
     {
+        SoundManager.Instance.PlaySound(SoundManager.Instance.getMoney);
         player.GetComponent<Player>().CmdAddMoney(value);
     }
 
@@ -224,8 +227,8 @@ public class EventCard : Card
         movePlayerToIndex(player, index);
     }
 
-    public void getPlayerOutOfJail(GameObject player)
+    public void getPlayerOutOfJail(GameObject player, String type)
     {
-
+        player.GetComponent<Player>().CmdChangeCardJailOwner(0, type);
     }
 }

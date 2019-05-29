@@ -8,18 +8,22 @@ using UnityEngine.Networking;
 [Serializable]
 public class PropertyCard : Card
 {
-    public int id;
-    public int cardIndex;
+    public int id;                          // Table id
+    public int cardIndex;                   // Index in properties vector
     public int[] cardColor = new int[3];
     public string cardName;
     public int priceValue;
     public int mortgageValue;
     public int pricePerHouse;
-    private int housesBuilt = 0;
+    public float[] houseCoordinates = new float[3];
+    private float houseOffset = 0.3f;
     public int cardsInGroup = 2;
-    private bool hasHotel = false;
+    public bool hasHotel = false;
     public int[] rent = new int[6];
     public int[] propertiesFromSameGroup;
+    public List<NetworkInstanceId> buildings = new List<NetworkInstanceId>();
+
+    public int housesBuilt { get; set; } = 0;
 
     public void PropertyCardConstructor()
     {
@@ -50,7 +54,7 @@ public class PropertyCard : Card
             if (ownerId == playerScript.idPlayer)
             {
                 CardReader.closeButton.SetActive(true);
-                CardReader.closeButton.GetComponent<Button>().onClick.AddListener(() => closeCard(player));
+                CardReader.closeButton.GetComponent<Button>().onClick.AddListener(() => closeCardSound(player));
             }
             else
             { 
@@ -67,15 +71,14 @@ public class PropertyCard : Card
             CardReader.buyPropertyButton.SetActive(true);
             CardReader.cancelButton.SetActive(true);
             CardReader.buyPropertyButton.GetComponent<Button>().onClick.AddListener(() => buyProperty(player));
-            CardReader.cancelButton.GetComponent<Button>().onClick.AddListener(() => hideCard(player));
+            CardReader.cancelButton.GetComponent<Button>().onClick.AddListener(() => hideCardSound(player));
         }
 
     }
 
-    //  verifies if the player has all properties in the same colour group but no houses on the property he landed on
+    //  verifies if the player has all properties in the same colour group
     bool hasAllProperties(int ownerId)
     {
-        if (housesBuilt != 0) return false;
         for(int index=0; index < propertiesFromSameGroup.Length; index++)
         {
             if (GameObject.Find("GameManager").GetComponent<GameManager>().cardsOwner[propertiesFromSameGroup[index]] != ownerId)
@@ -86,70 +89,200 @@ public class PropertyCard : Card
     }
 
     //  verifies if the all properties in the same colour group are equally developed
-    public bool propertiesAreEquallyDeveloped()
+    public bool propertiesAreEquallyDeveloped(bool forSelling = false)
     {
-        // TO-DO: create array of properties to be able to check other properties
-        /*if(cardsInGroup == 2)
+        if(cardsInGroup == 2)
         {
             int brotherCardId = propertiesFromSameGroup[0];
-            if (Math.Abs(GameManager.properties[brotherCardId].housesBuilt - housesBuilt) > 1)
+            int minMaxValue;
+            minMaxValue = forSelling ? Math.Max(CardReader.propertyCards[brotherCardId].housesBuilt, housesBuilt) : Math.Min(CardReader.propertyCards[brotherCardId].housesBuilt, housesBuilt);
+            if (minMaxValue != housesBuilt)
                 return false;
         }
         else if(cardsInGroup == 3)
         {
             int brotherCardId = propertiesFromSameGroup[0];
             int sisterCardId = propertiesFromSameGroup[1];
-            int brotherHouses = GameManager.properties[brotherCardId].housesBuilt;
-            int sisterHouses = GameManager.properties[sisterCardId].housesBuilt;
-            int min = Math.Min(Math.Min(brotherHouses, sisterHouses), housesBuilt);
-            if (min != housesBuilt)
+            int brotherHouses = CardReader.propertyCards[brotherCardId].housesBuilt;
+            int sisterHouses = CardReader.propertyCards[sisterCardId].housesBuilt;
+            int minMaxValue = forSelling ? Math.Max(Math.Max(brotherHouses, sisterHouses), housesBuilt) : Math.Min(Math.Min(brotherHouses, sisterHouses), housesBuilt);
+            if (minMaxValue != housesBuilt)
                 return false;
-        }*/
+        }
+
 
         return true;
     }
 
-    public void buildHouse()
+    public void buildHouse(GameObject player, bool useManual = false, int manualIndexOffset = 1)
     {
-        if (!hasHotel && housesBuilt <= 3 && propertiesAreEquallyDeveloped())
+        SoundManager.Instance.PlaySound(SoundManager.Instance.buyHouse);
+        closeCard();
+        if (!hasHotel && housesBuilt < 4 && propertiesAreEquallyDeveloped())
         {
             Debug.Log("Player built a house.");
-            //Player.money -= pricePerHouse;
-            housesBuilt += 1;
-            // TO-DO: animation for house being built
+            if(!useManual)
+            {
+                SoundManager.Instance.PlaySound(SoundManager.Instance.payMoney);
+                player.GetComponent<Player>().CmdTakeMoney(pricePerHouse);
+            }
+
+            int leftRight, downUp;
+            leftRight = downUp = 0;
+            Vector3 houseStartPosition = new Vector3(houseCoordinates[0], houseCoordinates[1], houseCoordinates[2]);
+
+            if (0 < id && id < 10) leftRight = -1;
+            if (10 < id && id < 20) downUp = 1;
+            if (20 < id && id < 30) leftRight = 1;
+            if (30 < id && id <= 39) downUp = -1;
+
+            Vector3 offsetVector = new Vector3(houseOffset * leftRight, 0, houseOffset * downUp);
+
+            // Would've been prettier with multiple if statements
+            Vector3 rotation = new Vector3(0, 180 * (Mathf.Abs((1 - leftRight) / 2)) + (-downUp * 90), 0);
+
+            if (useManual)
+                player.GetComponent<Player>().CmdConstructHouse("House", houseStartPosition + (offsetVector * manualIndexOffset), rotation,cardIndex);
+            else
+                player.GetComponent<Player>().CmdConstructHouse("House", houseStartPosition + (offsetVector * housesBuilt), rotation, cardIndex);
         }
         else if (housesBuilt == 4)
-            buildHotel();
+            buildHotel(player);
     }
 
-    public void buildHotel()
+    public void buildHotel(GameObject player)
     {
         Debug.Log("Player built a hotel.");
-        //Player.money -= pricePerHouse;
-        hasHotel = true;
-        // TO-DO: animation for hotel being built
+
+        // First delete all the houses on the property
+
+        SoundManager.Instance.PlaySound(SoundManager.Instance.payMoney);
+        player.GetComponent<Player>().CmdTakeMoney(pricePerHouse);
+
+        int leftRight, downUp;
+        leftRight = downUp = 0;
+        Vector3 houseStartPosition = new Vector3(houseCoordinates[0], houseCoordinates[1], houseCoordinates[2]);
+
+        if (0 < id && id < 10) leftRight = -1;
+        if (10 < id && id < 20) downUp = 1;
+        if (20 < id && id < 30) leftRight = 1;
+        if (30 < id && id <= 39) downUp = -1;
+
+        Vector3 offsetVector = new Vector3(houseOffset * leftRight, 0, houseOffset * downUp);
+
+        // Would've been prettier with multiple if statements
+        Vector3 rotation = new Vector3(0, 180 * (Mathf.Abs((1 - leftRight) / 2)) + (-downUp * 90), 0);
+
+        player.GetComponent<Player>().CmdConstructHotel("Hotel", houseStartPosition + (3 * offsetVector / 2), rotation, cardIndex);
+
+    }
+
+    public void sellHouse(GameObject player)
+    {
+        SoundManager.Instance.PlaySound(SoundManager.Instance.getMoney);
+        closeCard();
+        Debug.LogWarning("Do I have hotel? " + hasHotel);
+        if (hasHotel)
+        {
+            Debug.LogWarning("Entering CmdDeconstructHotel");
+            player.GetComponent<Player>().CmdDeconstructHotel(cardIndex);
+            Debug.LogWarning("Exiting CmdDeconstructHotel");
+
+            housesBuilt = 0;
+            hasHotel = false;
+
+            Debug.LogWarning("Entering for loop");
+            for (int i = 0; i < 4; i++)
+            {
+                Debug.LogWarning("I am in the for loop, constructing " + i + " / 4 houses");
+                buildHouse(player, true, i);
+            }
+        }
+        else
+        {
+            player.GetComponent<Player>().CmdDeconstructHouse(cardIndex);
+        }
+
+        player.GetComponent<Player>().CmdAddMoney(pricePerHouse/2);
+    }
+
+    public void addHouseObject(NetworkInstanceId houseId)
+    {
+        buildings.Add(houseId);
+        Debug.LogWarning("Added a house object to the list");
     }
     
+    public void removeHouses()
+    {
+        buildings.RemoveRange(0, buildings.Count);
+    }
+
+    public void removeLastHouse()
+    {
+        if (buildings.Count > 0)
+            buildings.RemoveAt(buildings.Count - 1);
+        else
+            Debug.LogError("Tried to delete a house that wasn't in the buildings list");
+    }
+    
+    void closeCardSound()
+    {
+        SoundManager.Instance.PlaySound(SoundManager.Instance.close);
+        closeCard();
+    }
+
+    void closeCardSound(GameObject plr)
+    {
+        SoundManager.Instance.PlaySound(SoundManager.Instance.close);
+        closeCard(plr);
+    }
+
+    void hideCardSound(GameObject plr)
+    {
+        SoundManager.Instance.PlaySound(SoundManager.Instance.close);
+        hideCard(plr);
+    }
+
     public override void showOwnedCard(GameObject player)
     {
+        closeCard();
         if (player.GetComponent<Player>().getStage() != 0) 
             return;
         showCard();
         CardReader.closeButton.SetActive(true);
-        CardReader.closeButton.GetComponent<Button>().onClick.AddListener(closeCard);
+        CardReader.closeButton.GetComponent<Button>().onClick.AddListener(closeCardSound);
 
         // if it's your turn you can sell/buy houses and sell the property
-        if (GameObject.Find("GameManager").GetComponent<GameManager>().playerTurn == player.GetComponent<Player>().idPlayer)
+         if (GameObject.Find("GameManager").GetComponent<GameManager>().playerTurn == player.GetComponent<Player>().idPlayer)
         {
+            // Sell property button
             CardReader.sellPropertyButton.SetActive(true);
             CardReader.sellPropertyButton.GetComponent<Button>().onClick.RemoveAllListeners();
-            CardReader.sellPropertyButton.GetComponent<Button>().onClick.AddListener(() => sellProperty(player));
+            CardReader.sellPropertyButton.GetComponent<Button>().onClick.AddListener( () => sellProperty(player) );
+
+            if(hasAllProperties(player.GetComponent<Player>().idPlayer) && propertiesAreEquallyDeveloped() && !hasHotel)
+            {
+                // Buy house
+                CardReader.buyHouseButton.SetActive(true);
+                CardReader.buyHouseButton.GetComponent<Button>().onClick.RemoveAllListeners();
+                CardReader.buyHouseButton.GetComponent<Button>().onClick.AddListener(() => buildHouse(player));
+            }
+
+            // Check to see if selling is a valid move
+            if (hasAllProperties(player.GetComponent<Player>().idPlayer) && housesBuilt > 0 && propertiesAreEquallyDeveloped(true))
+            {
+                // Sell house
+                CardReader.sellHouseButton.SetActive(true);
+                CardReader.sellHouseButton.GetComponent<Button>().onClick.RemoveAllListeners();
+                CardReader.sellHouseButton.GetComponent<Button>().onClick.AddListener(() => sellHouse(player));
+            }
         }
 
     }
 
     void showCard()
     {
+        SoundManager.Instance.PlaySound(SoundManager.Instance.openCard);
         CardReader.railroadPanel.SetActive(false);
         CardReader.utilityPanel.SetActive(false);
         closeCard();
@@ -178,6 +311,8 @@ public class PropertyCard : Card
     void closeCard()
     {
         CardReader.closeButton.GetComponent<Button>().onClick.RemoveAllListeners();
+        CardReader.buyHouseButton.SetActive(false);
+        CardReader.sellHouseButton.SetActive(false);
         CardReader.sellPropertyButton.SetActive(false);
         CardReader.closeButton.SetActive(false);
         CardReader.cardPanel.SetActive(false);
@@ -205,6 +340,7 @@ public class PropertyCard : Card
     {
         Player playerScript = player.GetComponent<Player>();
         playerScript.CmdChangeOwner(playerScript.idPlayer, cardIndex,id); 
+        SoundManager.Instance.PlaySound(SoundManager.Instance.payMoney);
         playerScript.CmdTakeMoney(priceValue);
         playerScript.buyProperty(this);
         hideCard(player);
@@ -212,6 +348,8 @@ public class PropertyCard : Card
 
     void sellProperty(GameObject player)
     {
+        // TODO: SELL ALL THE HOUSES OR THE HOTEL AS WELL 
+        if(housesBuilt > 0) return;
         CardReader.sellPropertyButton.GetComponent<Button>().onClick.RemoveAllListeners();
         CardReader.sellPropertyButton.SetActive(false);
         Player playerScript = player.GetComponent<Player>();
@@ -223,13 +361,21 @@ public class PropertyCard : Card
 
     int calculateRent(int ownerId)
     {
-        int amountPaid = 0;
-        if (hasHotel)
+        int amountPaid = rent[0];
+        if (hasHotel == true)
+        {
+            // Daca are hotel costul e ultimul din vectorul rent
             amountPaid = rent[5];
-        else if (hasAllProperties(ownerId)) //daca are toate din color group si fara case=> rent[0]x2
-            amountPaid = 2 * rent[0];
-        else
+        }
+        else if (housesBuilt > 0)
+        {
+            // Daca are un nr de case atunci nr de case este indexul pentru vectorul rent
             amountPaid = rent[housesBuilt];
+        }
+        else if (hasAllProperties(ownerId) == true)
+        {   // Daca are toate proprietatile din color group si fara case=> rent[0]x2
+            amountPaid = 2 * rent[0];
+        }
         return amountPaid;
     }
 
@@ -239,6 +385,7 @@ public class PropertyCard : Card
         CardReader.payRentButton.GetComponent<Button>().onClick.RemoveAllListeners();
         CardReader.payRentButton.SetActive(false);
          
+        SoundManager.Instance.PlaySound(SoundManager.Instance.payMoney);
         playerScript.CmdTakeMoney(amountPaid);
         playerScript.CmdGiveMoneyToPlayer(ownerId, amountPaid);
 

@@ -128,6 +128,7 @@ public class Player : NetworkBehaviour
                 }
                 else if (roundsInJail == 3)
                 {
+                    SoundManager.Instance.PlaySound(SoundManager.Instance.payMoney);
                     CmdTakeMoney(50);
                     inJail = false;
                     CmdGetOutOfJail(idPlayer);
@@ -227,11 +228,13 @@ public class Player : NetworkBehaviour
             }
             else if (indexPosition == 4) // Income Tax - Pay $200
             {
+                SoundManager.Instance.PlaySound(SoundManager.Instance.payMoney);
                 CmdTakeMoney(200);
                 endMovement();
             }
             else if (indexPosition == 38) // Luxury Tax - Pay $100
             {
+                SoundManager.Instance.PlaySound(SoundManager.Instance.payMoney);
                 CmdTakeMoney(100);
                 endMovement();
             }
@@ -242,7 +245,7 @@ public class Player : NetworkBehaviour
                     eventNr = Random.Range(0, 14);
                 else
                     eventNr = Random.Range(0, 13);
-
+                
                 Debug.Log("Event nr: " + eventNr + " triggered.");
                 Debug.Log(CardReader.chestCards[eventNr].ToString());
                 CardReader.chestCards[eventNr].doAction(this.gameObject);
@@ -251,10 +254,10 @@ public class Player : NetworkBehaviour
             {
                 int eventNr = 0;
                 if (gameManagerScript.chanceJailCardOwner == -1)
-                    eventNr = Random.Range(0, 14);
+                    eventNr = Random.Range(1, 14);
                 else
-                    eventNr = Random.Range(0, 13);
-
+                    eventNr = Random.Range(1, 13);
+                
                 Debug.Log("Event nr: " + eventNr + " triggered.");
                 Debug.Log(CardReader.chanceCards[eventNr].ToString());
                 CardReader.chanceCards[eventNr].doAction(this.gameObject);
@@ -302,8 +305,44 @@ public class Player : NetworkBehaviour
     void nextPlayer()
     {
         endTurnButton.SetActive(false);
+        SoundManager.Instance.PlaySound(SoundManager.Instance.endTurn);
         stage = 0;
         CmdNextPlayer();
+    }
+    
+    public void payEachPlayer(int amount)
+    {
+        SoundManager.Instance.PlaySound(SoundManager.Instance.payMoney);
+        CmdPayEachPlayer(idPlayer, amount);
+        CmdTakeMoney(amount * (gameManagerScript.connectedPlayers - 1));
+    }
+
+    [Command]
+    void CmdPayEachPlayer(int id, int amount)
+    {
+        gameManagerScript.CmdPayEachPlayer(id, amount);
+    }
+
+    public void collectFromEachPlayer(int amount)
+    {
+        SoundManager.Instance.PlaySound(SoundManager.Instance.getMoney);
+        CmdPayEachPlayer(idPlayer, -amount);
+        CmdAddMoney(amount * (gameManagerScript.connectedPlayers - 1));
+    }
+
+    public void payForBuildings(int housePrice, int hotelPrice)
+    {
+        int amount = 0;
+        foreach(Card card in ownedPropertyCards)
+            if (card.GetType() == typeof(PropertyCard))
+            {
+                if (((PropertyCard)card).hasHotel)
+                    amount += hotelPrice;
+                else
+                    amount += ((PropertyCard)card).housesBuilt * housePrice;
+            }
+        SoundManager.Instance.PlaySound(SoundManager.Instance.payMoney);
+        CmdTakeMoney(amount);
     }
     
     [ClientRpc]
@@ -351,7 +390,7 @@ public class Player : NetworkBehaviour
             ownedPropertyPanel.transform.GetComponent<Image>().color = new Color32((byte)((PropertyCard)propertyCard).cardColor[0],
                 (byte)((PropertyCard)propertyCard).cardColor[1], (byte)((PropertyCard)propertyCard).cardColor[2], 255);
 
-        ownedPropertyPanel.transform.SetParent(ownedPropertiesPanel.transform);
+        ownedPropertyPanel.transform.SetParent(ownedPropertiesPanel.transform.GetChild(0).transform);
         ownedPropertyPanel.transform.position = new Vector3(0, 0, 0);
         ownedPropertyPanel.GetComponent<RectTransform>().localScale = new Vector3(1, 1, 1);
         ownedPropertyPanel.transform.GetChild(0).GetComponent<Text>().text = propertyCard.CardName;
@@ -383,8 +422,8 @@ public class Player : NetworkBehaviour
 
     void changePositionOfPanel(GameObject ownedPropertyPanel, int position)
     {
-        ownedPropertyPanel.GetComponent<RectTransform>().offsetMax = new Vector2(0, -29.7f * position);
-        ownedPropertyPanel.GetComponent<RectTransform>().offsetMin = new Vector2(0, 363 - 29.7f * position);
+        ownedPropertyPanel.GetComponent<RectTransform>().offsetMax = new Vector2(0, -30.3f * position);
+        ownedPropertyPanel.GetComponent<RectTransform>().offsetMin = new Vector2(0, 817.7f - 30.3f * position);
     }
 
     public void sellProperty(Card propertyCard)
@@ -417,6 +456,7 @@ public class Player : NetworkBehaviour
         if (GameObject.Find("TradePanel") || waitingForTrade) return;
         stage = 1;
         rollButton.SetActive(false);
+        CardReader.closePlayerTradePanel();
         CmdRollDice();
     }
 
@@ -458,6 +498,7 @@ public class Player : NetworkBehaviour
 
     void payFine()
     {
+        SoundManager.Instance.PlaySound(SoundManager.Instance.payMoney);
         CmdTakeMoney(50);
         CardReader.inJailCardPanel.SetActive(false);
         inJail = false;
@@ -514,6 +555,7 @@ public class Player : NetworkBehaviour
 
     public void goToJail()
     {
+        SoundManager.Instance.PlaySound(SoundManager.Instance.goToJail);
         CmdJailAnimation();
         CmdMovePlayer(10);
         doublesRolled = 0;
@@ -603,11 +645,10 @@ public class Player : NetworkBehaviour
         createPanelsForPlayerProperties(tradePanel, 1, destinationId, destinationProperties);
 
         // the button
-        tradePanel.transform.GetChild(2).transform.GetChild(0).GetComponent<Text>().text = "Trade";
         tradePanel.transform.GetChild(2).GetComponent<Button>().onClick.AddListener(() => 
                     sendTrade(tradePanel, idPlayer, destinationId, sourceProperties, destinationProperties));
         tradePanel.transform.GetChild(3).GetComponent<Button>().onClick.AddListener(() =>
-                    destroyGameObject(tradePanel)); // cancel button
+                    cancelTrade(tradePanel)); // cancel button
 
     }
     
@@ -639,23 +680,31 @@ public class Player : NetworkBehaviour
         }
         
         // the button
-        tradePanel.transform.GetChild(2).transform.GetChild(0).GetComponent<Text>().text = "Accept";
         tradePanel.transform.GetChild(2).GetComponent<Button>().onClick.AddListener(() => 
                     executeTrade(tradePanel, sourceId, destinationId, sourceProperties, sourcePropertiesLength, destinationProperties, destinationPropertiesLength));
         tradePanel.transform.GetChild(3).GetComponent<Button>().onClick.AddListener(() =>
                     refuseTrade(tradePanel,sourceId)); 
+
+        SoundManager.Instance.PlaySound(SoundManager.Instance.receiveTradeOffer);
     }
 
     void refuseTrade(GameObject tradePanel, int sourceId)
     {
         CmdRefusedTrade(sourceId);
         destroyGameObject(tradePanel);
+        SoundManager.Instance.PlaySound(SoundManager.Instance.close);
     }
 
     [Command]
     void CmdRefusedTrade(int sourceId)
     {
         gameManagerScript.CmdRefusedTrade(sourceId);
+    }
+
+    void cancelTrade(GameObject panel)
+    {
+        SoundManager.Instance.PlaySound(SoundManager.Instance.close);
+        destroyGameObject(panel);
     }
 
     void destroyGameObject(GameObject go)
@@ -700,6 +749,7 @@ public class Player : NetworkBehaviour
 
     void addToList(GameObject panel, int index, List<int> list)
     {
+        SoundManager.Instance.PlaySound(SoundManager.Instance.selectProperty);
         list.Add(index);
         panel.transform.GetChild(0).GetComponent<Text>().color = Color.green;
         panel.GetComponent<Button>().onClick.RemoveAllListeners();
@@ -708,23 +758,51 @@ public class Player : NetworkBehaviour
     
     void removeFromList(GameObject panel, int index, List<int> list)
     {
+        SoundManager.Instance.PlaySound(SoundManager.Instance.selectProperty);
         list.Remove(index);
         panel.transform.GetChild(0).GetComponent<Text>().color = Color.white;
         panel.GetComponent<Button>().onClick.RemoveAllListeners();
         panel.GetComponent<Button>().onClick.AddListener(() => addToList(panel, index, list));
     }
 
+    bool checkTrade(List<int> sourceProperties, List<int> destinationProperties)
+    {
+        foreach (int cardIndex in sourceProperties)
+        {
+            PropertyCard card = CardReader.propertyCards[cardIndex];
+
+            if (card.housesBuilt > 0) return false;
+
+            foreach (int i in card.propertiesFromSameGroup)
+                if (CardReader.propertyCards[i].housesBuilt > 0) return false;
+
+        }
+
+        foreach (int cardIndex in destinationProperties)
+        {
+            PropertyCard card = CardReader.propertyCards[cardIndex];
+
+            if (card.housesBuilt > 0) return false;
+
+            foreach (int i in card.propertiesFromSameGroup)
+                if (CardReader.propertyCards[i].housesBuilt > 0) return false;
+
+        }
+        return true;
+    }
+
     void sendTrade(GameObject tradePanel, int sourceId, int destinationId, List<int> sourcePropertiesList, List<int> destinationPropertiesList)
     {
 
         if (sourcePropertiesList.Count == 0 && destinationPropertiesList.Count == 0) return;
+        if (!checkTrade(sourcePropertiesList, destinationPropertiesList)) return;
 
         Destroy(tradePanel);
 
         int[] sourceProperties = sourcePropertiesList.ToArray();
         int[] destinationProperties = destinationPropertiesList.ToArray();
         int sourcePropertiesLength = sourcePropertiesList.Count, destinationPropertiesLength = destinationPropertiesList.Count;
-               
+        /*    
         Debug.Log("Send: ");
         for (int k = 0; k < sourcePropertiesLength; k++)
         {
@@ -738,7 +816,7 @@ public class Player : NetworkBehaviour
             int id = destinationProperties[k];
             Debug.Log(id + " ");
         }
-
+        */
         waitingForTrade = true;
         CmdSendTrade(idPlayer, destinationId, sourceProperties, sourcePropertiesLength, destinationProperties, destinationPropertiesLength);
     }
@@ -775,6 +853,7 @@ public class Player : NetworkBehaviour
     {
         if (!isLocalPlayer) return;
         waitingForTrade = false;
+        SoundManager.Instance.PlaySound(SoundManager.Instance.completeTrade);
     }
     
     [ClientRpc]
@@ -784,7 +863,39 @@ public class Player : NetworkBehaviour
         waitingForTrade = false;
     }
 
-    // ---------------------------------
+    // ----------------- BUILDINGS ----------------
+
+     [ClientRpc]
+    public void RpcConstructHouse(GameObject housePrefab, Vector3 position)
+    {
+        Instantiate(housePrefab, position, Quaternion.identity);
+    }
+
+    [Command]
+    public void CmdConstructHouse(string housePrefabPath, Vector3 position, Vector3 rotation, int cardIndex)
+    {
+        gameManagerScript.CmdConstructHouse(housePrefabPath, position, rotation, cardIndex);
+    }
+
+    [Command]
+    public void CmdConstructHotel(string housePrefabPath, Vector3 position, Vector3 rotation, int cardIndex)
+    {
+        gameManagerScript.CmdConstructHotel(housePrefabPath, position, rotation, cardIndex);
+    }
+
+    [Command]
+    public void CmdDeconstructHouse(int cardIndex)
+    {
+        gameManagerScript.CmdDeconstructHouse(cardIndex);
+    }
+
+    [Command]
+    public void CmdDeconstructHotel(int cardIndex)
+    {
+        gameManagerScript.CmdDeconstructHotel(cardIndex);
+    }
+
+    // -----------------------
 
     [ClientRpc]
     public void RpcChangeColorOnPanel(GameObject playerInfo, byte r, byte g, byte b, byte a)
@@ -837,6 +948,7 @@ public class Player : NetworkBehaviour
     public void CmdAddMoney(int amount)
     {
         money += amount;
+        SoundManager.Instance.PlaySound(SoundManager.Instance.getMoney);
         //gameManagerScript.CmdChangeMoneyOnPanel(idPlayer, money);
     }
 
