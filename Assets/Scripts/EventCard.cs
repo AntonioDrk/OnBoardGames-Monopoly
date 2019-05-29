@@ -47,6 +47,7 @@ public class EventCard : Card
             CardReader.ChanceLogo.SetActive(true);
         else
             CardReader.ComunityChestLogo.SetActive(true);
+        SoundManager.Instance.PlaySound(SoundManager.Instance.openEvent);
         CardReader.closeEventButton.GetComponent<Button>().onClick.AddListener(() => activateEventCard(player));
                 
     }
@@ -179,11 +180,13 @@ public class EventCard : Card
 
     public void takeMoneyFromPlayer(GameObject player, int value)
     {
+        SoundManager.Instance.PlaySound(SoundManager.Instance.payMoney);
         player.GetComponent<Player>().CmdTakeMoney(value);
     }
 
     public void giveMoneyToPlayer(GameObject player, int value)
     {
+        SoundManager.Instance.PlaySound(SoundManager.Instance.getMoney);
         player.GetComponent<Player>().CmdAddMoney(value);
     }
 

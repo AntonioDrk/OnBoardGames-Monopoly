@@ -128,6 +128,7 @@ public class Player : NetworkBehaviour
                 }
                 else if (roundsInJail == 3)
                 {
+                    SoundManager.Instance.PlaySound(SoundManager.Instance.payMoney);
                     CmdTakeMoney(50);
                     inJail = false;
                     CmdGetOutOfJail(idPlayer);
@@ -227,11 +228,13 @@ public class Player : NetworkBehaviour
             }
             else if (indexPosition == 4) // Income Tax - Pay $200
             {
+                SoundManager.Instance.PlaySound(SoundManager.Instance.payMoney);
                 CmdTakeMoney(200);
                 endMovement();
             }
             else if (indexPosition == 38) // Luxury Tax - Pay $100
             {
+                SoundManager.Instance.PlaySound(SoundManager.Instance.payMoney);
                 CmdTakeMoney(100);
                 endMovement();
             }
@@ -302,6 +305,7 @@ public class Player : NetworkBehaviour
     void nextPlayer()
     {
         endTurnButton.SetActive(false);
+        SoundManager.Instance.PlaySound(SoundManager.Instance.endTurn);
         stage = 0;
         CmdNextPlayer();
     }
@@ -459,6 +463,7 @@ public class Player : NetworkBehaviour
 
     void payFine()
     {
+        SoundManager.Instance.PlaySound(SoundManager.Instance.payMoney);
         CmdTakeMoney(50);
         CardReader.inJailCardPanel.SetActive(false);
         inJail = false;
@@ -515,6 +520,7 @@ public class Player : NetworkBehaviour
 
     public void goToJail()
     {
+        SoundManager.Instance.PlaySound(SoundManager.Instance.goToJail);
         CmdJailAnimation();
         CmdMovePlayer(10);
         doublesRolled = 0;
@@ -607,7 +613,7 @@ public class Player : NetworkBehaviour
         tradePanel.transform.GetChild(2).GetComponent<Button>().onClick.AddListener(() => 
                     sendTrade(tradePanel, idPlayer, destinationId, sourceProperties, destinationProperties));
         tradePanel.transform.GetChild(3).GetComponent<Button>().onClick.AddListener(() =>
-                    destroyGameObject(tradePanel)); // cancel button
+                    cancelTrade(tradePanel)); // cancel button
 
     }
     
@@ -643,18 +649,27 @@ public class Player : NetworkBehaviour
                     executeTrade(tradePanel, sourceId, destinationId, sourceProperties, sourcePropertiesLength, destinationProperties, destinationPropertiesLength));
         tradePanel.transform.GetChild(3).GetComponent<Button>().onClick.AddListener(() =>
                     refuseTrade(tradePanel,sourceId)); 
+
+        SoundManager.Instance.PlaySound(SoundManager.Instance.receiveTradeOffer);
     }
 
     void refuseTrade(GameObject tradePanel, int sourceId)
     {
         CmdRefusedTrade(sourceId);
         destroyGameObject(tradePanel);
+        SoundManager.Instance.PlaySound(SoundManager.Instance.close);
     }
 
     [Command]
     void CmdRefusedTrade(int sourceId)
     {
         gameManagerScript.CmdRefusedTrade(sourceId);
+    }
+
+    void cancelTrade(GameObject panel)
+    {
+        SoundManager.Instance.PlaySound(SoundManager.Instance.close);
+        destroyGameObject(panel);
     }
 
     void destroyGameObject(GameObject go)
@@ -699,6 +714,7 @@ public class Player : NetworkBehaviour
 
     void addToList(GameObject panel, int index, List<int> list)
     {
+        SoundManager.Instance.PlaySound(SoundManager.Instance.selectProperty);
         list.Add(index);
         panel.transform.GetChild(0).GetComponent<Text>().color = Color.green;
         panel.GetComponent<Button>().onClick.RemoveAllListeners();
@@ -707,6 +723,7 @@ public class Player : NetworkBehaviour
     
     void removeFromList(GameObject panel, int index, List<int> list)
     {
+        SoundManager.Instance.PlaySound(SoundManager.Instance.selectProperty);
         list.Remove(index);
         panel.transform.GetChild(0).GetComponent<Text>().color = Color.white;
         panel.GetComponent<Button>().onClick.RemoveAllListeners();
@@ -774,6 +791,7 @@ public class Player : NetworkBehaviour
     {
         if (!isLocalPlayer) return;
         waitingForTrade = false;
+        SoundManager.Instance.PlaySound(SoundManager.Instance.completeTrade);
     }
     
     [ClientRpc]
@@ -868,6 +886,7 @@ public class Player : NetworkBehaviour
     public void CmdAddMoney(int amount)
     {
         money += amount;
+        SoundManager.Instance.PlaySound(SoundManager.Instance.getMoney);
         //gameManagerScript.CmdChangeMoneyOnPanel(idPlayer, money);
     }
 
