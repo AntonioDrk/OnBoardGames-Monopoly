@@ -245,7 +245,7 @@ public class Player : NetworkBehaviour
                     eventNr = Random.Range(0, 14);
                 else
                     eventNr = Random.Range(0, 13);
-
+                
                 Debug.Log("Event nr: " + eventNr + " triggered.");
                 Debug.Log(CardReader.chestCards[eventNr].ToString());
                 CardReader.chestCards[eventNr].doAction(this.gameObject);
@@ -257,7 +257,7 @@ public class Player : NetworkBehaviour
                     eventNr = Random.Range(1, 14);
                 else
                     eventNr = Random.Range(1, 13);
-
+                
                 Debug.Log("Event nr: " + eventNr + " triggered.");
                 Debug.Log(CardReader.chanceCards[eventNr].ToString());
                 CardReader.chanceCards[eventNr].doAction(this.gameObject);
@@ -312,6 +312,7 @@ public class Player : NetworkBehaviour
     
     public void payEachPlayer(int amount)
     {
+        SoundManager.Instance.PlaySound(SoundManager.Instance.payMoney);
         CmdPayEachPlayer(idPlayer, amount);
         CmdTakeMoney(amount * (gameManagerScript.connectedPlayers - 1));
     }
@@ -324,6 +325,7 @@ public class Player : NetworkBehaviour
 
     public void collectFromEachPlayer(int amount)
     {
+        SoundManager.Instance.PlaySound(SoundManager.Instance.getMoney);
         CmdPayEachPlayer(idPlayer, -amount);
         CmdAddMoney(amount * (gameManagerScript.connectedPlayers - 1));
     }
@@ -339,6 +341,7 @@ public class Player : NetworkBehaviour
                 else
                     amount += ((PropertyCard)card).housesBuilt * housePrice;
             }
+        SoundManager.Instance.PlaySound(SoundManager.Instance.payMoney);
         CmdTakeMoney(amount);
     }
     
@@ -387,7 +390,7 @@ public class Player : NetworkBehaviour
             ownedPropertyPanel.transform.GetComponent<Image>().color = new Color32((byte)((PropertyCard)propertyCard).cardColor[0],
                 (byte)((PropertyCard)propertyCard).cardColor[1], (byte)((PropertyCard)propertyCard).cardColor[2], 255);
 
-        ownedPropertyPanel.transform.SetParent(ownedPropertiesPanel.transform);
+        ownedPropertyPanel.transform.SetParent(ownedPropertiesPanel.transform.GetChild(0).transform);
         ownedPropertyPanel.transform.position = new Vector3(0, 0, 0);
         ownedPropertyPanel.GetComponent<RectTransform>().localScale = new Vector3(1, 1, 1);
         ownedPropertyPanel.transform.GetChild(0).GetComponent<Text>().text = propertyCard.CardName;
@@ -419,8 +422,8 @@ public class Player : NetworkBehaviour
 
     void changePositionOfPanel(GameObject ownedPropertyPanel, int position)
     {
-        ownedPropertyPanel.GetComponent<RectTransform>().offsetMax = new Vector2(0, -29.7f * position);
-        ownedPropertyPanel.GetComponent<RectTransform>().offsetMin = new Vector2(0, 363 - 29.7f * position);
+        ownedPropertyPanel.GetComponent<RectTransform>().offsetMax = new Vector2(0, -30.3f * position);
+        ownedPropertyPanel.GetComponent<RectTransform>().offsetMin = new Vector2(0, 817.7f - 30.3f * position);
     }
 
     public void sellProperty(Card propertyCard)
