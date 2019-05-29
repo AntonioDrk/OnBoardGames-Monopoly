@@ -68,7 +68,7 @@ public class Console : MonoBehaviour
         {
             int playerId = int.Parse(command[1]);
             int amount = int.Parse(command[2]);
-            if (playerId < gameManager.connectedPlayers)
+            if (playerId < gameManager.connectedPlayers && amount > 0)
                 gameManager.players[playerId].GetComponent<Player>().moveSpaces(amount);
         }
     }

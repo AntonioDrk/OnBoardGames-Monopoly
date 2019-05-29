@@ -254,9 +254,9 @@ public class Player : NetworkBehaviour
             {
                 int eventNr = 0;
                 if (gameManagerScript.chanceJailCardOwner == -1)
-                    eventNr = Random.Range(0, 14);
+                    eventNr = Random.Range(1, 14);
                 else
-                    eventNr = Random.Range(0, 13);
+                    eventNr = Random.Range(1, 13);
 
                 Debug.Log("Event nr: " + eventNr + " triggered.");
                 Debug.Log(CardReader.chanceCards[eventNr].ToString());
@@ -308,6 +308,38 @@ public class Player : NetworkBehaviour
         SoundManager.Instance.PlaySound(SoundManager.Instance.endTurn);
         stage = 0;
         CmdNextPlayer();
+    }
+    
+    public void payEachPlayer(int amount)
+    {
+        CmdPayEachPlayer(idPlayer, amount);
+        CmdTakeMoney(amount * (gameManagerScript.connectedPlayers - 1));
+    }
+
+    [Command]
+    void CmdPayEachPlayer(int id, int amount)
+    {
+        gameManagerScript.CmdPayEachPlayer(id, amount);
+    }
+
+    public void collectFromEachPlayer(int amount)
+    {
+        CmdPayEachPlayer(idPlayer, -amount);
+        CmdAddMoney(amount * (gameManagerScript.connectedPlayers - 1));
+    }
+
+    public void payForBuildings(int housePrice, int hotelPrice)
+    {
+        int amount = 0;
+        foreach(Card card in ownedPropertyCards)
+            if (card.GetType() == typeof(PropertyCard))
+            {
+                if (((PropertyCard)card).hasHotel)
+                    amount += hotelPrice;
+                else
+                    amount += ((PropertyCard)card).housesBuilt * housePrice;
+            }
+        CmdTakeMoney(amount);
     }
     
     [ClientRpc]
@@ -730,17 +762,44 @@ public class Player : NetworkBehaviour
         panel.GetComponent<Button>().onClick.AddListener(() => addToList(panel, index, list));
     }
 
+    bool checkTrade(List<int> sourceProperties, List<int> destinationProperties)
+    {
+        foreach (int cardIndex in sourceProperties)
+        {
+            PropertyCard card = CardReader.propertyCards[cardIndex];
+
+            if (card.housesBuilt > 0) return false;
+
+            foreach (int i in card.propertiesFromSameGroup)
+                if (CardReader.propertyCards[i].housesBuilt > 0) return false;
+
+        }
+
+        foreach (int cardIndex in destinationProperties)
+        {
+            PropertyCard card = CardReader.propertyCards[cardIndex];
+
+            if (card.housesBuilt > 0) return false;
+
+            foreach (int i in card.propertiesFromSameGroup)
+                if (CardReader.propertyCards[i].housesBuilt > 0) return false;
+
+        }
+        return true;
+    }
+
     void sendTrade(GameObject tradePanel, int sourceId, int destinationId, List<int> sourcePropertiesList, List<int> destinationPropertiesList)
     {
 
         if (sourcePropertiesList.Count == 0 && destinationPropertiesList.Count == 0) return;
+        if (!checkTrade(sourcePropertiesList, destinationPropertiesList)) return;
 
         Destroy(tradePanel);
 
         int[] sourceProperties = sourcePropertiesList.ToArray();
         int[] destinationProperties = destinationPropertiesList.ToArray();
         int sourcePropertiesLength = sourcePropertiesList.Count, destinationPropertiesLength = destinationPropertiesList.Count;
-               
+        /*    
         Debug.Log("Send: ");
         for (int k = 0; k < sourcePropertiesLength; k++)
         {
@@ -754,7 +813,7 @@ public class Player : NetworkBehaviour
             int id = destinationProperties[k];
             Debug.Log(id + " ");
         }
-
+        */
         waitingForTrade = true;
         CmdSendTrade(idPlayer, destinationId, sourceProperties, sourcePropertiesLength, destinationProperties, destinationPropertiesLength);
     }

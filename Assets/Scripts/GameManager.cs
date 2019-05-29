@@ -58,10 +58,8 @@ public class GameManager : NetworkBehaviour
         if (!isServer)
         {
             startGameButton.SetActive(false);
-            GameObject.Find("Console").SetActive(false);
         }
             
-
         players = new List<GameObject>();
 
         // Make sure we have meshes to assign the player
@@ -91,8 +89,29 @@ public class GameManager : NetworkBehaviour
         connectedPlayersText.text = connectedPlayers + " players";
 
         if (gameStarted && isServer)
+        {
             for (int i = 0; i < connectedPlayers; i++)
                 CmdChangeMoneyOnPanel(i, players[i].GetComponent<Player>().getMoney());
+        
+            if (Input.GetKeyDown(KeyCode.BackQuote))
+                {
+                    bool consoleState = CardReader.console.activeInHierarchy;
+
+                    if (!consoleState)
+                    {
+                        CardReader.console.SetActive(true);
+                        InputField input = GameObject.Find("ConsoleInput").GetComponent<InputField>();
+                        input.Select();
+                        input.ActivateInputField();
+                        input.text = "";
+                        EventSystem.current.SetSelectedGameObject(input.gameObject, null);
+                        input.OnPointerClick(null);   
+                    }
+                    else
+                        CardReader.console.SetActive(false);
+                }
+        
+        }
 
         if (targetPlayerIsMoving)
             UpdatePosCamera(targetPlayer);
@@ -101,24 +120,7 @@ public class GameManager : NetworkBehaviour
             mainCamera.transform.position = cameraPosition;
             mainCamera.transform.eulerAngles = new Vector3(90, 0, 0);
         }
-
-        if (Input.GetKeyDown(KeyCode.BackQuote) && isServer)
-        {
-            bool consoleState = CardReader.console.activeInHierarchy;
-
-            if (!consoleState)
-            {
-                CardReader.console.SetActive(true);
-                InputField input = GameObject.Find("ConsoleInput").GetComponent<InputField>();
-                input.Select();
-                input.ActivateInputField();
-                input.text = "";
-                EventSystem.current.SetSelectedGameObject(input.gameObject, null);
-                input.OnPointerClick(null);   
-            }
-            else
-                CardReader.console.SetActive(false);
-        }
+        
     }
 
     void startGame()
@@ -319,12 +321,21 @@ public class GameManager : NetworkBehaviour
         Debug.Log("Owner changed for " + cardIndex + " : " + newOwnerId);
     }
 
+    public void CmdPayEachPlayer(int id, int amount)
+    {
+        for (int i = 0; i < connectedPlayers; i++)
+            if(i != id)
+            {
+                CmdGiveMoneyToPlayer(i, amount);
+            }
+    }
+
     public void CmdGiveMoneyToPlayer(int playerId, int amount)
     {
         if (!isServer)
         {
             Debug.LogError("Clientul a incercat sa intre in cmd");
-            return; // ?
+            return;
         }
         players[playerId].GetComponent<Player>().CmdAddMoney(amount);
         //Debug.LogError("Added " + amount + " to " + playerId);
