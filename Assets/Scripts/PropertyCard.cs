@@ -54,7 +54,7 @@ public class PropertyCard : Card
             if (ownerId == playerScript.idPlayer)
             {
                 CardReader.closeButton.SetActive(true);
-                CardReader.closeButton.GetComponent<Button>().onClick.AddListener(() => closeCard(player));
+                CardReader.closeButton.GetComponent<Button>().onClick.AddListener(() => closeCardSound(player));
             }
             else
             { 
@@ -71,7 +71,7 @@ public class PropertyCard : Card
             CardReader.buyPropertyButton.SetActive(true);
             CardReader.cancelButton.SetActive(true);
             CardReader.buyPropertyButton.GetComponent<Button>().onClick.AddListener(() => buyProperty(player));
-            CardReader.cancelButton.GetComponent<Button>().onClick.AddListener(() => hideCard(player));
+            CardReader.cancelButton.GetComponent<Button>().onClick.AddListener(() => hideCardSound(player));
         }
 
     }
@@ -116,12 +116,16 @@ public class PropertyCard : Card
 
     public void buildHouse(GameObject player, bool useManual = false, int manualIndexOffset = 1)
     {
+        SoundManager.Instance.PlaySound(SoundManager.Instance.buyHouse);
         closeCard();
         if (!hasHotel && housesBuilt < 4 && propertiesAreEquallyDeveloped())
         {
             Debug.Log("Player built a house.");
             if(!useManual)
-                player.GetComponent<Player>().CmdAddMoney(-pricePerHouse);
+            {
+                SoundManager.Instance.PlaySound(SoundManager.Instance.payMoney);
+                player.GetComponent<Player>().CmdTakeMoney(pricePerHouse);
+            }
 
             int leftRight, downUp;
             leftRight = downUp = 0;
@@ -152,7 +156,8 @@ public class PropertyCard : Card
 
         // First delete all the houses on the property
 
-        player.GetComponent<Player>().CmdAddMoney(-pricePerHouse);
+        SoundManager.Instance.PlaySound(SoundManager.Instance.payMoney);
+        player.GetComponent<Player>().CmdTakeMoney(pricePerHouse);
 
         int leftRight, downUp;
         leftRight = downUp = 0;
@@ -174,6 +179,7 @@ public class PropertyCard : Card
 
     public void sellHouse(GameObject player)
     {
+        SoundManager.Instance.PlaySound(SoundManager.Instance.getMoney);
         closeCard();
         Debug.LogWarning("Do I have hotel? " + hasHotel);
         if (hasHotel)
@@ -219,6 +225,24 @@ public class PropertyCard : Card
             Debug.LogError("Tried to delete a house that wasn't in the buildings list");
     }
     
+    void closeCardSound()
+    {
+        SoundManager.Instance.PlaySound(SoundManager.Instance.close);
+        closeCard();
+    }
+
+    void closeCardSound(GameObject plr)
+    {
+        SoundManager.Instance.PlaySound(SoundManager.Instance.close);
+        closeCard(plr);
+    }
+
+    void hideCardSound(GameObject plr)
+    {
+        SoundManager.Instance.PlaySound(SoundManager.Instance.close);
+        hideCard(plr);
+    }
+
     public override void showOwnedCard(GameObject player)
     {
         closeCard();
@@ -226,7 +250,7 @@ public class PropertyCard : Card
             return;
         showCard();
         CardReader.closeButton.SetActive(true);
-        CardReader.closeButton.GetComponent<Button>().onClick.AddListener(closeCard);
+        CardReader.closeButton.GetComponent<Button>().onClick.AddListener(closeCardSound);
 
         // if it's your turn you can sell/buy houses and sell the property
          if (GameObject.Find("GameManager").GetComponent<GameManager>().playerTurn == player.GetComponent<Player>().idPlayer)
@@ -258,6 +282,7 @@ public class PropertyCard : Card
 
     void showCard()
     {
+        SoundManager.Instance.PlaySound(SoundManager.Instance.openCard);
         CardReader.railroadPanel.SetActive(false);
         CardReader.utilityPanel.SetActive(false);
         closeCard();
@@ -315,6 +340,7 @@ public class PropertyCard : Card
     {
         Player playerScript = player.GetComponent<Player>();
         playerScript.CmdChangeOwner(playerScript.idPlayer, cardIndex,id); 
+        SoundManager.Instance.PlaySound(SoundManager.Instance.payMoney);
         playerScript.CmdTakeMoney(priceValue);
         playerScript.buyProperty(this);
         hideCard(player);
@@ -359,6 +385,7 @@ public class PropertyCard : Card
         CardReader.payRentButton.GetComponent<Button>().onClick.RemoveAllListeners();
         CardReader.payRentButton.SetActive(false);
          
+        SoundManager.Instance.PlaySound(SoundManager.Instance.payMoney);
         playerScript.CmdTakeMoney(amountPaid);
         playerScript.CmdGiveMoneyToPlayer(ownerId, amountPaid);
 

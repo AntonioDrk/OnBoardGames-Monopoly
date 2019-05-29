@@ -108,6 +108,7 @@ public class CardReader : MonoBehaviour
         tradeButton.GetComponent<Button>().onClick.RemoveAllListeners();
         tradeButton.GetComponent<Button>().onClick.AddListener(closePlayerTradePanel);
         playerTradePanel.SetActive(true);
+        SoundManager.Instance.PlaySound(SoundManager.Instance.selectProperty);
     }
 
     static public void closePlayerTradePanel()
@@ -115,6 +116,7 @@ public class CardReader : MonoBehaviour
         tradeButton.GetComponent<Button>().onClick.RemoveAllListeners();
         tradeButton.GetComponent<Button>().onClick.AddListener(openPlayerTradePanel);
         playerTradePanel.SetActive(false);
+        SoundManager.Instance.PlaySound(SoundManager.Instance.close);
     }
 
     // Update is called once per frame

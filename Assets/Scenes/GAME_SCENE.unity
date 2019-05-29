@@ -6418,6 +6418,60 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1976077274}
   m_CullTransparentMesh: 0
+--- !u!1 &1987094164
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1987094166}
+  - component: {fileID: 1987094165}
+  m_Layer: 0
+  m_Name: SoundManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1987094165
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1987094164}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 37cc6a5fec870b54a9d20c380ab41835, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  buyHouse: {fileID: 8300000, guid: f381d881029c3a246b92105b6fb78c5a, type: 3}
+  close: {fileID: 8300000, guid: 54577a4a6937790408668d1580fb1fe2, type: 3}
+  completeTrade: {fileID: 8300000, guid: 15a4f74aa3d636f4b991a7a4c5bb0ed3, type: 3}
+  endTurn: {fileID: 8300000, guid: 60327ec843344b54a9cb8326c4454553, type: 3}
+  getMoney: {fileID: 8300000, guid: b79ab312c4ac694448a414b118c8852f, type: 3}
+  payMoney: {fileID: 8300000, guid: 9d7ac393f6285ec49918b98f2630222d, type: 3}
+  openCard: {fileID: 8300000, guid: 8aa670a487dac0747a6c6548b88deadd, type: 3}
+  openEvent: {fileID: 8300000, guid: b0a18c77ed2877048bd56948e25b8c8a, type: 3}
+  goToJail: {fileID: 8300000, guid: 3ebda54e5415c0d4484f36ec2953af18, type: 3}
+  receiveTradeOffer: {fileID: 8300000, guid: 6b19e40ca3c98bb438f65fff3aeb783e, type: 3}
+  selectProperty: {fileID: 8300000, guid: 73ed952e34839ed46b06173706dbd67f, type: 3}
+--- !u!4 &1987094166
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1987094164}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 1.6978883, y: 0.14962447, z: -4.072398}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 11
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2035681186
 GameObject:
   m_ObjectHideFlags: 0
