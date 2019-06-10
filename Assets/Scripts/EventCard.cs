@@ -29,26 +29,26 @@ public class EventCard : Card
 
     void hideCard()
     {
-        CardReader.closeEventButton.GetComponent<Button>().onClick.RemoveAllListeners();
-        CardReader.ChanceLogo.SetActive(false);
-        CardReader.ComunityChestLogo.SetActive(false);
-        CardReader.eventPanel.SetActive(false);
+        UIManager.closeEventButton.GetComponent<Button>().onClick.RemoveAllListeners();
+        UIManager.ChanceLogo.SetActive(false);
+        UIManager.ComunityChestLogo.SetActive(false);
+        UIManager.eventPanel.SetActive(false);
     }
 
     public override void doAction(GameObject player)
     {
         
-        CardReader.eventPanel.SetActive(true);
-        CardReader.eventPanel.transform.GetChild(0).GetComponent<Text>().text = cardName;
-        CardReader.eventPanel.transform.GetChild(1).GetComponent<Text>().text = description;
-        CardReader.eventPanel.transform.GetComponent<Image>().color
+        UIManager.eventPanel.SetActive(true);
+        UIManager.eventPanel.transform.GetChild(0).GetComponent<Text>().text = cardName;
+        UIManager.eventPanel.transform.GetChild(1).GetComponent<Text>().text = description;
+        UIManager.eventPanel.transform.GetComponent<Image>().color
             = new Color32((byte)cardColor[0], (byte)cardColor[1], (byte)cardColor[2], 255);
         if (cardName == "Chance")
-            CardReader.ChanceLogo.SetActive(true);
+            UIManager.ChanceLogo.SetActive(true);
         else
-            CardReader.ComunityChestLogo.SetActive(true);
+            UIManager.ComunityChestLogo.SetActive(true);
         SoundManager.Instance.PlaySound(SoundManager.Instance.openEvent);
-        CardReader.closeEventButton.GetComponent<Button>().onClick.AddListener(() => activateEventCard(player));
+        UIManager.closeEventButton.GetComponent<Button>().onClick.AddListener(() => activateEventCard(player));
                 
     }
 

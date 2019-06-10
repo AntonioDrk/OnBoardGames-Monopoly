@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 170076734}
-  m_IndirectSpecularColor: {r: 0.4366757, g: 0.48427194, b: 0.5645252, a: 1}
+  m_IndirectSpecularColor: {r: 0.43667564, g: 0.48427135, b: 0.5645232, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -1495,31 +1495,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d348c91c8c8b2e84eabc99b9612708a9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  nrOfPlayers: 0
   targetPlayerIsMoving: 0
   targetPlayer: {fileID: 0}
-  cameraDistance: {x: 0, y: -3.5, z: 3}
-  cameraPosition: {x: -5, y: 18, z: 0.5}
-  playerTurnText: {fileID: 0}
-  connectedPlayersText: {fileID: 0}
+  currentRolledNumber: 0
+  gameStarted: 0
   playerTurn: 0
+  playerTurnId: 0
   connectedPlayers: 0
   players: []
-  meshes:
-  - {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
-  - {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
-  - {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
-  - {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
-  - {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
-  - {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
-  playerInfoPrefab: {fileID: 1957596252967745488, guid: c81b5de9ee728444d8cd4990e86b8d39,
-    type: 3}
-  tradePanelPrefab: {fileID: 854639391237675916, guid: b54dbf09718b3bd4bb792780aa30ec57,
-    type: 3}
-  propertyTradePanelPrefab: {fileID: 1161731123461814996, guid: 5e88ddb1240b3b442856a14fce61cc7d,
-    type: 3}
-  gameStarted: 0
-  currentRolledNumber: 0
   chestJailCardOwner: 0
   chanceJailCardOwner: 0
 --- !u!4 &460316503
@@ -2482,7 +2465,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 965584635}
+      - m_Target: {fileID: 0}
         m_MethodName: removeButtonInfo
         m_Mode: 1
         m_Arguments:
@@ -2549,7 +2532,7 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 965584635}
+        - m_Target: {fileID: 0}
           m_MethodName: writeButtonInfo
           m_Mode: 5
           m_Arguments:
@@ -2566,7 +2549,7 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 965584635}
+        - m_Target: {fileID: 0}
           m_MethodName: removeButtonInfo
           m_Mode: 1
           m_Arguments:
@@ -2744,7 +2727,6 @@ GameObject:
   - component: {fileID: 965584632}
   - component: {fileID: 965584634}
   - component: {fileID: 965584633}
-  - component: {fileID: 965584635}
   m_Layer: 5
   m_Name: Card
   m_TagString: Untagged
@@ -2814,18 +2796,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 965584631}
   m_CullTransparentMesh: 0
---- !u!114 &965584635
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 965584631}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 240a16891a369f1498689a9673c7d4ff, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &990543152
 GameObject:
   m_ObjectHideFlags: 0
@@ -2980,7 +2950,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 965584635}
+      - m_Target: {fileID: 0}
         m_MethodName: removeButtonInfo
         m_Mode: 1
         m_Arguments:
@@ -3047,7 +3017,7 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 965584635}
+        - m_Target: {fileID: 0}
           m_MethodName: writeButtonInfo
           m_Mode: 5
           m_Arguments:
@@ -3064,7 +3034,7 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 965584635}
+        - m_Target: {fileID: 0}
           m_MethodName: removeButtonInfo
           m_Mode: 1
           m_Arguments:
@@ -3772,7 +3742,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 965584635}
+      - m_Target: {fileID: 0}
         m_MethodName: removeButtonInfo
         m_Mode: 1
         m_Arguments:
@@ -3839,7 +3809,7 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 965584635}
+        - m_Target: {fileID: 0}
           m_MethodName: writeButtonInfo
           m_Mode: 5
           m_Arguments:
@@ -3856,7 +3826,7 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 965584635}
+        - m_Target: {fileID: 0}
           m_MethodName: removeButtonInfo
           m_Mode: 1
           m_Arguments:
@@ -3950,7 +3920,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 965584635}
+      - m_Target: {fileID: 0}
         m_MethodName: removeButtonInfo
         m_Mode: 1
         m_Arguments:
@@ -4017,7 +3987,7 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 965584635}
+        - m_Target: {fileID: 0}
           m_MethodName: writeButtonInfo
           m_Mode: 5
           m_Arguments:
@@ -4034,7 +4004,7 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 965584635}
+        - m_Target: {fileID: 0}
           m_MethodName: removeButtonInfo
           m_Mode: 1
           m_Arguments:
@@ -4713,7 +4683,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 965584635}
+      - m_Target: {fileID: 0}
         m_MethodName: removeButtonInfo
         m_Mode: 1
         m_Arguments:
@@ -4780,7 +4750,7 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 965584635}
+        - m_Target: {fileID: 0}
           m_MethodName: writeButtonInfo
           m_Mode: 5
           m_Arguments:
@@ -4797,7 +4767,7 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 965584635}
+        - m_Target: {fileID: 0}
           m_MethodName: removeButtonInfo
           m_Mode: 1
           m_Arguments:
@@ -5390,7 +5360,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1870922916
 RectTransform:
   m_ObjectHideFlags: 0
@@ -5422,7 +5392,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1870922915}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: -765806418, guid: f70555f144d8491a825f0804e09c671c, type: 3}
   m_Name: 
@@ -5532,7 +5502,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 965584635}
+      - m_Target: {fileID: 0}
         m_MethodName: removeButtonInfo
         m_Mode: 1
         m_Arguments:
@@ -5599,7 +5569,7 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 965584635}
+        - m_Target: {fileID: 0}
           m_MethodName: writeButtonInfo
           m_Mode: 5
           m_Arguments:
@@ -5616,7 +5586,7 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 965584635}
+        - m_Target: {fileID: 0}
           m_MethodName: removeButtonInfo
           m_Mode: 1
           m_Arguments:
@@ -6410,6 +6380,8 @@ GameObject:
   - component: {fileID: 2035681189}
   - component: {fileID: 2035681188}
   - component: {fileID: 2035681187}
+  - component: {fileID: 2035681191}
+  - component: {fileID: 2035681192}
   m_Layer: 5
   m_Name: Canvas
   m_TagString: Untagged
@@ -6516,6 +6488,30 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
+--- !u!114 &2035681191
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2035681186}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 240a16891a369f1498689a9673c7d4ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &2035681192
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2035681186}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3d584de00492b7040ad143b6e68f5e10, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &2046596783
 GameObject:
   m_ObjectHideFlags: 0
@@ -7156,7 +7152,7 @@ GameObject:
   - component: {fileID: 4426778666628090342}
   - component: {fileID: 4426778666628090341}
   m_Layer: 0
-  m_Name: Portao (1)
+  m_Name: Portao
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -10809,7 +10805,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5992304866705039497}
   m_LocalRotation: {x: 0.000000021855694, y: 0.0000001509958, z: -3.300118e-15, w: 1}
-  m_LocalPosition: {x: 3.3287184, y: 0.000000090481045, z: 4.783285}
+  m_LocalPosition: {x: 3.3287184, y: 0.000000090481045, z: 3.927}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 5992304866705013921}
@@ -11704,7 +11700,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 6960453869527875716}
   m_Direction: 2
   m_Value: 1
-  m_Size: 0.4639999
+  m_Size: 0.464
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -13793,7 +13789,7 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 965584635}
+        - m_Target: {fileID: 0}
           m_MethodName: writeButtonInfo
           m_Mode: 5
           m_Arguments:
@@ -13810,7 +13806,7 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 965584635}
+        - m_Target: {fileID: 0}
           m_MethodName: removeButtonInfo
           m_Mode: 1
           m_Arguments:
@@ -13913,7 +13909,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 965584635}
+      - m_Target: {fileID: 0}
         m_MethodName: removeButtonInfo
         m_Mode: 1
         m_Arguments:
@@ -14119,7 +14115,7 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 965584635}
+        - m_Target: {fileID: 0}
           m_MethodName: writeButtonInfo
           m_Mode: 5
           m_Arguments:
@@ -14136,7 +14132,7 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 965584635}
+        - m_Target: {fileID: 0}
           m_MethodName: removeButtonInfo
           m_Mode: 1
           m_Arguments:
@@ -14239,7 +14235,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 965584635}
+      - m_Target: {fileID: 0}
         m_MethodName: removeButtonInfo
         m_Mode: 1
         m_Arguments:
@@ -14277,7 +14273,7 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 965584635}
+        - m_Target: {fileID: 0}
           m_MethodName: writeButtonInfo
           m_Mode: 5
           m_Arguments:
@@ -14294,7 +14290,7 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 965584635}
+        - m_Target: {fileID: 0}
           m_MethodName: removeButtonInfo
           m_Mode: 1
           m_Arguments:
@@ -14397,7 +14393,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 965584635}
+      - m_Target: {fileID: 0}
         m_MethodName: removeButtonInfo
         m_Mode: 1
         m_Arguments:
@@ -14470,7 +14466,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 965584635}
+      - m_Target: {fileID: 0}
         m_MethodName: removeButtonInfo
         m_Mode: 1
         m_Arguments:
@@ -14500,7 +14496,7 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 965584635}
+        - m_Target: {fileID: 0}
           m_MethodName: writeButtonInfo
           m_Mode: 5
           m_Arguments:
@@ -14517,7 +14513,7 @@ MonoBehaviour:
     callback:
       m_PersistentCalls:
         m_Calls:
-        - m_Target: {fileID: 965584635}
+        - m_Target: {fileID: 0}
           m_MethodName: removeButtonInfo
           m_Mode: 1
           m_Arguments:

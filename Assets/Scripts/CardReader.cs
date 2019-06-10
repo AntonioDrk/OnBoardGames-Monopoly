@@ -1,12 +1,11 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using System;
 using UnityEngine;
-using UnityEngine.UI;
 
 public class CardReader : MonoBehaviour
 {
+
     string propertiesFile = "Properties";
     string railroadsFile = "Railroads";
     string utilitiesFile = "Utilities";
@@ -20,14 +19,8 @@ public class CardReader : MonoBehaviour
     static public EventCard[] chanceCards;
     static public EventCard[] chestCards;
 
-    static public GameObject cardPanel, buyPropertyButton, cancelButton, payRentButton, closeButton, closeEventButton, eventPanel,
-                                ComunityChestLogo, ChanceLogo, sellPropertyButton, sellHouseButton, buyHouseButton, railroadPanel,
-                                utilityPanel, ElectricCompanyLogo, WaterWorksLogo, buttonInfo, canvas, inJailCardPanel, playerTradePanel,
-                                tradeButton, console;
-
     static public GameObject housePrefab, hotelPrefab;
-
-    // Start is called before the first frame update
+     
     void Start()
     {
         LoadPropertyCards(propertiesFile);
@@ -36,100 +29,13 @@ public class CardReader : MonoBehaviour
         LoadChanceCards(chanceFile);
         LoadChestCards(chestFile);
         LoadHousePrefab();
-
-        //In Jail Card
-        inJailCardPanel = GameObject.Find("InJailCard");
-        inJailCardPanel.SetActive(false);
-
-        // Button info
-        buttonInfo = GameObject.Find("ButtonInfo");
-        buttonInfo.SetActive(false);
-
-        // Utilities
-        utilityPanel = GameObject.Find("UtilityCard");
-        ElectricCompanyLogo = GameObject.Find("ElectricCompanyLogo");
-        ElectricCompanyLogo.SetActive(false);
-        WaterWorksLogo = GameObject.Find("WaterWorksLogo");
-        WaterWorksLogo.SetActive(false);
-        utilityPanel.SetActive(false);
-
-        // Railroad Card
-        railroadPanel = GameObject.Find("RailroadCard");
-        railroadPanel.SetActive(false);
-
-        // Property Card
-        cardPanel = GameObject.Find("Card");
-        buyPropertyButton = GameObject.Find("BuyProperty");
-        buyPropertyButton.SetActive(false);
-        cancelButton = GameObject.Find("Cancel");
-        cancelButton.SetActive(false);
-        closeButton = GameObject.Find("Close");
-        closeButton.SetActive(false);
-        payRentButton = GameObject.Find("PayRent");
-        payRentButton.SetActive(false);
-
-        // Owned Card
-        sellPropertyButton = GameObject.Find("SellProperty");
-        sellPropertyButton.SetActive(false);
-        sellHouseButton = GameObject.Find("SellHouse");
-        sellHouseButton.SetActive(false);
-        buyHouseButton = GameObject.Find("BuyHouse");
-        buyHouseButton.SetActive(false);
-        cardPanel.SetActive(false);
-
-        // Event Card
-        eventPanel = GameObject.Find("EventCard");
-        closeEventButton = GameObject.Find("CloseEvent");
-        //closeEventButton.SetActive(false);
-        ComunityChestLogo = GameObject.Find("ComunityChestLogo");
-        ComunityChestLogo.SetActive(false);
-        ChanceLogo = GameObject.Find("ChanceLogo");
-        ChanceLogo.SetActive(false);
-        eventPanel.SetActive(false);
-
-        canvas = GameObject.Find("Canvas");
-
-        // Trade
-        tradeButton = GameObject.Find("TradeButton");
-        tradeButton.GetComponent<Button>().onClick.AddListener(openPlayerTradePanel);
-        tradeButton.SetActive(false);
-        playerTradePanel = GameObject.Find("playerTradePanel");
-        playerTradePanel.SetActive(false);
-
-        // Console
-        console = GameObject.Find("Console");
-        console.SetActive(false);
-
     }
 
-    static public void openPlayerTradePanel()
-    {
-        if (GameObject.Find("TradePanel")) return;
-        tradeButton.GetComponent<Button>().onClick.RemoveAllListeners();
-        tradeButton.GetComponent<Button>().onClick.AddListener(closePlayerTradePanel);
-        playerTradePanel.SetActive(true);
-        SoundManager.Instance.PlaySound(SoundManager.Instance.selectProperty);
-    }
-
-    static public void closePlayerTradePanel()
-    {
-        tradeButton.GetComponent<Button>().onClick.RemoveAllListeners();
-        tradeButton.GetComponent<Button>().onClick.AddListener(openPlayerTradePanel);
-        playerTradePanel.SetActive(false);
-        SoundManager.Instance.PlaySound(SoundManager.Instance.close);
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-
-    }
-
-    private void LoadHousePrefab()
-    {
-        housePrefab = Resources.Load<GameObject>("House") as GameObject;
-        //hotelPrefab = Resources.Load<GameObject>("Hotel.prefab");
-        if (housePrefab == null ) Debug.LogError("House/hotel object not found in the resources folder!");
+    static public int getIdOnBoard(int i)
+    { 
+        if (i < 22) return propertyCards[i].id;
+        if (i < 26) return railroadCards[i - 22].id;
+        return utilityCards[i - 26].id;
     }
 
     static public int getPropertyCardIndex(int id)
@@ -140,7 +46,14 @@ public class CardReader : MonoBehaviour
         return -1;
     }
 
-    public void LoadPropertyCards(string fileName)
+    private void LoadHousePrefab()
+    {
+        housePrefab = Resources.Load<GameObject>("House") as GameObject;
+        if (housePrefab == null)
+            Debug.LogError("House/hotel object not found in the resources folder!");
+    }
+
+    private void LoadPropertyCards(string fileName)
     {
         string filePath = Path.Combine("Data files", fileName);
         TextAsset propertiesJson = Resources.Load<TextAsset>(filePath);
@@ -161,7 +74,7 @@ public class CardReader : MonoBehaviour
 
     }
 
-    public void LoadRailroadCards(string fileName)
+    private void LoadRailroadCards(string fileName)
     {
         string filePath = Path.Combine(folderLocation, fileName);
         TextAsset railwaysJson = Resources.Load<TextAsset>(filePath);
@@ -181,7 +94,7 @@ public class CardReader : MonoBehaviour
         }
     }
 
-    public void LoadUtilityCards(string fileName)
+    private void LoadUtilityCards(string fileName)
     {
         string filePath = Path.Combine(folderLocation, fileName);
         TextAsset utilitiesJson = Resources.Load<TextAsset>(filePath);
@@ -201,7 +114,7 @@ public class CardReader : MonoBehaviour
         }
     }
 
-    public void LoadChanceCards(string fileName)
+    private void LoadChanceCards(string fileName)
     {
         string filePath = Path.Combine(folderLocation, fileName);
         TextAsset chanceJson = Resources.Load<TextAsset>(filePath);
@@ -209,14 +122,11 @@ public class CardReader : MonoBehaviour
         if (chanceJson != null)
         {
             chanceCards = JsonHelper.FromJson<EventCard>(chanceJson.ToString());
-            
+
             Debug.Log(fileName + " data retrieved. " + chanceCards.Length + " cards loaded.");
 
             for (int i = 0; i < chanceCards.Length; i++)
                 chanceCards[i].EventCardConstructor();
-
-            //for (int i = 0; i < chanceCards.Length; i++)
-            // Debug.Log(chanceCards[i].ToString());
         }
         else
         {
@@ -224,7 +134,7 @@ public class CardReader : MonoBehaviour
         }
     }
 
-    public void LoadChestCards(string fileName)
+    private void LoadChestCards(string fileName)
     {
         string filePath = Path.Combine(folderLocation, fileName);
         TextAsset chestJson = Resources.Load<TextAsset>(filePath);
@@ -232,14 +142,11 @@ public class CardReader : MonoBehaviour
         if (chestJson != null)
         {
             chestCards = JsonHelper.FromJson<EventCard>(chestJson.ToString());
-            
+
             Debug.Log(fileName + " data retrieved. " + chestCards.Length + " cards loaded.");
 
             for (int i = 0; i < chestCards.Length; i++)
                 chestCards[i].EventCardConstructor();
-
-            //for (int i = 0; i < chestCards.Length; i++)
-            // Debug.Log(chestCards[i].ToString());
         }
         else
         {
@@ -247,14 +154,4 @@ public class CardReader : MonoBehaviour
         }
     }
 
-    public void writeButtonInfo(string info)
-    {
-        buttonInfo.SetActive(true);
-        buttonInfo.transform.GetChild(0).GetComponent<Text>().text = info;
-    }
-
-    public void removeButtonInfo()
-    {
-        buttonInfo.SetActive(false);
-    }
 }

@@ -6,69 +6,53 @@ using UnityEngine.Networking;
 
 public class Player : NetworkBehaviour
 {
-    [SyncVar] public int idPlayer = 0;
 
-    // Serialized just for testing purposes, remove me 
-    [SerializeField] [SyncVar] private int indexPosition = 0; // Indicates the position on the board list (the list of cards that are on the board)
-    [SerializeField] private GameObject diceManager, gameManager;
-
-    private Animator anim;
-    private DiceScript diceScript;
-    private GameManager gameManagerScript;
-    private Vector3 goPosition = new Vector3(2.5f, 0.125f, -6.49f);
-    private Vector3 jailPosition = new Vector3(-11f, 0.125f, -6f);
-    private Vector3 justVisitingPosition = new Vector3(-11.45854f, 0.125f, -6.49f);
-    private GameObject rollButton, endTurnButton, ownedPropertiesPanel;
-    private GameObject jail;
-    public GameObject ownedPropertyPanelPrefab;// playerInfoPrefab;
-    private Text playerMoneyText, idText;
-
+    [SyncVar] public int idPlayer = -1;    
+    [SyncVar] private int indexPosition = 0; // Indicates the position on the board list (the list of cards that are on the board)
+    [SyncVar] private int money = 1500;
     [SyncVar] private Color plyColor;
 
-    private Renderer renderer;
-    [SyncVar] private int myMeshIndex;
+    private List<Card> ownedPropertyCards;
+    private List<GameObject> ownedPropertyList;
 
-    [SerializeField] [SyncVar] private int money = 1500;
     private int doublesRolled = 0;
     private int roundsInJail = 0;
     private bool inJail = false;
     private bool waitingForTrade = false;
-    [SerializeField] private int stage = 0; // 0 = player can roll the dice/ 1 = player rolled / 2 = the player ended his movement
+    private Renderer renderer;
+    private int stage = 0; // 0 = player can roll the dice/ 1 = player rolled / 2 = the player ended his movement
 
-    [SerializeField] private List<Card> ownedPropertyCards;
-    private List<GameObject> ownedPropertyList;
+    private Animator anim;
+    private DiceManager diceManagerScript;
+    private GameManager gameManagerScript;
+    private Vector3 goPosition = new Vector3(2.5f, 0.125f, -6.49f), jailPosition = new Vector3(-11f, 0.125f, -6f), justVisitingPosition = new Vector3(-11.45854f, 0.125f, -6.49f);
+    private GameObject jail;
+    private Text playerMoneyText;
 
     void Start()
     {
-        gameManager = GameObject.Find("GameManager");
-        gameManagerScript = gameManager.GetComponent<GameManager>();
-        diceManager = GameObject.Find("DiceManager");
-        diceScript = diceManager.GetComponent<DiceScript>();
+        gameManagerScript = GameObject.Find("GameManager").GetComponent<GameManager>();
+        diceManagerScript = GameObject.Find("DiceManager").GetComponent<DiceManager>();
         anim = GetComponent<Animator>();
         renderer = transform.GetChild(0).GetComponent<Renderer>();
 
         if (isLocalPlayer)
         {
             ownedPropertyList = new List<GameObject>();
-            ownedPropertiesPanel = GameObject.Find("OwnedProprietiesPanel");
+            UIManager.ownedPropertiesPanel = GameObject.Find("OwnedProprietiesPanel");
             ownedPropertyCards = new List<Card>();
-            rollButton = GameObject.Find("RollDice");
-            rollButton.GetComponent<Button>().onClick.AddListener(RollTheDice);
-            rollButton.SetActive(false);
-            endTurnButton = GameObject.Find("EndTurn");
-            endTurnButton.GetComponent<Button>().onClick.AddListener(nextPlayer);
-            endTurnButton.SetActive(false);
+            UIManager.rollButton.GetComponent<Button>().onClick.AddListener(RollTheDice);
+            UIManager.endTurnButton.GetComponent<Button>().onClick.AddListener(nextPlayer);
             jail = GameObject.Find("Jail");
             jail.SetActive(false);
 
             // the listeners for the buttons from jail panel
-            CardReader.inJailCardPanel.transform.GetChild(0).GetChild(0).GetComponent<Button>().onClick.AddListener(() => useCardInJail("Chance")); // chance
-            CardReader.inJailCardPanel.transform.GetChild(0).GetChild(1).GetComponent<Button>().onClick.AddListener(() => useCardInJail("Chest")); // chest
-            CardReader.inJailCardPanel.transform.GetChild(0).GetChild(2).GetComponent<Button>().onClick.AddListener(payFine); // pay fine
-            CardReader.inJailCardPanel.transform.GetChild(0).GetChild(3).GetComponent<Button>().onClick.AddListener(rollDoubles); // roll doubles
+            UIManager.inJailCardPanel.transform.GetChild(0).GetChild(0).GetComponent<Button>().onClick.AddListener(() => useCardInJail("Chance")); // chance
+            UIManager.inJailCardPanel.transform.GetChild(0).GetChild(1).GetComponent<Button>().onClick.AddListener(() => useCardInJail("Chest")); // chest
+            UIManager.inJailCardPanel.transform.GetChild(0).GetChild(2).GetComponent<Button>().onClick.AddListener(payFine); // pay fine
+            UIManager.inJailCardPanel.transform.GetChild(0).GetChild(3).GetComponent<Button>().onClick.AddListener(rollDoubles); // roll doubles
 
             CmdAddConnectedPlayer(this.gameObject);
-            idText = GameObject.Find("idText").GetComponent<Text>();
             playerMoneyText = GameObject.Find("playerMoneyText").GetComponent<Text>();
             transform.position = goPosition;
         }
@@ -86,11 +70,9 @@ public class Player : NetworkBehaviour
         if (!isLocalPlayer)
             return;
 
-        idText.text = "id: " + idPlayer;
-
         // If it's my turn
         if ((isServer && gameManagerScript.gameStarted) || !isServer)
-            if (gameManagerScript.playerTurn == idPlayer && stage == 0)
+            if (gameManagerScript.playerTurnId == idPlayer && stage == 0)
             {
                 if (inJail)
                 {
@@ -98,29 +80,29 @@ public class Player : NetworkBehaviour
                 }
                 else
                 {
-                    CardReader.tradeButton.SetActive(true);
-                    rollButton.SetActive(true);
+                    UIManager.tradeButton.SetActive(true);
+                    UIManager.rollButton.SetActive(true);
                 }
             }
             else
             {
-                rollButton.SetActive(false);
-                CardReader.tradeButton.SetActive(false);
-                CardReader.inJailCardPanel.SetActive(false);
+                UIManager.rollButton.SetActive(false);
+                UIManager.tradeButton.SetActive(false);
+                UIManager.inJailCardPanel.SetActive(false);
             }
 
 
-        // if the diceManager rolled and it's player's turn 
-        if (diceScript.rolled == true && gameManagerScript.playerTurn == idPlayer)
+        // if the dice rolled and it's player's turn 
+        if (diceManagerScript.rolled == true && gameManagerScript.playerTurnId == idPlayer)
         {
-            diceScript.rolled = false;
-            Debug.Log("Player " + idPlayer + " rolled " + gameManager.GetComponent<GameManager>().currentRolledNumber);
+            diceManagerScript.rolled = false;
+            Debug.Log("Player " + idPlayer + " rolled " + gameManagerScript.currentRolledNumber);
 
             if (inJail)
             {
-                if (diceScript.isDouble)
+                if (diceManagerScript.isDouble)
                 {
-                    diceScript.isDouble = false;
+                    diceManagerScript.isDouble = false;
                     inJail = false;
                     CmdGetOutOfJail(idPlayer);
                     roundsInJail = 0;
@@ -142,7 +124,7 @@ public class Player : NetworkBehaviour
                 }
             }
 
-            if (diceScript.isDouble)
+            if (diceManagerScript.isDouble)
                 doublesRolled++;
             else
                 doublesRolled = 0;
@@ -152,7 +134,7 @@ public class Player : NetworkBehaviour
                 goToJail();
             }
             else if (!inJail)
-                moveSpaces(gameManager.GetComponent<GameManager>().currentRolledNumber);
+                moveSpaces(gameManagerScript.currentRolledNumber);
 
         }
 
@@ -169,7 +151,7 @@ public class Player : NetworkBehaviour
     {
         gameManagerScript.targetPlayerIsMoving = true;
         gameManagerScript.targetPlayer = this.gameObject;
-        CardReader.canvas.SetActive(false);
+        UIManager.canvas.SetActive(false);
 
         for (int i = 0; i < amountToMove; i++)
         {
@@ -203,7 +185,7 @@ public class Player : NetworkBehaviour
             }
         }
 
-        CardReader.canvas.SetActive(true);
+        UIManager.canvas.SetActive(true);
         gameManagerScript.targetPlayerIsMoving = false;
 
         if (indexPosition == 30)
@@ -213,7 +195,7 @@ public class Player : NetworkBehaviour
         else
         {
             stage = 2;
-            if (diceManager.transform.childCount > 0)
+            if (diceManagerScript.transform.childCount > 0)
                 CmdSetDiceInactive();
 
             if (indexPosition == 12 || indexPosition == 28) // Utilities
@@ -280,8 +262,6 @@ public class Player : NetworkBehaviour
     public Renderer getRenderer() { return renderer; }
     public void setPlyColor(Color value) { plyColor = value; }
     public Color getPlyColor() { return plyColor; }
-    public int getMyMeshIndex() { return myMeshIndex; }
-    public void setMyMeshIndex(int value) { myMeshIndex = value; }
     public int getIndexPosition() { return indexPosition; }
     public int getStage() { return stage; }
     public int getMoney() { return money; }
@@ -289,7 +269,7 @@ public class Player : NetworkBehaviour
     public void endMovement()
     {
         //CmdSetDiceInactive();
-        if (diceScript.isDouble)
+        if (diceManagerScript.isDouble)
         {
             stage = 0;
         }
@@ -299,12 +279,12 @@ public class Player : NetworkBehaviour
 
     void endTurn()
     {
-        endTurnButton.SetActive(true);
+        UIManager.endTurnButton.SetActive(true);
     }
 
     void nextPlayer()
     {
-        endTurnButton.SetActive(false);
+        UIManager.endTurnButton.SetActive(false);
         SoundManager.Instance.PlaySound(SoundManager.Instance.endTurn);
         stage = 0;
         CmdNextPlayer();
@@ -384,13 +364,13 @@ public class Player : NetworkBehaviour
         int numberOfOwnedCards = ownedPropertyCards.Count;
         //Debug.Log("Nr of owned cards: " + numberOfOwnedCards);
 
-        GameObject ownedPropertyPanel = Instantiate(ownedPropertyPanelPrefab);
+        GameObject ownedPropertyPanel = Instantiate(Resources.Load<GameObject>("OwnedProperty"));
 
         if (propertyCard.GetType() == typeof(PropertyCard))
             ownedPropertyPanel.transform.GetComponent<Image>().color = new Color32((byte)((PropertyCard)propertyCard).cardColor[0],
                 (byte)((PropertyCard)propertyCard).cardColor[1], (byte)((PropertyCard)propertyCard).cardColor[2], 255);
 
-        ownedPropertyPanel.transform.SetParent(ownedPropertiesPanel.transform.GetChild(0).transform);
+        ownedPropertyPanel.transform.SetParent(UIManager.ownedPropertiesPanel.transform.GetChild(0).transform);
         ownedPropertyPanel.transform.position = new Vector3(0, 0, 0);
         ownedPropertyPanel.GetComponent<RectTransform>().localScale = new Vector3(1, 1, 1);
         ownedPropertyPanel.transform.GetChild(0).GetComponent<Text>().text = propertyCard.CardName;
@@ -455,8 +435,8 @@ public class Player : NetworkBehaviour
     {
         if (GameObject.Find("TradePanel") || waitingForTrade) return;
         stage = 1;
-        rollButton.SetActive(false);
-        CardReader.closePlayerTradePanel();
+        UIManager.rollButton.SetActive(false);
+        UIManager.closePlayerTradePanel();
         CmdRollDice();
     }
 
@@ -464,7 +444,7 @@ public class Player : NetworkBehaviour
     [Command]
     public void CmdRollDice()
     {
-        diceScript.CmdRollDice();
+        diceManagerScript.CmdRollDice();
     }
 
     [ClientRpc]
@@ -474,12 +454,12 @@ public class Player : NetworkBehaviour
         Debug.Log("Move player: " + idPlayer);
 
         if (rolledValue == rolledNumber - rolledValue)
-            diceScript.isDouble = true;
+            diceManagerScript.isDouble = true;
         else
-            diceScript.isDouble = false;
+            diceManagerScript.isDouble = false;
 
-        gameManager.GetComponent<GameManager>().currentRolledNumber = rolledNumber;
-        diceScript.rolled = true;
+        gameManagerScript.currentRolledNumber = rolledNumber;
+        diceManagerScript.rolled = true;
     }
 
     // ----------- jail related functions
@@ -487,7 +467,7 @@ public class Player : NetworkBehaviour
     void useCardInJail(string type)
     {
         CmdChangeCardJailOwner(-1, type);
-        CardReader.inJailCardPanel.SetActive(false);
+        UIManager.inJailCardPanel.SetActive(false);
         inJail = false;
         CmdGetOutOfJail(idPlayer);
         roundsInJail = 0;
@@ -500,7 +480,7 @@ public class Player : NetworkBehaviour
     {
         SoundManager.Instance.PlaySound(SoundManager.Instance.payMoney);
         CmdTakeMoney(50);
-        CardReader.inJailCardPanel.SetActive(false);
+        UIManager.inJailCardPanel.SetActive(false);
         inJail = false;
         CmdGetOutOfJail(idPlayer);
         roundsInJail = 0;
@@ -510,18 +490,18 @@ public class Player : NetworkBehaviour
 
     void rollDoubles()
     {
-        CardReader.inJailCardPanel.SetActive(false);
+        UIManager.inJailCardPanel.SetActive(false);
         roundsInJail += 1;
         RollTheDice();
     }
 
     void playerInJail()
     {
-        CardReader.inJailCardPanel.SetActive(true);
+        UIManager.inJailCardPanel.SetActive(true);
         if (gameManagerScript.chanceJailCardOwner != idPlayer)
-            CardReader.inJailCardPanel.transform.GetChild(0).GetChild(0).gameObject.SetActive(false);
+            UIManager.inJailCardPanel.transform.GetChild(0).GetChild(0).gameObject.SetActive(false);
         if (gameManagerScript.chestJailCardOwner != idPlayer)
-            CardReader.inJailCardPanel.transform.GetChild(0).GetChild(1).gameObject.SetActive(false);
+            UIManager.inJailCardPanel.transform.GetChild(0).GetChild(1).gameObject.SetActive(false);
     }
 
     [ClientRpc]
@@ -561,7 +541,7 @@ public class Player : NetworkBehaviour
         doublesRolled = 0;
         roundsInJail = 0;
         inJail = true;
-        if (diceManager.transform.childCount > 0)
+        if (diceManagerScript.transform.childCount > 0)
             CmdSetDiceInactive();
         transform.position = jailPosition;
         transform.eulerAngles = new Vector3(0, 90, 0);
@@ -578,10 +558,16 @@ public class Player : NetworkBehaviour
     }
 
     [ClientRpc]
-    public void RpcUpdateMesh(int newMeshIndex)
+    public void RpcChangePositionOfPlayerPanel(int id, GameObject playerInfo)
     {
-        transform.GetChild(0).GetComponent<MeshFilter>().mesh = gameManagerScript.getMeshes()[newMeshIndex];
-        myMeshIndex = newMeshIndex;
+        changePositionOfPlayerPanel(id, playerInfo);
+    }
+    
+    public void changePositionOfPlayerPanel(int id, GameObject playerInfo)
+    {
+        playerInfo.GetComponent<RectTransform>().offsetMax = new Vector2(-17, -(12 + 58 * id));
+        playerInfo.GetComponent<RectTransform>().offsetMin = new Vector2(21, 260 - 60 * id);
+        playerInfo.GetComponent<RectTransform>().localScale = new Vector3(1, 1, 1);
     }
 
     [ClientRpc]
@@ -591,9 +577,7 @@ public class Player : NetworkBehaviour
         playerInfo.transform.GetChild(0).GetComponent<Text>().color = plyColor;
         playerInfo.transform.GetChild(0).GetComponent<Text>().text = "Player " + id + "\n$" + money;
         playerInfo.transform.SetParent(GameObject.Find("PlayersPanel").transform);
-        playerInfo.GetComponent<RectTransform>().offsetMax = new Vector2(-17, -(12 + 58 * id));
-        playerInfo.GetComponent<RectTransform>().offsetMin = new Vector2(21, 260 - 60 * id);
-        playerInfo.GetComponent<RectTransform>().localScale = new Vector3(1, 1, 1);
+        changePositionOfPlayerPanel(id, playerInfo);
     }
 
     [ClientRpc]
@@ -601,10 +585,8 @@ public class Player : NetworkBehaviour
     {
         playerInfo.transform.GetChild(0).GetComponent<Text>().color = plyColor;
         playerInfo.transform.GetChild(0).GetComponent<Text>().text = "Player " + id;
-        playerInfo.transform.SetParent(CardReader.playerTradePanel.transform);
-        playerInfo.GetComponent<RectTransform>().offsetMax = new Vector2(-17, -(12 + 58 * id));
-        playerInfo.GetComponent<RectTransform>().offsetMin = new Vector2(21, 260 - 60 * id);
-        playerInfo.GetComponent<RectTransform>().localScale = new Vector3(1, 1, 1);
+        playerInfo.transform.SetParent(UIManager.playerTradePanel.transform);
+        changePositionOfPlayerPanel(id, playerInfo);
     }
     
     // ------------------ TRADE -------------------
@@ -613,11 +595,11 @@ public class Player : NetworkBehaviour
     public void RpcAddButtonToPlayerTradeInfo()
     {
         if (!isLocalPlayer) return;
-        //Debug.Log("panels: " + CardReader.playerTradePanel.transform.childCount);
-        for (int k = 0; k < CardReader.playerTradePanel.transform.childCount; k++)
+        //Debug.Log("panels: " + UIManager.playerTradePanel.transform.childCount);
+        for (int k = 0; k < UIManager.playerTradePanel.transform.childCount; k++)
             if(k != idPlayer)
         {
-            Transform panel = CardReader.playerTradePanel.transform.GetChild(k);
+            Transform panel = UIManager.playerTradePanel.transform.GetChild(k);
             int destinationId = k;
             panel.gameObject.AddComponent<Button>().onClick.AddListener(() => playerWantsTrade(destinationId));
         }
@@ -629,9 +611,9 @@ public class Player : NetworkBehaviour
 
         if (waitingForTrade) return;
 
-        CardReader.closePlayerTradePanel();
-        GameObject tradePanel = Instantiate(gameManagerScript.tradePanelPrefab);
-        tradePanel.transform.SetParent(CardReader.canvas.transform);
+        UIManager.closePlayerTradePanel();
+        GameObject tradePanel = Instantiate(Resources.Load<GameObject>("TradePanel"));
+        tradePanel.transform.SetParent(UIManager.canvas.transform);
         tradePanel.transform.localPosition = new Vector3(0, 0, 0);
         tradePanel.name = "TradePanel";
 
@@ -659,8 +641,8 @@ public class Player : NetworkBehaviour
         // you are the destination now and the other player is the source
         if (!isLocalPlayer) return;
 
-        GameObject tradePanel = Instantiate(gameManagerScript.tradePanelPrefab);
-        tradePanel.transform.SetParent(CardReader.canvas.transform);
+        GameObject tradePanel = Instantiate(Resources.Load<GameObject>("tradePanel"));
+        tradePanel.transform.SetParent(UIManager.canvas.transform);
         tradePanel.transform.localPosition = new Vector3(0, 0, 0);
         
         // create panels for your properties (destinationId)
@@ -714,7 +696,7 @@ public class Player : NetworkBehaviour
 
     GameObject createIndividualPanel(GameObject tradePanel, int childId, int idOfOwnedProp, int i)
     {
-        GameObject panel = Instantiate(gameManagerScript.propertyTradePanelPrefab);
+        GameObject panel = Instantiate(Resources.Load<GameObject>("PropertyTradePanel"));
         panel.transform.SetParent(tradePanel.transform.GetChild(childId));
         panel.transform.localPosition = new Vector3(-73 + (50 * (int)(idOfOwnedProp % 4)), 135 - (50 * (int)(idOfOwnedProp / 4)), 0);
         if (i < 22) // the card is a property
@@ -768,6 +750,7 @@ public class Player : NetworkBehaviour
     bool checkTrade(List<int> sourceProperties, List<int> destinationProperties)
     {
         foreach (int cardIndex in sourceProperties)
+            if(cardIndex < 22)
         {
             PropertyCard card = CardReader.propertyCards[cardIndex];
 
@@ -779,6 +762,7 @@ public class Player : NetworkBehaviour
         }
 
         foreach (int cardIndex in destinationProperties)
+            if (cardIndex < 22)
         {
             PropertyCard card = CardReader.propertyCards[cardIndex];
 
@@ -802,21 +786,7 @@ public class Player : NetworkBehaviour
         int[] sourceProperties = sourcePropertiesList.ToArray();
         int[] destinationProperties = destinationPropertiesList.ToArray();
         int sourcePropertiesLength = sourcePropertiesList.Count, destinationPropertiesLength = destinationPropertiesList.Count;
-        /*    
-        Debug.Log("Send: ");
-        for (int k = 0; k < sourcePropertiesLength; k++)
-        {
-            int id = sourceProperties[k];
-            Debug.Log(id + " ");
-        }
-
-        Debug.Log("Receive: ");
-        for (int k = 0; k < destinationPropertiesLength; k++)
-        {
-            int id = destinationProperties[k];
-            Debug.Log(id + " ");
-        }
-        */
+        
         waitingForTrade = true;
         CmdSendTrade(idPlayer, destinationId, sourceProperties, sourcePropertiesLength, destinationProperties, destinationPropertiesLength);
     }
@@ -918,9 +888,9 @@ public class Player : NetworkBehaviour
     }
 
     [Command]
-    public void CmdChangeOwner(int newOwnerId, int cardIndex, int id)
+    public void CmdChangeOwner(int newOwnerId, int cardIndex)
     {
-        gameManagerScript.CmdChangeOwner(cardIndex, newOwnerId, id);
+        gameManagerScript.CmdChangeOwner(cardIndex, newOwnerId);
     }
 
     [Command]
@@ -969,7 +939,7 @@ public class Player : NetworkBehaviour
     [Command]
     public void CmdSetDiceInactive()
     {
-        diceScript.CmdSetDiceInactive();
+        diceManagerScript.CmdSetDiceInactive();
     }
 
     [Command]

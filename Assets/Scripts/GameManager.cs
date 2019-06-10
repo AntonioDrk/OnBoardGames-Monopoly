@@ -7,86 +7,60 @@ using UnityEngine.EventSystems;
 
 public class GameManager : NetworkBehaviour
 {
-    public int nrOfPlayers = 0;
+
     public bool targetPlayerIsMoving = false;
     public GameObject targetPlayer;
+    public int currentRolledNumber;
 
-    private Camera mainCamera;
+    private Camera mainCamera;    
+    private Vector3 cameraDistance = new Vector3(0, -3.5f, 3f); // the distance of the camera from the target player when it's moving    
+    private Vector3 cameraPosition = new Vector3(-5, 18, 0.5f); // the position of the camera when the target player is not moving
+    
+    private List<Color> playerColors; // colors of the players    
+    private List<GameObject> playerInfo = new List<GameObject>(); // info panels of the players
 
-    // THIS IS TESTING ONLY
-    // This is bad v and needs to be changed ASAP, we will pass the players vector between the scripts 
-    [SerializeField]
-    private Vector3 cameraDistance = new Vector3(0, -3.5f, 3f);
-    [SerializeField]
-    // the position of the camera when the target player is not moving
-    //private Vector3 cameraPosition = new Vector3(-5f, 8f, -9.5f); 
-    private Vector3 cameraPosition;
-    [SerializeField]
-    private Text playerTurnText, connectedPlayersText;
-
+    [SyncVar] public bool gameStarted;
     [SyncVar] public int playerTurn = 0;
+    [SyncVar] public int playerTurnId = 0;    
     [SyncVar] public int connectedPlayers = 0;
     public List<GameObject> players;
     public SyncListInt cardsOwner;
-
-    [SerializeField] private List<Mesh> meshes; // Set them at startup in the editor!!
-    private List<int> meshesIndexes; // Indexes of the meshes to use
-    public GameObject playerInfoPrefab, tradePanelPrefab, propertyTradePanelPrefab;
-    private GameObject[] playerInfo = new GameObject[6];
-    public bool gameStarted = false;
-    private GameObject startGameButton;
-    public int currentRolledNumber;
-
-    private List<Color> playerColors;
-
     [SyncVar] public int chestJailCardOwner;
     [SyncVar] public int chanceJailCardOwner;
 
+    // debug info
+    private Text connectedPlayersText;
+
     void Start()
     {
-        chestJailCardOwner = -1;
-        chanceJailCardOwner = -1;
 
         mainCamera = Camera.main;
 
-        connectedPlayersText = GameObject.Find("connectedPlayersText").GetComponent<Text>();
-        playerTurnText = GameObject.Find("playerTurnText").GetComponent<Text>();
-        playerTurnText.text = "Turn: Player " + playerTurn;
-        startGameButton = GameObject.Find("StartGame");
-        startGameButton.GetComponent<Button>().onClick.AddListener(startGame);
+        chestJailCardOwner = -1;
+        chanceJailCardOwner = -1;
 
-        if (!isServer)
-        {
-            startGameButton.SetActive(false);
-        }
-            
         players = new List<GameObject>();
-
-        // Make sure we have meshes to assign the player
-        if (meshes.Count == 0)
+        if (isServer)
         {
-            Debug.LogError("No meshes for players to assign! Assign the meshes in the editor in the gamemanager object");
-        }
-
-        meshesIndexes = new List<int>();
-
-        for (int i = 0; i < meshes.Count; i++)
-        {
-            meshesIndexes.Add(i);
+            gameStarted = false;
+            UIManager.startGameButton.GetComponent<Button>().onClick.AddListener(startGame);
+            UIManager.startGameButton.SetActive(true);
+            addPlayerColor(new List<Color> { new Color32(0, 108, 0, 255), new Color32(200, 7, 0, 255), new Color32(0, 21, 161, 255), new Color32(160, 130, 0, 255),
+                new Color32(139, 0, 162, 255), Color.black });
         }
 
         for (int i = 0; i < 28; i++)
             cardsOwner.Add(-1);
 
-        if (isServer)
-            addPlayerColor(new List<Color> { new Color32(0, 108, 0, 255), new Color32(200, 7, 0, 255), new Color32(0, 21, 161, 255), new Color32(160, 130, 0, 255), new Color32(139, 0, 162, 255), Color.black });
-
+        // debug info
+        // connectedPlayersText = GameObject.Find("connectedPlayersText").GetComponent<Text>();       
+        
     }
 
     void Update()
     {
-        playerTurnText.text = "Turn: Player " + playerTurn;
-        connectedPlayersText.text = connectedPlayers + " players";
+
+        // connectedPlayersText.text = connectedPlayers + " players";
 
         if (gameStarted && isServer)
         {
@@ -95,11 +69,9 @@ public class GameManager : NetworkBehaviour
         
             if (Input.GetKeyDown(KeyCode.BackQuote))
                 {
-                    bool consoleState = CardReader.console.activeInHierarchy;
-
-                    if (!consoleState)
+                    if (!UIManager.console.activeInHierarchy)
                     {
-                        CardReader.console.SetActive(true);
+                        UIManager.console.SetActive(true);
                         InputField input = GameObject.Find("ConsoleInput").GetComponent<InputField>();
                         input.Select();
                         input.ActivateInputField();
@@ -108,7 +80,7 @@ public class GameManager : NetworkBehaviour
                         input.OnPointerClick(null);   
                     }
                     else
-                        CardReader.console.SetActive(false);
+                        UIManager.console.SetActive(false);
                 }
         
         }
@@ -125,40 +97,53 @@ public class GameManager : NetworkBehaviour
 
     void startGame()
     {
-        nrOfPlayers = connectedPlayers;
-        Debug.Log("Nr of players: " + nrOfPlayers);
-        gameStarted = true;
-        startGameButton.GetComponent<Button>().onClick.RemoveAllListeners();
-        startGameButton.SetActive(false);
 
+        Debug.Log("Nr of players: " + connectedPlayers);
+        gameStarted = true;
+        UIManager.startGameButton.GetComponent<Button>().onClick.RemoveAllListeners();
+        UIManager.startGameButton.SetActive(false);
         Debug.Log("GAME STARTED");
-        for (int i = 0; i < nrOfPlayers; i++)
+
+        for (int i = 0; i < connectedPlayers; i++)
         {
-            Debug.Log("Server creates info for player " + i);
-            playerInfo[i] = Instantiate(playerInfoPrefab);
+            Debug.Log("Server creates info for player " + players[i].GetComponent<Player>().idPlayer);
+            playerInfo.Add(Instantiate(Resources.Load<GameObject>("PlayerInfo")));
             NetworkServer.Spawn(playerInfo[i]);
             players[i].GetComponent<Player>().RpcCreatePlayerInfo(i, playerInfo[i]);
 
-            GameObject playerTradePanel = Instantiate(playerInfoPrefab);
+            GameObject playerTradePanel = Instantiate(Resources.Load<GameObject>("PlayerInfo"));
             NetworkServer.Spawn(playerTradePanel);
             players[i].GetComponent<Player>().RpcCreatePlayerTradeInfo(i, playerTradePanel);
 
         }
         players[0].GetComponent<Player>().RpcChangeColorOnPanel(playerInfo[0], 255, 190, 190, 190);
 
-        for (int i = 0; i < nrOfPlayers; i++)
+        for (int i = 0; i < connectedPlayers; i++)
             players[i].GetComponent<Player>().RpcAddButtonToPlayerTradeInfo();
 
     }
 
+    // this function is only for the server
+    private int getPlayerIndex(int idPlayer)
+    {
+        for (int i = 0; i < connectedPlayers; i++)
+            if (players[i].GetComponent<Player>().idPlayer == idPlayer)
+                return i;
+        Debug.LogError("Player " + idPlayer + " is out.");
+        return -1;
+    }
+
     public void CmdSendTrade(int sourceId, int destinationId, int[] sourceProperties, int sourcePropertiesLength, int[] destinationProperties, int destinationPropertiesLength)
     {
-            players[destinationId].GetComponent<Player>().RpcReceiveTrade(sourceId, destinationId, sourceProperties, sourcePropertiesLength, destinationProperties, destinationPropertiesLength);
+        if (getPlayerIndex(destinationId) == -1)
+            players[getPlayerIndex(sourceId)].GetComponent<Player>().RpcRefusedTrade();
+        else
+            players[getPlayerIndex(destinationId)].GetComponent<Player>().RpcReceiveTrade(sourceId, destinationId, sourceProperties, sourcePropertiesLength, destinationProperties, destinationPropertiesLength);
     }
 
     public void CmdRefusedTrade(int sourceId)
     {
-        players[sourceId].GetComponent<Player>().RpcRefusedTrade();
+        players[getPlayerIndex(sourceId)].GetComponent<Player>().RpcRefusedTrade();
     }
 
     public void CmdExecuteTrade(int sourceId, int destinationId, int[] sourceProperties, int sourcePropertiesLength, int[] destinationProperties, int destinationPropertiesLength)
@@ -167,40 +152,25 @@ public class GameManager : NetworkBehaviour
         //Debug.Log("Execute trade from " + sourceId + " to " + destinationId);        
         for(int k=0; k< sourcePropertiesLength; k++)
         {
-            int i = sourceProperties[k];
-            int idOnBoard = -1; 
-            if (i < 22)
-                idOnBoard = CardReader.propertyCards[i].id;
-            else if (i < 26)
-                idOnBoard = CardReader.railroadCards[i - 22].id;
-            else
-                idOnBoard = CardReader.utilityCards[i - 26].id;
-            
-            CmdChangeOwner(i, destinationId, idOnBoard);
-            // the source sells it and the destination buys it
-            players[destinationId].GetComponent<Player>().RpcBuyProperty(i);
-            players[sourceId].GetComponent<Player>().RpcSellProperty(i);
+            int i = sourceProperties[k]; 
+            CmdChangeOwner(i, destinationId);
 
+            // the source sells it and the destination buys it
+            players[getPlayerIndex(destinationId)].GetComponent<Player>().RpcBuyProperty(i);
+            players[getPlayerIndex(sourceId)].GetComponent<Player>().RpcSellProperty(i);
         }
 
         for (int k = 0; k < destinationPropertiesLength; k++)
         {
             int i = destinationProperties[k];
-            int idOnBoard = -1;
-            if (i < 22)
-                idOnBoard = CardReader.propertyCards[i].id;
-            else if (i < 26)
-                idOnBoard = CardReader.railroadCards[i - 22].id;
-            else
-                idOnBoard = CardReader.utilityCards[i - 26].id;
-            
-            CmdChangeOwner(i, sourceId, idOnBoard);
+            CmdChangeOwner(i, sourceId);
+
             // the destination sells it and the source buys it
-            players[sourceId].GetComponent<Player>().RpcBuyProperty(i);
-            players[destinationId].GetComponent<Player>().RpcSellProperty(i);
+            players[getPlayerIndex(sourceId)].GetComponent<Player>().RpcBuyProperty(i);
+            players[getPlayerIndex(destinationId)].GetComponent<Player>().RpcSellProperty(i);
         }
 
-        players[sourceId].GetComponent<Player>().RpcAcceptedTrade();
+        players[getPlayerIndex(sourceId)].GetComponent<Player>().RpcAcceptedTrade();
 
     }
     
@@ -226,20 +196,11 @@ public class GameManager : NetworkBehaviour
     // Add players to the list of players
     public void CmdAddConnectedPlayer(GameObject newPlayer)
     {
-        // Make sure this is run only on the server to not fuck up something
+
         if (!isServer) return;
+        if (gameStarted) return;
 
-        Player playerScript = newPlayer.GetComponent<Player>();
-        MeshFilter meshFilter = newPlayer.transform.GetChild(0).GetComponent<MeshFilter>();
-
-        // We will extract a random mesh from our pool of meshes, this will be changed as players can 
-        // select what model they want to play as with
-        int selectedMeshIndex = meshesIndexes[Random.Range(0, meshesIndexes.Count - 1)];
-        meshesIndexes.Remove(selectedMeshIndex);
-
-        // Update shit server-side
-        meshFilter.mesh = meshes[selectedMeshIndex];
-        playerScript.setMyMeshIndex(selectedMeshIndex);
+        Player playerScript = newPlayer.GetComponent<Player>();        
 
         players.Add(newPlayer);
         playerScript.idPlayer = connectedPlayers;
@@ -251,11 +212,10 @@ public class GameManager : NetworkBehaviour
         playerColors.Remove(randomColor);
         playerScript.getRenderer().material.color = playerScript.getPlyColor();
 
-        // Update each player for the new color change and the new mesh change
+        // Update each player for the new color change
         for (int i = 0; i < connectedPlayers; i++)
         {
             players[i].GetComponent<Player>().RpcUpdateColor(players[i].GetComponent<Player>().getPlyColor());
-            players[i].GetComponent<Player>().RpcUpdateMesh(players[i].GetComponent<Player>().getMyMeshIndex());
         }
 
     }
@@ -280,42 +240,43 @@ public class GameManager : NetworkBehaviour
             players[i].GetComponent<Player>().RpcJailAnimation();
     }
 
-
+    private bool checkIfPlayerInJail(int id)
+    {
+        for (int i = 0; i < connectedPlayers; i++)
+            if (players[i].transform.position == new Vector3(-11f, 0.125f, -6f) && players[i].GetComponent<Player>().idPlayer != id)
+                return true;
+        return false;
+    }
+    
     public void CmdGetOutOfJail(int id)
     {
-        int ok = 0;
-        for (int i = 0; i < connectedPlayers; i++)
-            if (players[i].transform.position == new Vector3(-11f, 0.125f, -6f) && i != id)
-                ok = 1;
-
-        if (ok == 0)
+        if (!checkIfPlayerInJail(id))
             for (int i = 0; i < connectedPlayers; i++)
                 players[i].GetComponent<Player>().RpcGetOutOfJail();
     }
 
     public void CmdNextPlayer()
     {
-        // Make sure this is run only on the server to not fuck up something
-        if (!isServer)
-            return;
+        if (!isServer) return;
 
         players[playerTurn].GetComponent<Player>().RpcChangeColorOnPanel(playerInfo[playerTurn], 255, 255, 255, 190);
         playerTurn = (playerTurn + 1) % connectedPlayers;
         Debug.Log("playerTurn: " + playerTurn);
         players[playerTurn].GetComponent<Player>().RpcChangeColorOnPanel(playerInfo[playerTurn], 255, 190, 190, 190);
+        playerTurnId = players[playerTurn].GetComponent<Player>().idPlayer;
     }
 
-    public void CmdChangeOwner(int cardIndex, int newOwnerId, int id)
+    public void CmdChangeOwner(int cardIndex, int newOwnerId)
     {
         if (!isServer) return;
         cardsOwner[cardIndex] = newOwnerId;
-
-        for (int i = 0; i < nrOfPlayers; i++)
+        
+        for (int i = 0; i < connectedPlayers; i++)
         {
             Color ownerColor = Color.clear;
             if (newOwnerId != -1)
-                ownerColor = players[newOwnerId].GetComponent<Player>().getPlyColor();
-            players[i].GetComponent<Player>().RpcChangeOwnerPanelColor(newOwnerId, id, ownerColor);
+                ownerColor = players[getPlayerIndex(newOwnerId)].GetComponent<Player>().getPlyColor();
+            players[i].GetComponent<Player>().RpcChangeOwnerPanelColor(newOwnerId, CardReader.getIdOnBoard(cardIndex), ownerColor);
         }
 
         Debug.Log("Owner changed for " + cardIndex + " : " + newOwnerId);
@@ -324,7 +285,7 @@ public class GameManager : NetworkBehaviour
     public void CmdPayEachPlayer(int id, int amount)
     {
         for (int i = 0; i < connectedPlayers; i++)
-            if(i != id)
+            if(players[i].GetComponent<Player>().idPlayer != id)
             {
                 CmdGiveMoneyToPlayer(i, amount);
             }
@@ -337,8 +298,7 @@ public class GameManager : NetworkBehaviour
             Debug.LogError("Clientul a incercat sa intre in cmd");
             return;
         }
-        players[playerId].GetComponent<Player>().CmdAddMoney(amount);
-        //Debug.LogError("Added " + amount + " to " + playerId);
+        players[getPlayerIndex(playerId)].GetComponent<Player>().CmdAddMoney(amount);
     }
 
     public void CmdConstructHouse(string housePrefabPath, Vector3 position, Vector3 rotation, int cardIndex)
@@ -453,18 +413,34 @@ public class GameManager : NetworkBehaviour
             Debug.LogError("The player disconnected object is null for some reason!");
             return;
         }
+        
+        int idPlayer = playerDisconnected.GetComponent<Player>().idPlayer;
+        int indexPlayer = getPlayerIndex(idPlayer);
 
-        meshesIndexes.Add(playerDisconnected.GetComponent<Player>().getMyMeshIndex());
+        if (playerTurnId == idPlayer)
+            CmdNextPlayer();
+        else if (playerTurnId > idPlayer)
+            playerTurn--;
 
+        // SELL HIS PROPERTIES TO THE BANK
+        for (int i = 0; i < 28; i++)
+            if (cardsOwner[i] == idPlayer)
+                CmdChangeOwner(i, -1);
+
+        // DESTROY PANEL OF DISCONNECTED PLAYER
+        Destroy(playerInfo[indexPlayer]);
+        playerInfo.Remove(playerInfo[indexPlayer]);
+      
         players.Remove(playerDisconnected);
         NetworkServer.Destroy(playerDisconnected);
+
         connectedPlayers--;
-        // DESTROY PANEL OF DISCONNECTED PLAYER
-        // SELL HIS PROPERTIES TO THE BANK
+
+        // Change the postions of the rest panels
+        for (int i = 0; i < connectedPlayers; i++)
+        {
+            players[i].GetComponent<Player>().RpcChangePositionOfPlayerPanel(i, playerInfo[i]);
+        }
     }
-
-    //   ----------------  Getters and Setters   ----------------  
-    public List<Mesh> getMeshes() { return meshes; }
-
-    //   ----------------                        ----------------  
+    
 }
