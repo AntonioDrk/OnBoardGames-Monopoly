@@ -54,11 +54,8 @@ MonoBehaviour:
   gameManager: {fileID: 0}
   ownedPropertyPanelPrefab: {fileID: 3958510613029917670, guid: a9de705e55292124f9ecd76ebbe07d4d,
     type: 3}
-  playerInfoPrefab: {fileID: 1957596252967745488, guid: c81b5de9ee728444d8cd4990e86b8d39,
-    type: 3}
   money: 1500
   stage: 0
-  ownedPropertyCards: []
 --- !u!95 &5493900274388599887
 Animator:
   serializedVersion: 3
@@ -124,7 +121,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_TransformSyncMode: 1
-  m_SendInterval: 0.11111111
+  m_SendInterval: 0.033333335
   m_SyncRotationAxis: 7
   m_RotationSyncCompression: 0
   m_SyncSpin: 0
