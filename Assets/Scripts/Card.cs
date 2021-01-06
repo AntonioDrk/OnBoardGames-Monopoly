@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System;
 using UnityEngine;
 using UnityEngine.Networking;
+using UnityEngine.UI;
 
 //[Serializable]
 public abstract class Card
@@ -24,5 +25,21 @@ public abstract class Card
     {
         // Stuff to be called at the end
         player.GetComponent<Player>().ViewingCard = false;
+    }
+    
+    protected virtual void buyCard(GameObject player)
+    {
+        Player playerScript = player.GetComponent<Player>();
+        SoundManager.Instance.PlaySound(SoundManager.Instance.payMoney);
+        playerScript.CmdTakeMoney(Price);
+        playerScript.buyProperty(this);
+    }
+    protected virtual void sellCard(GameObject player)
+    {
+        UIManager.sellPropertyButton.GetComponent<Button>().onClick.RemoveAllListeners();
+        UIManager.sellPropertyButton.SetActive(false);
+        Player playerScript = player.GetComponent<Player>();
+        playerScript.CmdAddMoney(Mortgage); // players get in return the card's mortgage value
+        playerScript.sellProperty(this);
     }
 }

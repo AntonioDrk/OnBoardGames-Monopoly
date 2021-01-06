@@ -27,14 +27,12 @@ public class UtilityCard : Card
                "\nMortgage: " + Mortgage.ToString();
     }
     
-    void buyUtility(GameObject player)
+    protected override void buyCard(GameObject player)
     {
         int cardIndex = 26 + (id - 12) / 16;
         Player playerScript = player.GetComponent<Player>();
         playerScript.CmdChangeOwner(playerScript.idPlayer, cardIndex);
-        SoundManager.Instance.PlaySound(SoundManager.Instance.payMoney);
-        playerScript.CmdTakeMoney(Price);
-        playerScript.buyProperty(this);
+        base.buyCard(player);
         hideCard(player);
     }
 
@@ -86,7 +84,7 @@ public class UtilityCard : Card
             Debug.Log("Player can buy this utility. Card owner: " + ownerId);
             UIManager.buyPropertyButton.SetActive(true);
             UIManager.cancelButton.SetActive(true);
-            UIManager.buyPropertyButton.GetComponent<Button>().onClick.AddListener(() => buyUtility(player));
+            UIManager.buyPropertyButton.GetComponent<Button>().onClick.AddListener(() => buyCard(player));
             UIManager.cancelButton.GetComponent<Button>().onClick.AddListener(() => hideCardSound(player));
         }
         
@@ -170,19 +168,17 @@ public class UtilityCard : Card
         {
             UIManager.sellPropertyButton.SetActive(true);
             UIManager.sellPropertyButton.GetComponent<Button>().onClick.RemoveAllListeners();
-            UIManager.sellPropertyButton.GetComponent<Button>().onClick.AddListener(() => sellUtility(player));
+            UIManager.sellPropertyButton.GetComponent<Button>().onClick.AddListener(() => sellCard(player));
         }
     }
 
-    void sellUtility(GameObject player)
-    {
+    protected override void sellCard(GameObject player)
+    { 
+        base.sellCard(player);
+        
         int cardIndex = 26 + (id - 12) / 16;
-        UIManager.sellPropertyButton.GetComponent<Button>().onClick.RemoveAllListeners();
-        UIManager.sellPropertyButton.SetActive(false);
         Player playerScript = player.GetComponent<Player>();
         playerScript.CmdChangeOwner(-1, cardIndex);
-        playerScript.CmdAddMoney(Mortgage); // players get in return the card's mortgage value
-        playerScript.sellProperty(this);
         closeCard();
     }
 }

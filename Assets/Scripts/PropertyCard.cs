@@ -70,7 +70,7 @@ public class PropertyCard : Card
             Debug.Log("Player can buy this property. Card owner: " + ownerId);
             UIManager.buyPropertyButton.SetActive(true);
             UIManager.cancelButton.SetActive(true);
-            UIManager.buyPropertyButton.GetComponent<Button>().onClick.AddListener(() => buyProperty(player));
+            UIManager.buyPropertyButton.GetComponent<Button>().onClick.AddListener(() => buyCard(player));
             UIManager.cancelButton.GetComponent<Button>().onClick.AddListener(() => hideCardSound(player));
         }
 
@@ -258,7 +258,7 @@ public class PropertyCard : Card
             // Sell property button
             UIManager.sellPropertyButton.SetActive(true);
             UIManager.sellPropertyButton.GetComponent<Button>().onClick.RemoveAllListeners();
-            UIManager.sellPropertyButton.GetComponent<Button>().onClick.AddListener( () => sellProperty(player) );
+            UIManager.sellPropertyButton.GetComponent<Button>().onClick.AddListener( () => sellCard(player) );
 
             if(hasAllProperties(player.GetComponent<Player>().idPlayer) && propertiesAreEquallyDeveloped() && !hasHotel)
             {
@@ -337,26 +337,27 @@ public class PropertyCard : Card
         base.hideCard(player);
     }
 
-    void buyProperty(GameObject player)
+    protected override void buyCard(GameObject player)
     {
         Player playerScript = player.GetComponent<Player>();
         playerScript.CmdChangeOwner(playerScript.idPlayer, cardIndex); 
-        SoundManager.Instance.PlaySound(SoundManager.Instance.payMoney);
-        playerScript.CmdTakeMoney(priceValue);
-        playerScript.buyProperty(this);
+        base.buyCard(player);
         hideCard(player);
     }
 
-    void sellProperty(GameObject player)
+    protected override void sellCard(GameObject player)
     {
         // TODO: SELL ALL THE HOUSES OR THE HOTEL AS WELL 
+        
         if(housesBuilt > 0) return;
-        UIManager.sellPropertyButton.GetComponent<Button>().onClick.RemoveAllListeners();
-        UIManager.sellPropertyButton.SetActive(false);
+        
+        foreach (int i in propertiesFromSameGroup)
+            if (CardReader.propertyCards[i].housesBuilt > 0) return;
+        
+        base.sellCard(player);
+        
         Player playerScript = player.GetComponent<Player>();
         playerScript.CmdChangeOwner(-1, cardIndex);
-        playerScript.CmdAddMoney(mortgageValue); // players get in return the card's mortgage value
-        playerScript.sellProperty(this);
         closeCard();
     }
 

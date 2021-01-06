@@ -27,13 +27,11 @@ public class RailroadCard  : Card
                "\nMortgage: " + Mortgage.ToString();
     }
 
-    void buyRailroad(GameObject player, int cardIndex)
+    protected override void buyCard(GameObject player)
     {
         Player playerScript = player.GetComponent<Player>();
-        playerScript.CmdChangeOwner(playerScript.idPlayer, cardIndex);
-        SoundManager.Instance.PlaySound(SoundManager.Instance.payMoney);
-        playerScript.CmdTakeMoney(Price);
-        playerScript.buyProperty(this);
+        playerScript.CmdChangeOwner(playerScript.idPlayer, (id - 5) / 10 + 22);
+        base.buyCard(player);
         hideCard(player);
     }
 
@@ -84,7 +82,7 @@ public class RailroadCard  : Card
             Debug.Log("Player can buy this railroad. Card owner: " + ownerId);
             UIManager.buyPropertyButton.SetActive(true);
             UIManager.cancelButton.SetActive(true);
-            UIManager.buyPropertyButton.GetComponent<Button>().onClick.AddListener(() => buyRailroad(player,22 + cardIndex));
+            UIManager.buyPropertyButton.GetComponent<Button>().onClick.AddListener(() => buyCard(player));
             UIManager.cancelButton.GetComponent<Button>().onClick.AddListener(() => hideCardSound(player));
         }
         
@@ -163,19 +161,17 @@ public class RailroadCard  : Card
         {
             UIManager.sellPropertyButton.SetActive(true);
             UIManager.sellPropertyButton.GetComponent<Button>().onClick.RemoveAllListeners();
-            UIManager.sellPropertyButton.GetComponent<Button>().onClick.AddListener(() => sellRailroad(player));
+            UIManager.sellPropertyButton.GetComponent<Button>().onClick.AddListener(() => sellCard(player));
         }
     }
 
-    void sellRailroad(GameObject player)
+    protected override void sellCard(GameObject player)
     {
+        base.sellCard(player);
+        
         int cardIndex = 22 + (id - 5) / 10;
-        UIManager.sellPropertyButton.GetComponent<Button>().onClick.RemoveAllListeners();
-        UIManager.sellPropertyButton.SetActive(false);
         Player playerScript = player.GetComponent<Player>();
         playerScript.CmdChangeOwner(-1, cardIndex);
-        playerScript.CmdAddMoney(Mortgage); // players get in return the card's mortgage value
-        playerScript.sellProperty(this);
         closeCard();
     }
 
