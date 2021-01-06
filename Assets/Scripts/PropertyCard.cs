@@ -53,25 +53,25 @@ public class PropertyCard : Card
             Player playerScript = player.GetComponent<Player>();
             if (ownerId == playerScript.idPlayer)
             {
-                CardReader.closeButton.SetActive(true);
-                CardReader.closeButton.GetComponent<Button>().onClick.AddListener(() => closeCardSound(player));
+                UIManager.closeButton.SetActive(true);
+                UIManager.closeButton.GetComponent<Button>().onClick.AddListener(() => closeCardSound(player));
             }
             else
             { 
                 Debug.Log("Player must pay rent to player " + ownerId);
                 int amountPaid = calculateRent(ownerId);
-                CardReader.payRentButton.transform.GetChild(0).GetComponent<Text>().text = "Pay $" + amountPaid;
-                CardReader.payRentButton.SetActive(true);
-                CardReader.payRentButton.GetComponent<Button>().onClick.AddListener(() => payRent(player,playerScript, ownerId, amountPaid));
+                UIManager.payRentButton.transform.GetChild(0).GetComponent<Text>().text = "Pay $" + amountPaid;
+                UIManager.payRentButton.SetActive(true);
+                UIManager.payRentButton.GetComponent<Button>().onClick.AddListener(() => payRent(player,playerScript, ownerId, amountPaid));
             }
         }
         else
         {
             Debug.Log("Player can buy this property. Card owner: " + ownerId);
-            CardReader.buyPropertyButton.SetActive(true);
-            CardReader.cancelButton.SetActive(true);
-            CardReader.buyPropertyButton.GetComponent<Button>().onClick.AddListener(() => buyProperty(player));
-            CardReader.cancelButton.GetComponent<Button>().onClick.AddListener(() => hideCardSound(player));
+            UIManager.buyPropertyButton.SetActive(true);
+            UIManager.cancelButton.SetActive(true);
+            UIManager.buyPropertyButton.GetComponent<Button>().onClick.AddListener(() => buyProperty(player));
+            UIManager.cancelButton.GetComponent<Button>().onClick.AddListener(() => hideCardSound(player));
         }
 
     }
@@ -249,32 +249,32 @@ public class PropertyCard : Card
         if (player.GetComponent<Player>().getStage() != 0) 
             return;
         showCard();
-        CardReader.closeButton.SetActive(true);
-        CardReader.closeButton.GetComponent<Button>().onClick.AddListener(closeCardSound);
+        UIManager.closeButton.SetActive(true);
+        UIManager.closeButton.GetComponent<Button>().onClick.AddListener(closeCardSound);
 
         // if it's your turn you can sell/buy houses and sell the property
-         if (GameObject.Find("GameManager").GetComponent<GameManager>().playerTurn == player.GetComponent<Player>().idPlayer)
+         if (GameObject.Find("GameManager").GetComponent<GameManager>().playerTurnId == player.GetComponent<Player>().idPlayer)
         {
             // Sell property button
-            CardReader.sellPropertyButton.SetActive(true);
-            CardReader.sellPropertyButton.GetComponent<Button>().onClick.RemoveAllListeners();
-            CardReader.sellPropertyButton.GetComponent<Button>().onClick.AddListener( () => sellProperty(player) );
+            UIManager.sellPropertyButton.SetActive(true);
+            UIManager.sellPropertyButton.GetComponent<Button>().onClick.RemoveAllListeners();
+            UIManager.sellPropertyButton.GetComponent<Button>().onClick.AddListener( () => sellProperty(player) );
 
             if(hasAllProperties(player.GetComponent<Player>().idPlayer) && propertiesAreEquallyDeveloped() && !hasHotel)
             {
                 // Buy house
-                CardReader.buyHouseButton.SetActive(true);
-                CardReader.buyHouseButton.GetComponent<Button>().onClick.RemoveAllListeners();
-                CardReader.buyHouseButton.GetComponent<Button>().onClick.AddListener(() => buildHouse(player));
+                UIManager.buyHouseButton.SetActive(true);
+                UIManager.buyHouseButton.GetComponent<Button>().onClick.RemoveAllListeners();
+                UIManager.buyHouseButton.GetComponent<Button>().onClick.AddListener(() => buildHouse(player));
             }
 
             // Check to see if selling is a valid move
             if (hasAllProperties(player.GetComponent<Player>().idPlayer) && housesBuilt > 0 && propertiesAreEquallyDeveloped(true))
             {
                 // Sell house
-                CardReader.sellHouseButton.SetActive(true);
-                CardReader.sellHouseButton.GetComponent<Button>().onClick.RemoveAllListeners();
-                CardReader.sellHouseButton.GetComponent<Button>().onClick.AddListener(() => sellHouse(player));
+                UIManager.sellHouseButton.SetActive(true);
+                UIManager.sellHouseButton.GetComponent<Button>().onClick.RemoveAllListeners();
+                UIManager.sellHouseButton.GetComponent<Button>().onClick.AddListener(() => sellHouse(player));
             }
         }
 
@@ -283,11 +283,11 @@ public class PropertyCard : Card
     void showCard()
     {
         SoundManager.Instance.PlaySound(SoundManager.Instance.openCard);
-        CardReader.railroadPanel.SetActive(false);
-        CardReader.utilityPanel.SetActive(false);
+        UIManager.railroadPanel.SetActive(false);
+        UIManager.utilityPanel.SetActive(false);
         closeCard();
 
-        GameObject cardPanel = CardReader.cardPanel;
+        GameObject cardPanel = UIManager.cardPanel;
         cardPanel.SetActive(true);
 
         cardPanel.transform.GetChild(0).transform.GetComponent<Image>().color
@@ -310,36 +310,36 @@ public class PropertyCard : Card
 
     void closeCard()
     {
-        CardReader.closeButton.GetComponent<Button>().onClick.RemoveAllListeners();
-        CardReader.buyHouseButton.SetActive(false);
-        CardReader.sellHouseButton.SetActive(false);
-        CardReader.sellPropertyButton.SetActive(false);
-        CardReader.closeButton.SetActive(false);
-        CardReader.cardPanel.SetActive(false);
+        UIManager.closeButton.GetComponent<Button>().onClick.RemoveAllListeners();
+        UIManager.buyHouseButton.SetActive(false);
+        UIManager.sellHouseButton.SetActive(false);
+        UIManager.sellPropertyButton.SetActive(false);
+        UIManager.closeButton.SetActive(false);
+        UIManager.cardPanel.SetActive(false);
     }
 
     void closeCard(GameObject player)
     {
-        CardReader.closeButton.GetComponent<Button>().onClick.RemoveAllListeners();
-        CardReader.closeButton.SetActive(false);
-        CardReader.cardPanel.SetActive(false);
+        UIManager.closeButton.GetComponent<Button>().onClick.RemoveAllListeners();
+        UIManager.closeButton.SetActive(false);
+        UIManager.cardPanel.SetActive(false);
         player.GetComponent<Player>().endMovement();
     }
 
     void hideCard(GameObject player)
     {
-        CardReader.buyPropertyButton.GetComponent<Button>().onClick.RemoveAllListeners();
-        CardReader.cancelButton.GetComponent<Button>().onClick.RemoveAllListeners();
-        CardReader.buyPropertyButton.SetActive(false);
-        CardReader.cancelButton.SetActive(false);
-        CardReader.cardPanel.SetActive(false);
+        UIManager.buyPropertyButton.GetComponent<Button>().onClick.RemoveAllListeners();
+        UIManager.cancelButton.GetComponent<Button>().onClick.RemoveAllListeners();
+        UIManager.buyPropertyButton.SetActive(false);
+        UIManager.cancelButton.SetActive(false);
+        UIManager.cardPanel.SetActive(false);
         player.GetComponent<Player>().endMovement();
     }
 
     void buyProperty(GameObject player)
     {
         Player playerScript = player.GetComponent<Player>();
-        playerScript.CmdChangeOwner(playerScript.idPlayer, cardIndex,id); 
+        playerScript.CmdChangeOwner(playerScript.idPlayer, cardIndex); 
         SoundManager.Instance.PlaySound(SoundManager.Instance.payMoney);
         playerScript.CmdTakeMoney(priceValue);
         playerScript.buyProperty(this);
@@ -350,10 +350,10 @@ public class PropertyCard : Card
     {
         // TODO: SELL ALL THE HOUSES OR THE HOTEL AS WELL 
         if(housesBuilt > 0) return;
-        CardReader.sellPropertyButton.GetComponent<Button>().onClick.RemoveAllListeners();
-        CardReader.sellPropertyButton.SetActive(false);
+        UIManager.sellPropertyButton.GetComponent<Button>().onClick.RemoveAllListeners();
+        UIManager.sellPropertyButton.SetActive(false);
         Player playerScript = player.GetComponent<Player>();
-        playerScript.CmdChangeOwner(-1, cardIndex,id);
+        playerScript.CmdChangeOwner(-1, cardIndex);
         playerScript.CmdAddMoney(mortgageValue); // players get in return the card's mortgage value
         playerScript.sellProperty(this);
         closeCard();
@@ -382,14 +382,14 @@ public class PropertyCard : Card
     // player pays rent to player[ownerId]
     void payRent(GameObject player, Player playerScript, int ownerId, int amountPaid) 
     { 
-        CardReader.payRentButton.GetComponent<Button>().onClick.RemoveAllListeners();
-        CardReader.payRentButton.SetActive(false);
+        UIManager.payRentButton.GetComponent<Button>().onClick.RemoveAllListeners();
+        UIManager.payRentButton.SetActive(false);
          
         SoundManager.Instance.PlaySound(SoundManager.Instance.payMoney);
         playerScript.CmdTakeMoney(amountPaid);
         playerScript.CmdGiveMoneyToPlayer(ownerId, amountPaid);
 
-        CardReader.cardPanel.SetActive(false);
+        UIManager.cardPanel.SetActive(false);
         player.GetComponent<Player>().endMovement();
     }
 

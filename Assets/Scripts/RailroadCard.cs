@@ -30,7 +30,7 @@ public class RailroadCard  : Card
     void buyRailroad(GameObject player, int cardIndex)
     {
         Player playerScript = player.GetComponent<Player>();
-        playerScript.CmdChangeOwner(playerScript.idPlayer, cardIndex,id);
+        playerScript.CmdChangeOwner(playerScript.idPlayer, cardIndex);
         SoundManager.Instance.PlaySound(SoundManager.Instance.payMoney);
         playerScript.CmdTakeMoney(Price);
         playerScript.buyProperty(this);
@@ -39,19 +39,19 @@ public class RailroadCard  : Card
 
     void hideCard(GameObject player)
     {
-        CardReader.buyPropertyButton.GetComponent<Button>().onClick.RemoveAllListeners();
-        CardReader.cancelButton.GetComponent<Button>().onClick.RemoveAllListeners();
-        CardReader.buyPropertyButton.SetActive(false);
-        CardReader.cancelButton.SetActive(false);
-        CardReader.railroadPanel.SetActive(false);
+        UIManager.buyPropertyButton.GetComponent<Button>().onClick.RemoveAllListeners();
+        UIManager.cancelButton.GetComponent<Button>().onClick.RemoveAllListeners();
+        UIManager.buyPropertyButton.SetActive(false);
+        UIManager.cancelButton.SetActive(false);
+        UIManager.railroadPanel.SetActive(false);
         player.GetComponent<Player>().endMovement();
     }
 
     void closeCard(GameObject player)
     {
-        CardReader.closeButton.GetComponent<Button>().onClick.RemoveAllListeners();
-        CardReader.closeButton.SetActive(false);
-        CardReader.railroadPanel.SetActive(false);
+        UIManager.closeButton.GetComponent<Button>().onClick.RemoveAllListeners();
+        UIManager.closeButton.SetActive(false);
+        UIManager.railroadPanel.SetActive(false);
         player.GetComponent<Player>().endMovement();
     }
 
@@ -66,25 +66,25 @@ public class RailroadCard  : Card
             Player playerScript = player.GetComponent<Player>();
             if (ownerId == playerScript.idPlayer)
             {
-                CardReader.closeButton.SetActive(true);
-                CardReader.closeButton.GetComponent<Button>().onClick.AddListener(() => closeCardSound(player));
+                UIManager.closeButton.SetActive(true);
+                UIManager.closeButton.GetComponent<Button>().onClick.AddListener(() => closeCardSound(player));
             }
             else
             {
                 Debug.Log("Player must pay rent to player " + ownerId);
                 int amountPaid = rent[numberOfRailroads(ownerId) - 1];
-                CardReader.payRentButton.transform.GetChild(0).GetComponent<Text>().text = "Pay $" + amountPaid;
-                CardReader.payRentButton.SetActive(true);
-                CardReader.payRentButton.GetComponent<Button>().onClick.AddListener(() => payRent(player, playerScript, ownerId, amountPaid));
+                UIManager.payRentButton.transform.GetChild(0).GetComponent<Text>().text = "Pay $" + amountPaid;
+                UIManager.payRentButton.SetActive(true);
+                UIManager.payRentButton.GetComponent<Button>().onClick.AddListener(() => payRent(player, playerScript, ownerId, amountPaid));
             }
         }
         else
         {
             Debug.Log("Player can buy this railroad. Card owner: " + ownerId);
-            CardReader.buyPropertyButton.SetActive(true);
-            CardReader.cancelButton.SetActive(true);
-            CardReader.buyPropertyButton.GetComponent<Button>().onClick.AddListener(() => buyRailroad(player,22 + cardIndex));
-            CardReader.cancelButton.GetComponent<Button>().onClick.AddListener(() => hideCardSound(player));
+            UIManager.buyPropertyButton.SetActive(true);
+            UIManager.cancelButton.SetActive(true);
+            UIManager.buyPropertyButton.GetComponent<Button>().onClick.AddListener(() => buyRailroad(player,22 + cardIndex));
+            UIManager.cancelButton.GetComponent<Button>().onClick.AddListener(() => hideCardSound(player));
         }
         
     }
@@ -92,14 +92,14 @@ public class RailroadCard  : Card
     // player pays rent to player[ownerId]
     void payRent(GameObject player, Player playerScript, int ownerId, int amountPaid)
     {
-        CardReader.payRentButton.GetComponent<Button>().onClick.RemoveAllListeners();
-        CardReader.payRentButton.SetActive(false);
+        UIManager.payRentButton.GetComponent<Button>().onClick.RemoveAllListeners();
+        UIManager.payRentButton.SetActive(false);
         
         SoundManager.Instance.PlaySound(SoundManager.Instance.payMoney);
         playerScript.CmdTakeMoney(amountPaid);
         playerScript.CmdGiveMoneyToPlayer(ownerId, amountPaid);
 
-        CardReader.railroadPanel.SetActive(false);
+        UIManager.railroadPanel.SetActive(false);
         player.GetComponent<Player>().endMovement();
     }
 
@@ -115,20 +115,20 @@ public class RailroadCard  : Card
 
     void showCard()
     {
-        CardReader.cardPanel.SetActive(false);
-        CardReader.utilityPanel.SetActive(false);
+        UIManager.cardPanel.SetActive(false);
+        UIManager.utilityPanel.SetActive(false);
         closeCard();
 
-        CardReader.railroadPanel.SetActive(true);
-        CardReader.railroadPanel.transform.GetChild(0).GetComponent<Text>().text = cardName;
+        UIManager.railroadPanel.SetActive(true);
+        UIManager.railroadPanel.transform.GetChild(0).GetComponent<Text>().text = cardName;
     }
 
     void closeCard()
     {
-        CardReader.closeButton.GetComponent<Button>().onClick.RemoveAllListeners();
-        CardReader.sellPropertyButton.SetActive(false);
-        CardReader.closeButton.SetActive(false);
-        CardReader.railroadPanel.SetActive(false);
+        UIManager.closeButton.GetComponent<Button>().onClick.RemoveAllListeners();
+        UIManager.sellPropertyButton.SetActive(false);
+        UIManager.closeButton.SetActive(false);
+        UIManager.railroadPanel.SetActive(false);
     }
 
     void closeCardSound()
@@ -154,25 +154,25 @@ public class RailroadCard  : Card
         if (player.GetComponent<Player>().getStage() != 0)
             return;
         showCard();
-        CardReader.closeButton.SetActive(true);
-        CardReader.closeButton.GetComponent<Button>().onClick.AddListener(closeCardSound);
+        UIManager.closeButton.SetActive(true);
+        UIManager.closeButton.GetComponent<Button>().onClick.AddListener(closeCardSound);
 
         // if it's your turn you can sell the property
-        if (GameObject.Find("GameManager").GetComponent<GameManager>().playerTurn == player.GetComponent<Player>().idPlayer)
+        if (GameObject.Find("GameManager").GetComponent<GameManager>().playerTurnId == player.GetComponent<Player>().idPlayer)
         {
-            CardReader.sellPropertyButton.SetActive(true);
-            CardReader.sellPropertyButton.GetComponent<Button>().onClick.RemoveAllListeners();
-            CardReader.sellPropertyButton.GetComponent<Button>().onClick.AddListener(() => sellRailroad(player));
+            UIManager.sellPropertyButton.SetActive(true);
+            UIManager.sellPropertyButton.GetComponent<Button>().onClick.RemoveAllListeners();
+            UIManager.sellPropertyButton.GetComponent<Button>().onClick.AddListener(() => sellRailroad(player));
         }
     }
 
     void sellRailroad(GameObject player)
     {
         int cardIndex = 22 + (id - 5) / 10;
-        CardReader.sellPropertyButton.GetComponent<Button>().onClick.RemoveAllListeners();
-        CardReader.sellPropertyButton.SetActive(false);
+        UIManager.sellPropertyButton.GetComponent<Button>().onClick.RemoveAllListeners();
+        UIManager.sellPropertyButton.SetActive(false);
         Player playerScript = player.GetComponent<Player>();
-        playerScript.CmdChangeOwner(-1, cardIndex,id);
+        playerScript.CmdChangeOwner(-1, cardIndex);
         playerScript.CmdAddMoney(Mortgage); // players get in return the card's mortgage value
         playerScript.sellProperty(this);
         closeCard();

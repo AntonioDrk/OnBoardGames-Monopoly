@@ -44,24 +44,16 @@ public class Console : MonoBehaviour
         {
             int ownerId = int.Parse(command[1]);
             int cardIndex = int.Parse(command[2]);
-            int idOnBoard = -1;
 
             if (cardIndex < 28 && ownerId < gameManager.connectedPlayers)
             {
-                if (cardIndex < 22)
-                    idOnBoard = CardReader.propertyCards[cardIndex].id;
-                else if (cardIndex < 26)
-                    idOnBoard = CardReader.railroadCards[cardIndex - 22].id;
-                else
-                    idOnBoard = CardReader.utilityCards[cardIndex - 26].id;
-
                 if (gameManager.cardsOwner[cardIndex] != -1)
                 {
                     gameManager.players[gameManager.cardsOwner[cardIndex]].GetComponent<Player>().RpcSellProperty(cardIndex);
                 }
 
                 gameManager.players[ownerId].GetComponent<Player>().RpcBuyProperty(cardIndex);
-                gameManager.CmdChangeOwner(cardIndex, ownerId, idOnBoard);
+                gameManager.CmdChangeOwner(cardIndex, ownerId);
             }
         }
         else if (command[0] == "movePlayer" && command.Length == 3)
