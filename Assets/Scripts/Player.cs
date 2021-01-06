@@ -21,6 +21,12 @@ public class Player : NetworkBehaviour
     private bool waitingForTrade = false;
     private Renderer renderer;
     private int stage = 0; // 0 = player can roll the dice/ 1 = player rolled / 2 = the player ended his movement
+    private bool viewingCard = false;
+    public bool ViewingCard
+    {
+        get => viewingCard;
+        set => viewingCard = value;
+    }
 
     private Animator anim;
     private DiceManager diceManagerScript;
@@ -202,11 +208,13 @@ public class Player : NetworkBehaviour
             {
                 int utilityIndex = (indexPosition - 12) / 16;
                 CardReader.utilityCards[utilityIndex].doAction(this.gameObject);
+                ViewingCard = true;
             }
             else if (indexPosition == 5 || indexPosition == 15 || indexPosition == 25 || indexPosition == 35) // Railroads
             {
                 int railroadIndex = (indexPosition - 5) / 10;
                 CardReader.railroadCards[railroadIndex].doAction(this.gameObject);
+                ViewingCard = true;
             }
             else if (indexPosition == 4) // Income Tax - Pay $200
             {
@@ -251,6 +259,7 @@ public class Player : NetworkBehaviour
                 if (cardIndex != -1) // if it's a property card
                 {
                     CardReader.propertyCards[cardIndex].doAction(this.gameObject);
+                    ViewingCard = true;
                 }
                 else
                     endMovement();
@@ -266,6 +275,7 @@ public class Player : NetworkBehaviour
     public int getStage() { return stage; }
     public int getMoney() { return money; }
 
+    // Checks if you have got a double and if not, then let's you end turn
     public void endMovement()
     {
         //CmdSetDiceInactive();
@@ -374,7 +384,7 @@ public class Player : NetworkBehaviour
         ownedPropertyPanel.transform.position = new Vector3(0, 0, 0);
         ownedPropertyPanel.GetComponent<RectTransform>().localScale = new Vector3(1, 1, 1);
         ownedPropertyPanel.transform.GetChild(0).GetComponent<Text>().text = propertyCard.CardName;
-        ownedPropertyPanel.GetComponent<Button>().onClick.AddListener(() => propertyCard.showOwnedCard(this.gameObject));
+        ownedPropertyPanel.GetComponent<Button>().onClick.AddListener(() => { if (ViewingCard == false) propertyCard.showOwnedCard(this.gameObject); });
         //Debug.LogError("Owned Property Panel List Count: " + ownedPropertyList.Count);
 
         // find the new position in the list
@@ -750,28 +760,24 @@ public class Player : NetworkBehaviour
     bool checkTrade(List<int> sourceProperties, List<int> destinationProperties)
     {
         foreach (int cardIndex in sourceProperties)
-            if(cardIndex < 22)
-        {
-            PropertyCard card = CardReader.propertyCards[cardIndex];
+            if(cardIndex < 22) {
+                PropertyCard card = CardReader.propertyCards[cardIndex];
 
-            if (card.housesBuilt > 0) return false;
+                if (card.housesBuilt > 0) return false;
 
-            foreach (int i in card.propertiesFromSameGroup)
-                if (CardReader.propertyCards[i].housesBuilt > 0) return false;
-
-        }
+                foreach (int i in card.propertiesFromSameGroup)
+                    if (CardReader.propertyCards[i].housesBuilt > 0) return false;
+            }
 
         foreach (int cardIndex in destinationProperties)
-            if (cardIndex < 22)
-        {
-            PropertyCard card = CardReader.propertyCards[cardIndex];
+            if (cardIndex < 22) {
+                PropertyCard card = CardReader.propertyCards[cardIndex];
 
-            if (card.housesBuilt > 0) return false;
+                if (card.housesBuilt > 0) return false;
 
-            foreach (int i in card.propertiesFromSameGroup)
-                if (CardReader.propertyCards[i].housesBuilt > 0) return false;
-
-        }
+                foreach (int i in card.propertiesFromSameGroup)
+                    if (CardReader.propertyCards[i].housesBuilt > 0) return false;
+            }
         return true;
     }
 

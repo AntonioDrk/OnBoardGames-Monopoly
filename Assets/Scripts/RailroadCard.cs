@@ -37,7 +37,7 @@ public class RailroadCard  : Card
         hideCard(player);
     }
 
-    void hideCard(GameObject player)
+    protected override void hideCard(GameObject player)
     {
         UIManager.buyPropertyButton.GetComponent<Button>().onClick.RemoveAllListeners();
         UIManager.cancelButton.GetComponent<Button>().onClick.RemoveAllListeners();
@@ -45,6 +45,7 @@ public class RailroadCard  : Card
         UIManager.cancelButton.SetActive(false);
         UIManager.railroadPanel.SetActive(false);
         player.GetComponent<Player>().endMovement();
+        base.hideCard(player);
     }
 
     void closeCard(GameObject player)

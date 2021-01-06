@@ -26,13 +26,14 @@ public class EventCard : Card
                "Type: " + cardName.ToString() + 
                "Description: " + description.ToString();
     }
-
-    void hideCard()
+    
+    protected override void hideCard(GameObject player)
     {
         UIManager.closeEventButton.GetComponent<Button>().onClick.RemoveAllListeners();
         UIManager.ChanceLogo.SetActive(false);
         UIManager.ComunityChestLogo.SetActive(false);
         UIManager.eventPanel.SetActive(false);
+        base.hideCard(player);
     }
 
     public override void doAction(GameObject player)
@@ -59,7 +60,7 @@ public class EventCard : Card
 
     void activateEventCard(GameObject player)
     {
-        hideCard();
+        hideCard(player);
         bool isMoving = false;
         if (cardName.Equals("Chance"))
         {

@@ -7,7 +7,7 @@ using UnityEngine.UI;
 public class UIManager : MonoBehaviour
 {
 
-    static public GameObject cardPanel, buyPropertyButton, cancelButton, payRentButton, closeButton, closeEventButton, eventPanel,
+    public static GameObject cardPanel, buyPropertyButton, cancelButton, payRentButton, closeButton, closeEventButton, eventPanel,
                                 ComunityChestLogo, ChanceLogo, sellPropertyButton, sellHouseButton, buyHouseButton, railroadPanel,
                                 utilityPanel, ElectricCompanyLogo, WaterWorksLogo, buttonInfo, canvas, inJailCardPanel, playerTradePanel,
                                 tradeButton, console, startGameButton, rollButton, endTurnButton, ownedPropertiesPanel;
@@ -96,7 +96,7 @@ public class UIManager : MonoBehaviour
 
     }
 
-    static public void openPlayerTradePanel()
+    public static void openPlayerTradePanel()
     {
         if (GameObject.Find("TradePanel")) return;
         tradeButton.GetComponent<Button>().onClick.RemoveAllListeners();
@@ -105,7 +105,7 @@ public class UIManager : MonoBehaviour
         SoundManager.Instance.PlaySound(SoundManager.Instance.selectProperty);
     }
 
-    static public void closePlayerTradePanel()
+    public static void closePlayerTradePanel()
     {
         tradeButton.GetComponent<Button>().onClick.RemoveAllListeners();
         tradeButton.GetComponent<Button>().onClick.AddListener(openPlayerTradePanel);

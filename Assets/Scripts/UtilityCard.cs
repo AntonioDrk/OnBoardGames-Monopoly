@@ -38,7 +38,7 @@ public class UtilityCard : Card
         hideCard(player);
     }
 
-    void hideCard(GameObject player)
+    protected override void hideCard(GameObject player)
     {
         UIManager.buyPropertyButton.GetComponent<Button>().onClick.RemoveAllListeners();
         UIManager.cancelButton.GetComponent<Button>().onClick.RemoveAllListeners();
@@ -46,6 +46,7 @@ public class UtilityCard : Card
         UIManager.cancelButton.SetActive(false);
         UIManager.utilityPanel.SetActive(false);
         player.GetComponent<Player>().endMovement();
+        base.hideCard(player);
     }
 
     void closeCard(GameObject player)

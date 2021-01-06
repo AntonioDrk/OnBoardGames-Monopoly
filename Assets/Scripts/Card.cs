@@ -20,4 +20,9 @@ public abstract class Card
     public abstract void doAction(GameObject player);
     public abstract void showOwnedCard(GameObject player);
 
+    protected virtual void hideCard(GameObject player)
+    {
+        // Stuff to be called at the end
+        player.GetComponent<Player>().ViewingCard = false;
+    }
 }
