@@ -23,7 +23,7 @@ public class Console : MonoBehaviour
             executeCommand();
             input.text = "";
             EventSystem.current.SetSelectedGameObject(input.gameObject, null);
-            input.OnPointerClick(null);
+            input.OnPointerClick(new PointerEventData(EventSystem.current));
         }
     }
 
@@ -31,6 +31,7 @@ public class Console : MonoBehaviour
     {
         gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
         string inputCommand = input.text;
+        inputCommand = inputCommand.TrimEnd(' ').TrimStart(' ');
         string[] command = inputCommand.Split(' ');
 
         if(command[0] == "addMoney" && command.Length == 3)

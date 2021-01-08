@@ -608,11 +608,11 @@ public class Player : NetworkBehaviour
         //Debug.Log("panels: " + UIManager.playerTradePanel.transform.childCount);
         for (int k = 0; k < UIManager.playerTradePanel.transform.childCount; k++)
             if(k != idPlayer)
-        {
-            Transform panel = UIManager.playerTradePanel.transform.GetChild(k);
-            int destinationId = k;
-            panel.gameObject.AddComponent<Button>().onClick.AddListener(() => playerWantsTrade(destinationId));
-        }
+            {
+                Transform panel = UIManager.playerTradePanel.transform.GetChild(k);
+                int destinationId = k;
+                panel.gameObject.AddComponent<Button>().onClick.AddListener(() => playerWantsTrade(destinationId));
+            }
     }
     
     // create trade panel
@@ -622,8 +622,7 @@ public class Player : NetworkBehaviour
         if (waitingForTrade) return;
 
         UIManager.closePlayerTradePanel();
-        GameObject tradePanel = Instantiate(Resources.Load<GameObject>("TradePanel"));
-        tradePanel.transform.SetParent(UIManager.canvas.transform);
+        GameObject tradePanel = Instantiate(Resources.Load<GameObject>("TradePanel"), UIManager.canvas.transform);
         tradePanel.transform.localPosition = new Vector3(0, 0, 0);
         tradePanel.name = "TradePanel";
 
@@ -651,8 +650,7 @@ public class Player : NetworkBehaviour
         // you are the destination now and the other player is the source
         if (!isLocalPlayer) return;
 
-        GameObject tradePanel = Instantiate(Resources.Load<GameObject>("tradePanel"));
-        tradePanel.transform.SetParent(UIManager.canvas.transform);
+        GameObject tradePanel = Instantiate(Resources.Load<GameObject>("tradePanel"), UIManager.canvas.transform);
         tradePanel.transform.localPosition = new Vector3(0, 0, 0);
         
         // create panels for your properties (destinationId)

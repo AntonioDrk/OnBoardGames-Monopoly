@@ -181,20 +181,20 @@ public class PropertyCard : Card
     {
         SoundManager.Instance.PlaySound(SoundManager.Instance.getMoney);
         closeCard();
-        Debug.LogWarning("Do I have hotel? " + hasHotel);
+        //Debug.LogWarning("Do I have hotel? " + hasHotel);
         if (hasHotel)
         {
-            Debug.LogWarning("Entering CmdDeconstructHotel");
+            //Debug.LogWarning("Entering CmdDeconstructHotel");
             player.GetComponent<Player>().CmdDeconstructHotel(cardIndex);
-            Debug.LogWarning("Exiting CmdDeconstructHotel");
+            //Debug.LogWarning("Exiting CmdDeconstructHotel");
 
             housesBuilt = 0;
             hasHotel = false;
 
-            Debug.LogWarning("Entering for loop");
+            //Debug.LogWarning("Entering for loop");
             for (int i = 0; i < 4; i++)
             {
-                Debug.LogWarning("I am in the for loop, constructing " + i + " / 4 houses");
+                //Debug.LogWarning("I am in the for loop, constructing " + i + " / 4 houses");
                 buildHouse(player, true, i);
             }
         }
@@ -209,7 +209,7 @@ public class PropertyCard : Card
     public void addHouseObject(NetworkInstanceId houseId)
     {
         buildings.Add(houseId);
-        Debug.LogWarning("Added a house object to the list");
+        //Debug.LogWarning("Added a house object to the list");
     }
     
     public void removeHouses()

@@ -68,20 +68,20 @@ public class GameManager : NetworkBehaviour
                 CmdChangeMoneyOnPanel(i, players[i].GetComponent<Player>().getMoney());
         
             if (Input.GetKeyDown(KeyCode.BackQuote))
+            {
+                if (!UIManager.console.activeInHierarchy)
                 {
-                    if (!UIManager.console.activeInHierarchy)
-                    {
-                        UIManager.console.SetActive(true);
-                        InputField input = GameObject.Find("ConsoleInput").GetComponent<InputField>();
-                        input.Select();
-                        input.ActivateInputField();
-                        input.text = "";
-                        EventSystem.current.SetSelectedGameObject(input.gameObject, null);
-                        input.OnPointerClick(null);   
-                    }
-                    else
-                        UIManager.console.SetActive(false);
+                    UIManager.console.SetActive(true);
+                    InputField input = GameObject.Find("ConsoleInput").GetComponent<InputField>();
+                    input.Select();
+                    input.ActivateInputField();
+                    input.text = "";
+                    EventSystem.current.SetSelectedGameObject(input.gameObject, null);
+                    input.OnPointerClick(new PointerEventData(EventSystem.current));   
                 }
+                else
+                    UIManager.console.SetActive(false);
+            }
         
         }
 
