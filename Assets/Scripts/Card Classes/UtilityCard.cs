@@ -122,9 +122,9 @@ public class UtilityCard : Card
         UIManager.utilityPanel.SetActive(true);
         UIManager.utilityPanel.transform.GetChild(0).GetComponent<Text>().text = cardName;
         if (id == 12)
-            UIManager.ElectricCompanyLogo.SetActive(true);
+            UIManager.electricCompanyLogo.SetActive(true);
         else
-            UIManager.WaterWorksLogo.SetActive(true);
+            UIManager.waterWorksLogo.SetActive(true);
     }
 
     void closeCard()
@@ -132,8 +132,8 @@ public class UtilityCard : Card
         UIManager.closeButton.GetComponent<Button>().onClick.RemoveAllListeners();
         UIManager.sellPropertyButton.SetActive(false);
         UIManager.closeButton.SetActive(false);
-        UIManager.ElectricCompanyLogo.SetActive(false);
-        UIManager.WaterWorksLogo.SetActive(false);
+        UIManager.electricCompanyLogo.SetActive(false);
+        UIManager.waterWorksLogo.SetActive(false);
         UIManager.utilityPanel.SetActive(false);
     }
 

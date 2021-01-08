@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.Networking;
 
 public class ConnectionHandler : NetworkManager
@@ -27,10 +25,5 @@ public class ConnectionHandler : NetworkManager
 
         base.OnServerDisconnect(conn);
     }
-
-    public override void OnStartServer()
-    {
-        // This is called when the server starts
-        base.OnStartServer();
-    }
+    
 }

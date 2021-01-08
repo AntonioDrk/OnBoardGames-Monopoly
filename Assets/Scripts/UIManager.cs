@@ -1,15 +1,12 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using System;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 
 public class UIManager : MonoBehaviour
 {
 
     public static GameObject cardPanel, buyPropertyButton, cancelButton, payRentButton, closeButton, closeEventButton, eventPanel,
-                                ComunityChestLogo, ChanceLogo, sellPropertyButton, sellHouseButton, buyHouseButton, railroadPanel,
-                                utilityPanel, ElectricCompanyLogo, WaterWorksLogo, buttonInfo, canvas, inJailCardPanel, playerTradePanel,
+                                comunityChestLogo, chanceLogo, sellPropertyButton, sellHouseButton, buyHouseButton, railroadPanel,
+                                utilityPanel, electricCompanyLogo, waterWorksLogo, buttonInfo, canvas, inJailCardPanel, playerTradePanel,
                                 tradeButton, console, startGameButton, rollButton, endTurnButton, ownedPropertiesPanel;
     
     // Start is called before the first frame update
@@ -26,10 +23,10 @@ public class UIManager : MonoBehaviour
 
         // Utilities
         utilityPanel = GameObject.Find("UtilityCard");
-        ElectricCompanyLogo = GameObject.Find("ElectricCompanyLogo");
-        ElectricCompanyLogo.SetActive(false);
-        WaterWorksLogo = GameObject.Find("WaterWorksLogo");
-        WaterWorksLogo.SetActive(false);
+        electricCompanyLogo = GameObject.Find("ElectricCompanyLogo");
+        electricCompanyLogo.SetActive(false);
+        waterWorksLogo = GameObject.Find("WaterWorksLogo");
+        waterWorksLogo.SetActive(false);
         utilityPanel.SetActive(false);
 
         // Railroad Card
@@ -60,10 +57,10 @@ public class UIManager : MonoBehaviour
         eventPanel = GameObject.Find("EventCard");
         closeEventButton = GameObject.Find("CloseEvent");
         //closeEventButton.SetActive(false);
-        ComunityChestLogo = GameObject.Find("ComunityChestLogo");
-        ComunityChestLogo.SetActive(false);
-        ChanceLogo = GameObject.Find("ChanceLogo");
-        ChanceLogo.SetActive(false);
+        comunityChestLogo = GameObject.Find("ComunityChestLogo");
+        comunityChestLogo.SetActive(false);
+        chanceLogo = GameObject.Find("ChanceLogo");
+        chanceLogo.SetActive(false);
         eventPanel.SetActive(false);
 
         canvas = GameObject.Find("Canvas");
@@ -96,7 +93,7 @@ public class UIManager : MonoBehaviour
 
     }
 
-    public static void openPlayerTradePanel()
+    private static void openPlayerTradePanel()
     {
         if (GameObject.Find("TradePanel")) return;
         tradeButton.GetComponent<Button>().onClick.RemoveAllListeners();
@@ -113,7 +110,7 @@ public class UIManager : MonoBehaviour
         SoundManager.Instance.PlaySound(SoundManager.Instance.close);
     } 
 
-    public void writeButtonInfo(string info)
+    private void writeButtonInfo(string info)
     {
         buttonInfo.SetActive(true);
         buttonInfo.transform.GetChild(0).GetComponent<Text>().text = info;

@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using System;
+﻿using System;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -22,16 +20,16 @@ public class EventCard : Card
 
     public override string ToString()
     {
-        return "Id: " + id.ToString() + 
-               "Type: " + cardName.ToString() + 
-               "Description: " + description.ToString();
+        return "Id: " + id + 
+               "Type: " + cardName + 
+               "Description: " + description;
     }
     
     protected override void hideCard(GameObject player)
     {
         UIManager.closeEventButton.GetComponent<Button>().onClick.RemoveAllListeners();
-        UIManager.ChanceLogo.SetActive(false);
-        UIManager.ComunityChestLogo.SetActive(false);
+        UIManager.chanceLogo.SetActive(false);
+        UIManager.comunityChestLogo.SetActive(false);
         UIManager.eventPanel.SetActive(false);
         base.hideCard(player);
     }
@@ -45,9 +43,9 @@ public class EventCard : Card
         UIManager.eventPanel.transform.GetComponent<Image>().color
             = new Color32((byte)cardColor[0], (byte)cardColor[1], (byte)cardColor[2], 255);
         if (cardName == "Chance")
-            UIManager.ChanceLogo.SetActive(true);
+            UIManager.chanceLogo.SetActive(true);
         else
-            UIManager.ComunityChestLogo.SetActive(true);
+            UIManager.comunityChestLogo.SetActive(true);
         SoundManager.Instance.PlaySound(SoundManager.Instance.openEvent);
         UIManager.closeEventButton.GetComponent<Button>().onClick.AddListener(() => activateEventCard(player));
                 

@@ -1,15 +1,13 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.Networking;
 
 public class DiceManager : NetworkBehaviour
 {
-    public int rolledNumber = 0; 
-    public bool isDouble = false;
-    public bool rolled = false;
+    public int rolledNumber; 
+    public bool isDouble;
+    public bool rolled;
 
-    public int diceCounter = 0;
+    public int diceCounter;
     public GameObject dice;
     public GameManager gameManager;
      

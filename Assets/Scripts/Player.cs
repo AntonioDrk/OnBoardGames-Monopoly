@@ -8,20 +8,20 @@ public class Player : NetworkBehaviour
 {
 
     [SyncVar] public int idPlayer = -1;    
-    [SyncVar] private int indexPosition = 0; // Indicates the position on the board list (the list of cards that are on the board)
+    [SyncVar] private int indexPosition; // Indicates the position on the board list (the list of cards that are on the board)
     [SyncVar] private int money = 1500;
     [SyncVar] private Color plyColor;
 
     private List<Card> ownedPropertyCards;
     private List<GameObject> ownedPropertyList;
 
-    private int doublesRolled = 0;
-    private int roundsInJail = 0;
-    private bool inJail = false;
-    private bool waitingForTrade = false;
-    private Renderer renderer;
-    private int stage = 0; // 0 = player can roll the dice/ 1 = player rolled / 2 = the player ended his movement
-    private bool viewingCard = false;
+    private int doublesRolled;
+    private int roundsInJail;
+    private bool inJail;
+    private bool waitingForTrade;
+    private new Renderer renderer;
+    private int stage; // 0 = player can roll the dice/ 1 = player rolled / 2 = the player ended his movement
+    private bool viewingCard;
     public bool ViewingCard
     {
         get => viewingCard;
@@ -31,7 +31,8 @@ public class Player : NetworkBehaviour
     private Animator anim;
     private DiceManager diceManagerScript;
     private GameManager gameManagerScript;
-    private Vector3 goPosition = new Vector3(2.5f, 0.125f, -6.49f), jailPosition = new Vector3(-11f, 0.125f, -6f), justVisitingPosition = new Vector3(-11.45854f, 0.125f, -6.49f);
+    private readonly Vector3 goPosition = new Vector3(2.5f, 0.125f, -6.49f);
+    private Vector3 jailPosition = new Vector3(-11f, 0.125f, -6f), justVisitingPosition = new Vector3(-11.45854f, 0.125f, -6.49f);
     private GameObject jail;
     private Text playerMoneyText;
 
@@ -99,7 +100,7 @@ public class Player : NetworkBehaviour
 
 
         // if the dice rolled and it's player's turn 
-        if (diceManagerScript.rolled == true && gameManagerScript.playerTurnId == idPlayer)
+        if (diceManagerScript.rolled && gameManagerScript.playerTurnId == idPlayer)
         {
             diceManagerScript.rolled = false;
             Debug.Log("Player " + idPlayer + " rolled " + gameManagerScript.currentRolledNumber);
@@ -230,7 +231,7 @@ public class Player : NetworkBehaviour
             }
             else if (indexPosition == 2 || indexPosition == 17 || indexPosition == 33) // Comunity Chest
             {
-                int eventNr = 0;
+                int eventNr;
                 if (gameManagerScript.chestJailCardOwner == -1)
                     eventNr = Random.Range(0, 14);
                 else
@@ -242,7 +243,7 @@ public class Player : NetworkBehaviour
             }
             else if (indexPosition == 7 || indexPosition == 22 || indexPosition == 36) //Chance
             {
-                int eventNr = 0;
+                int eventNr;
                 if (gameManagerScript.chanceJailCardOwner == -1)
                     eventNr = Random.Range(1, 14);
                 else

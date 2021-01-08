@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using System.IO;
+﻿using System.IO;
 using UnityEngine;
 
 public class CardReader : MonoBehaviour
@@ -48,7 +46,7 @@ public class CardReader : MonoBehaviour
 
     private void LoadHousePrefab()
     {
-        housePrefab = Resources.Load<GameObject>("House") as GameObject;
+        housePrefab = Resources.Load<GameObject>("House");
         if (housePrefab == null)
             Debug.LogError("House/hotel object not found in the resources folder!");
     }

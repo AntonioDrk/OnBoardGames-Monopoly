@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class SoundManager : MonoBehaviour
 {
@@ -27,12 +25,6 @@ public class SoundManager : MonoBehaviour
         manager.AddComponent<AudioSource>();
         source.clip = selectProperty;
         source.playOnAwake = false;
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
     }
 
     public static SoundManager Instance { get { return _instance; } }

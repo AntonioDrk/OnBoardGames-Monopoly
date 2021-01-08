@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Networking;
@@ -8,7 +7,7 @@ using UnityEngine.EventSystems;
 public class GameManager : NetworkBehaviour
 {
 
-    public bool targetPlayerIsMoving = false;
+    public bool targetPlayerIsMoving;
     public GameObject targetPlayer;
     public int currentRolledNumber;
 
@@ -20,9 +19,9 @@ public class GameManager : NetworkBehaviour
     private List<GameObject> playerInfo = new List<GameObject>(); // info panels of the players
 
     [SyncVar] public bool gameStarted;
-    [SyncVar] public int playerTurn = 0;
-    [SyncVar] public int playerTurnId = 0;    
-    [SyncVar] public int connectedPlayers = 0;
+    [SyncVar] public int playerTurn;
+    [SyncVar] public int playerTurnId;    
+    [SyncVar] public int connectedPlayers;
     public List<GameObject> players;
     public SyncListInt cardsOwner;
     [SyncVar] public int chestJailCardOwner;
@@ -31,7 +30,7 @@ public class GameManager : NetworkBehaviour
     // debug info
     private Text connectedPlayersText;
 
-    void Start()
+    private void Start()
     {
 
         mainCamera = Camera.main;

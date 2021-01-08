@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System;
 using UnityEngine;
 using UnityEngine.UI;
@@ -18,7 +17,7 @@ public class PropertyCard : Card
     public float[] houseCoordinates = new float[3];
     private float houseOffset = 0.3f;
     public int cardsInGroup = 2;
-    public bool hasHotel = false;
+    public bool hasHotel;
     public int[] rent = new int[6];
     public int[] propertiesFromSameGroup;
     public List<NetworkInstanceId> buildings = new List<NetworkInstanceId>();
@@ -364,7 +363,7 @@ public class PropertyCard : Card
     int calculateRent(int ownerId)
     {
         int amountPaid = rent[0];
-        if (hasHotel == true)
+        if (hasHotel)
         {
             // Daca are hotel costul e ultimul din vectorul rent
             amountPaid = rent[5];
@@ -374,7 +373,7 @@ public class PropertyCard : Card
             // Daca are un nr de case atunci nr de case este indexul pentru vectorul rent
             amountPaid = rent[housesBuilt];
         }
-        else if (hasAllProperties(ownerId) == true)
+        else if (hasAllProperties(ownerId))
         {   // Daca are toate proprietatile din color group si fara case=> rent[0]x2
             amountPaid = 2 * rent[0];
         }

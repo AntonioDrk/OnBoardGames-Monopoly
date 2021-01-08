@@ -1,7 +1,5 @@
 using System;
 using UnityEngine;
-using UnityEngine.Networking;
-using System.Collections.Generic;
 
 public class Die : MonoBehaviour {
 
@@ -30,8 +28,8 @@ public class Die : MonoBehaviour {
             int index = collision.contacts.Length - 1; 
             myCollider = collision.contacts[index].thisCollider;
             
-            if (myCollider.tag == "1" || myCollider.tag == "2" || myCollider.tag == "3" || myCollider.tag == "4"
-                || myCollider.tag == "5" || myCollider.tag == "6")
+            if (myCollider.CompareTag("1") || myCollider.CompareTag("2") || myCollider.CompareTag("3") || myCollider.CompareTag("4")
+                || myCollider.CompareTag("5") || myCollider.CompareTag("6"))
             {
                 int rolledValue = 7 - Int32.Parse(myCollider.tag);
                 diceManager.CmdAddDice(rolledValue); 

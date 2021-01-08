@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 
@@ -13,6 +11,7 @@ public class Console : MonoBehaviour
     void Start()
     {
         input = GameObject.Find("ConsoleInput").GetComponent<InputField>();
+        gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
     }
 
     // Update is called once per frame
@@ -29,40 +28,46 @@ public class Console : MonoBehaviour
 
     public void executeCommand()
     {
-        gameManager = GameObject.Find("GameManager").GetComponent<GameManager>();
         string inputCommand = input.text;
         inputCommand = inputCommand.TrimEnd(' ').TrimStart(' ');
         string[] command = inputCommand.Split(' ');
 
-        if(command[0] == "addMoney" && command.Length == 3)
+        switch (command[0])
         {
-            int playerId = int.Parse(command[1]);
-            int amount = int.Parse(command[2]);
-            if (playerId < gameManager.connectedPlayers)
-                gameManager.CmdGiveMoneyToPlayer(playerId, amount);
-        }
-        else if(command[0] == "changeOwner" && command.Length == 3)
-        {
-            int ownerId = int.Parse(command[1]);
-            int cardIndex = int.Parse(command[2]);
-
-            if (cardIndex < 28 && ownerId < gameManager.connectedPlayers)
+            case "addMoney" when command.Length == 3:
             {
-                if (gameManager.cardsOwner[cardIndex] != -1)
+                int playerId = int.Parse(command[1]);
+                int amount = int.Parse(command[2]);
+                if (playerId < gameManager.connectedPlayers)
+                    gameManager.CmdGiveMoneyToPlayer(playerId, amount);
+                break;
+            }
+            case "changeOwner" when command.Length == 3:
+            {
+                int ownerId = int.Parse(command[1]);
+                int cardIndex = int.Parse(command[2]);
+
+                if (cardIndex < 28 && ownerId < gameManager.connectedPlayers)
                 {
-                    gameManager.players[gameManager.cardsOwner[cardIndex]].GetComponent<Player>().RpcSellProperty(cardIndex);
+                    if (gameManager.cardsOwner[cardIndex] != -1)
+                    {
+                        gameManager.players[gameManager.cardsOwner[cardIndex]].GetComponent<Player>().RpcSellProperty(cardIndex);
+                    }
+
+                    gameManager.players[ownerId].GetComponent<Player>().RpcBuyProperty(cardIndex);
+                    gameManager.CmdChangeOwner(cardIndex, ownerId);
                 }
 
-                gameManager.players[ownerId].GetComponent<Player>().RpcBuyProperty(cardIndex);
-                gameManager.CmdChangeOwner(cardIndex, ownerId);
+                break;
             }
-        }
-        else if (command[0] == "movePlayer" && command.Length == 3)
-        {
-            int playerId = int.Parse(command[1]);
-            int amount = int.Parse(command[2]);
-            if (playerId < gameManager.connectedPlayers && amount > 0)
-                gameManager.players[playerId].GetComponent<Player>().moveSpaces(amount);
+            case "movePlayer" when command.Length == 3:
+            {
+                int playerId = int.Parse(command[1]);
+                int amount = int.Parse(command[2]);
+                if (playerId < gameManager.connectedPlayers && amount > 0)
+                    gameManager.players[playerId].GetComponent<Player>().moveSpaces(amount);
+                break;
+            }
         }
     }
 }
