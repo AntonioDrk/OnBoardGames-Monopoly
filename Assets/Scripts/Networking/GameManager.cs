@@ -258,11 +258,35 @@ public class GameManager : NetworkBehaviour
     {
         if (!isServer) return;
 
-        players[playerTurn].GetComponent<Player>().RpcChangeColorOnPanel(playerInfo[playerTurn], 255, 255, 255, 190);
+        if (playerTurn < connectedPlayers)
+        {
+            players[playerTurn].GetComponent<Player>().RpcChangeColorOnPanel(playerInfo[playerTurn], 255, 255, 255, 190);
+        }
         playerTurn = (playerTurn + 1) % connectedPlayers;
         Debug.Log("playerTurn: " + playerTurn);
         players[playerTurn].GetComponent<Player>().RpcChangeColorOnPanel(playerInfo[playerTurn], 255, 190, 190, 190);
         playerTurnId = players[playerTurn].GetComponent<Player>().idPlayer;
+    }
+
+    int FindIdInPlayers(int idPlayer)
+    {
+        for (int i = 0; i < connectedPlayers; i++)
+            if (players[i].GetComponent<Player>().idPlayer == idPlayer)
+                return i;
+        return 0;
+    }
+
+    public void CmdBankruptPlayer(int idPlayer)
+    {
+        if (!isServer) return;
+        
+        
+        players[playerTurn].GetComponent<Player>().RpcChangeColorOnPanel(playerInfo[playerTurn], 255, 255, 255, 190);
+        players[playerTurn].GetComponent<Player>().RpcBankruptPanel(playerInfo[playerTurn]);
+
+        players.RemoveAt(playerTurn);
+        playerInfo.RemoveAt(playerTurn);
+        connectedPlayers--;
     }
 
     public void CmdChangeOwner(int cardIndex, int newOwnerId)
@@ -297,7 +321,11 @@ public class GameManager : NetworkBehaviour
             Debug.LogError("Clientul a incercat sa intre in cmd");
             return;
         }
-        players[getPlayerIndex(playerId)].GetComponent<Player>().CmdAddMoney(amount);
+        int playerIndex = getPlayerIndex(playerId);
+        if (playerIndex != -1)
+        {
+            players[playerIndex].GetComponent<Player>().CmdAddMoney(amount);
+        }
     }
 
     public void CmdConstructHouse(string housePrefabPath, Vector3 position, Vector3 rotation, int cardIndex)

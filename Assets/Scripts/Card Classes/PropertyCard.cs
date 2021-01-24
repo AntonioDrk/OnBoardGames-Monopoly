@@ -22,7 +22,7 @@ public class PropertyCard : Card
     public int[] propertiesFromSameGroup;
     public List<NetworkInstanceId> buildings = new List<NetworkInstanceId>();
 
-    public int housesBuilt { get; set; } = 0;
+    public int housesBuilt {get { return buildings.Count;} set{} }
 
     public void PropertyCardConstructor()
     {
@@ -46,10 +46,10 @@ public class PropertyCard : Card
     {
         int ownerId = GameObject.Find("GameManager").GetComponent<GameManager>().cardsOwner[cardIndex];
         showCard();
-        Debug.Log("Owner's id for " + cardName + " : " + ownerId);
+        Debug.Log("Owner's id for " + cardName + " : " + ownerId); 
+        Player playerScript = player.GetComponent<Player>();
         if (ownerId != -1)
         {
-            Player playerScript = player.GetComponent<Player>();
             if (ownerId == playerScript.idPlayer)
             {
                 UIManager.closeButton.SetActive(true);
@@ -67,9 +67,13 @@ public class PropertyCard : Card
         else
         {
             Debug.Log("Player can buy this property. Card owner: " + ownerId);
-            UIManager.buyPropertyButton.SetActive(true);
+
+            if (playerScript.getMoney() > Price)
+            {
+                UIManager.buyPropertyButton.SetActive(true);
+                UIManager.buyPropertyButton.GetComponent<Button>().onClick.AddListener(() => buyCard(player));
+            }
             UIManager.cancelButton.SetActive(true);
-            UIManager.buyPropertyButton.GetComponent<Button>().onClick.AddListener(() => buyCard(player));
             UIManager.cancelButton.GetComponent<Button>().onClick.AddListener(() => hideCardSound(player));
         }
 
@@ -262,9 +266,12 @@ public class PropertyCard : Card
             if(hasAllProperties(player.GetComponent<Player>().idPlayer) && propertiesAreEquallyDeveloped() && !hasHotel)
             {
                 // Buy house
-                UIManager.buyHouseButton.SetActive(true);
-                UIManager.buyHouseButton.GetComponent<Button>().onClick.RemoveAllListeners();
-                UIManager.buyHouseButton.GetComponent<Button>().onClick.AddListener(() => buildHouse(player));
+                if (player.GetComponent<Player>().getMoney() > pricePerHouse)
+                {                
+                    UIManager.buyHouseButton.SetActive(true);
+                    UIManager.buyHouseButton.GetComponent<Button>().onClick.RemoveAllListeners();
+                    UIManager.buyHouseButton.GetComponent<Button>().onClick.AddListener(() => buildHouse(player));
+                }
             }
 
             // Check to see if selling is a valid move
@@ -346,8 +353,6 @@ public class PropertyCard : Card
 
     protected override void sellCard(GameObject player)
     {
-        // TODO: SELL ALL THE HOUSES OR THE HOTEL AS WELL 
-        
         if(housesBuilt > 0) return;
         
         foreach (int i in propertiesFromSameGroup)
@@ -387,11 +392,12 @@ public class PropertyCard : Card
         UIManager.payRentButton.SetActive(false);
          
         SoundManager.Instance.PlaySound(SoundManager.Instance.payMoney);
-        playerScript.CmdTakeMoney(amountPaid);
         playerScript.CmdGiveMoneyToPlayer(ownerId, amountPaid);
+        playerScript.CmdTakeMoney(amountPaid);
 
         UIManager.cardPanel.SetActive(false);
-        player.GetComponent<Player>().endMovement();
+        if(playerScript.getMoney() > 0)
+            player.GetComponent<Player>().endMovement();
     }
 
 }

@@ -27,8 +27,8 @@ public abstract class Card
     {
         Player playerScript = player.GetComponent<Player>();
         SoundManager.Instance.PlaySound(SoundManager.Instance.payMoney);
-        playerScript.CmdTakeMoney(Price);
         playerScript.buyProperty(this);
+        playerScript.CmdTakeMoney(Price);
     }
     protected virtual void sellCard(GameObject player)
     {
