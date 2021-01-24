@@ -419,7 +419,6 @@ public class Player : NetworkBehaviour
 
     public void sellProperty(Card propertyCard)
     {
-
         Debug.Log("Sold " + propertyCard.CardName);
         int cardIndex = ownedPropertyCards.IndexOf(propertyCard);
         if (cardIndex == -1)
@@ -910,6 +909,12 @@ public class Player : NetworkBehaviour
         playerInfo.transform.GetChild(0).GetComponent<Text>().text = "Player " + idPlayer + "\n$" + money;
     }
 
+    [ClientRpc]
+    public void RpcBankruptPanel(GameObject playerInfo)
+    {
+        playerInfo.transform.GetChild(0).GetComponent<Text>().text = "Player " + idPlayer + "\n" + "Bankrupt";
+    }
+
     [Command]
     public void CmdChangeCardJailOwner(int ownerId, string type)
     {
@@ -932,7 +937,43 @@ public class Player : NetworkBehaviour
     {
         Debug.Log("Took $" + amount);
         money -= amount;
-        //gameManagerScript.CmdChangeMoneyOnPanel(idPlayer, money);
+
+        if (money <= 0)
+        {
+            var list = new List<Card>(ownedPropertyCards);
+            foreach (Card card in list)
+            {
+                var cardIndex = 0;
+                if (card.GetType() == typeof(PropertyCard))
+                {
+                    cardIndex = ((PropertyCard) card).cardIndex;
+                    if (((PropertyCard) card).hasHotel)
+                    {
+                        CmdDeconstructHotel(cardIndex);
+                        //((PropertyCard) card).hasHotel = false;
+                    }
+
+                    while (((PropertyCard) card).buildings.Count > 0)
+                    {
+                        CmdDeconstructHouse(cardIndex);
+                        //((PropertyCard) card).housesBuilt--;
+                    }
+                }
+                else if (card.GetType() == typeof(RailroadCard))
+                {
+                    cardIndex = ((RailroadCard) card).cardIndex + 22;
+                }
+                else
+                {
+                    cardIndex = ((UtilityCard) card).cardIndex + 26;
+                }
+                
+                sellProperty(card);
+                CmdChangeOwner(-1, cardIndex);
+            }
+            gameManagerScript.CmdBankruptPlayer(idPlayer);
+            nextPlayer();
+        }
     }
 
     [Command]

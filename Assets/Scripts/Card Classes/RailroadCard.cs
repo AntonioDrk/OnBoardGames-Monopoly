@@ -6,6 +6,7 @@ using UnityEngine.UI;
 public class RailroadCard  : Card
 {
     public int id;
+    public int cardIndex;
     public string cardName;
     public int[] rent = { 25, 50, 100, 200 };
 
@@ -58,9 +59,10 @@ public class RailroadCard  : Card
         int ownerId = GameObject.Find("GameManager").GetComponent<GameManager>().cardsOwner[22 + cardIndex]; // the railroads are 22,23,24,25
         showCard();
         Debug.Log("Owner's id for " + cardName + " : " + ownerId);
+        
+        Player playerScript = player.GetComponent<Player>();
         if (ownerId != -1)
         {
-            Player playerScript = player.GetComponent<Player>();
             if (ownerId == playerScript.idPlayer)
             {
                 UIManager.closeButton.SetActive(true);
@@ -78,9 +80,13 @@ public class RailroadCard  : Card
         else
         {
             Debug.Log("Player can buy this railroad. Card owner: " + ownerId);
-            UIManager.buyPropertyButton.SetActive(true);
+
+            if (playerScript.getMoney() >= Price)
+            {
+                UIManager.buyPropertyButton.SetActive(true);
+                UIManager.buyPropertyButton.GetComponent<Button>().onClick.AddListener(() => buyCard(player));
+            }
             UIManager.cancelButton.SetActive(true);
-            UIManager.buyPropertyButton.GetComponent<Button>().onClick.AddListener(() => buyCard(player));
             UIManager.cancelButton.GetComponent<Button>().onClick.AddListener(() => hideCardSound(player));
         }
         
