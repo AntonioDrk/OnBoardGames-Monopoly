@@ -256,7 +256,7 @@ public class GameManager : NetworkBehaviour
 
     public void CmdNextPlayer()
     {
-        if (!isServer) return;
+        if (!isServer || connectedPlayers <= 0) return;
 
         if (playerTurn < connectedPlayers)
         {
@@ -377,7 +377,13 @@ public class GameManager : NetworkBehaviour
     public void CmdDeconstructHouse(int cardIndex)
     {
         NetworkInstanceId lastBuilding = CardReader.propertyCards[cardIndex].buildings[CardReader.propertyCards[cardIndex].buildings.Count - 1];
-        NetworkServer.Destroy(NetworkServer.FindLocalObject(lastBuilding));
+        Debug.LogError("Last building id:" + lastBuilding);
+        
+        GameObject houseInstance = NetworkServer.FindLocalObject(lastBuilding);
+        if(houseInstance == null)
+            Debug.LogError("Tried to remove a house the network didn't find!");
+        
+        NetworkServer.Destroy(houseInstance);
         RpcRemoveHouse(cardIndex);
     }
 

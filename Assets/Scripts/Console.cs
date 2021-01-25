@@ -34,6 +34,14 @@ public class Console : MonoBehaviour
 
         switch (command[0])
         {
+            case "takeMoney" when command.Length == 3:
+            {
+                int playerId = int.Parse(command[1]);
+                int amount = int.Parse(command[2]);
+                if (playerId < gameManager.connectedPlayers)
+                    gameManager.players[playerId].GetComponent<Player>().CmdTakeMoney(amount);
+                break;   
+            }
             case "addMoney" when command.Length == 3:
             {
                 int playerId = int.Parse(command[1]);

@@ -21,8 +21,11 @@ public class PropertyCard : Card
     public int[] rent = new int[6];
     public int[] propertiesFromSameGroup;
     public List<NetworkInstanceId> buildings = new List<NetworkInstanceId>();
-
-    public int housesBuilt {get { return buildings.Count;} set{} }
+    public int housesBuilt
+    {
+        get;
+        set;
+    }
 
     public void PropertyCardConstructor()
     {

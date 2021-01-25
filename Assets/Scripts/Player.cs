@@ -949,14 +949,18 @@ public class Player : NetworkBehaviour
                     cardIndex = ((PropertyCard) card).cardIndex;
                     if (((PropertyCard) card).hasHotel)
                     {
-                        CmdDeconstructHotel(cardIndex);
+                        
+                        gameManagerScript.CmdDeconstructHotel(cardIndex);
                         //((PropertyCard) card).hasHotel = false;
                     }
-
-                    while (((PropertyCard) card).buildings.Count > 0)
+                    else
                     {
-                        CmdDeconstructHouse(cardIndex);
-                        //((PropertyCard) card).housesBuilt--;
+                        int housesTotal = ((PropertyCard) card).housesBuilt;
+                        for (int i = 0; i < housesTotal; i++)
+                        {
+                            CmdDeconstructHouse(cardIndex);
+                            ((PropertyCard) card).housesBuilt--;
+                        }
                     }
                 }
                 else if (card.GetType() == typeof(RailroadCard))
@@ -968,7 +972,7 @@ public class Player : NetworkBehaviour
                     cardIndex = ((UtilityCard) card).cardIndex + 26;
                 }
                 
-                sellProperty(card);
+                RpcSellProperty(cardIndex);
                 CmdChangeOwner(-1, cardIndex);
             }
             gameManagerScript.CmdBankruptPlayer(idPlayer);
