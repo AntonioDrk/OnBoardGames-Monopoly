@@ -17,6 +17,7 @@ public class GameManager : NetworkBehaviour
     
     private List<Color> playerColors; // colors of the players    
     [SerializeField] private List<GameObject> playerMeshes;
+    private List<GameObject> playerMeshesUnmodifiedCopy;
     private List<GameObject> playerInfo = new List<GameObject>(); // info panels of the players
 
     [SyncVar] public bool gameStarted;
@@ -38,6 +39,8 @@ public class GameManager : NetworkBehaviour
 
         chestJailCardOwner = -1;
         chanceJailCardOwner = -1;
+
+        playerMeshesUnmodifiedCopy = new List<GameObject>(playerMeshes);
 
         players = new List<GameObject>();
         if (isServer)
@@ -114,8 +117,8 @@ public class GameManager : NetworkBehaviour
             GameObject playerTradePanel = Instantiate(Resources.Load<GameObject>("PlayerInfo"));
             NetworkServer.Spawn(playerTradePanel);
             players[i].GetComponent<Player>().RpcCreatePlayerTradeInfo(i, playerTradePanel);
-
         }
+        
         players[0].GetComponent<Player>().RpcChangeColorOnPanel(playerInfo[0], 255, 190, 190, 190);
 
         for (int i = 0; i < connectedPlayers; i++)
@@ -207,9 +210,16 @@ public class GameManager : NetworkBehaviour
         connectedPlayers++;
 
         //Asign the Mesh Token for the player
-        int randomIndex = Random.Range(0, playerMeshes.Count);
+        GameObject objectMesh = playerMeshes[Random.Range(0, playerMeshes.Count)];
+        playerMeshes.Remove(objectMesh);
+        int randomIndex = playerMeshesUnmodifiedCopy.FindIndex(obj => obj == objectMesh);
+        if (randomIndex == -1)
+        {
+            Debug.LogError("NO MORE TOKENS TO GIVE TO PLAYERS, HELP!");
+            randomIndex = 0;
+        }
+            
         playerScript.setMeshIndex(randomIndex);
-        playerMeshes.RemoveAt(randomIndex);
         for (int i = 0; i < connectedPlayers; i++)
         {
             players[i].GetComponent<Player>().RpcUpdateMesh(players[i].GetComponent<Player>().getMeshIndex());
