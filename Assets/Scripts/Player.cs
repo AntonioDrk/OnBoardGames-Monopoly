@@ -951,16 +951,10 @@ public class Player : NetworkBehaviour
                     {
                         
                         gameManagerScript.CmdDeconstructHotel(cardIndex);
-                        //((PropertyCard) card).hasHotel = false;
                     }
                     else
                     {
-                        int housesTotal = ((PropertyCard) card).housesBuilt;
-                        for (int i = 0; i < housesTotal; i++)
-                        {
-                            CmdDeconstructHouse(cardIndex);
-                            ((PropertyCard) card).housesBuilt--;
-                        }
+                        gameManagerScript.CmdDeconstructAllHouses(cardIndex);
                     }
                 }
                 else if (card.GetType() == typeof(RailroadCard))

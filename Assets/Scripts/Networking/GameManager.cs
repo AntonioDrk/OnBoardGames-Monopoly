@@ -348,14 +348,9 @@ public class GameManager : NetworkBehaviour
             return;
         }
 
-        foreach (NetworkInstanceId objectNetId in CardReader.propertyCards[cardIndex].buildings)
-        {
-            NetworkServer.Destroy(NetworkServer.FindLocalObject(objectNetId));
-
-        }
+        CmdDeconstructAllHouses(cardIndex);
 
         Debug.Log("In cmd construct hotel");
-        RpcRemoveHouses(cardIndex);
 
         // Instantiate in world
         GameObject go = Instantiate(Resources.Load<GameObject>(hotelPrefabPath), position, Quaternion.Euler(rotation));
@@ -372,6 +367,15 @@ public class GameManager : NetworkBehaviour
         NetworkInstanceId lastBuilding = CardReader.propertyCards[cardIndex].buildings[CardReader.propertyCards[cardIndex].buildings.Count - 1];
         NetworkServer.Destroy(NetworkServer.FindLocalObject(lastBuilding));
         RpcRemoveHotel(cardIndex);
+    }
+
+    public void CmdDeconstructAllHouses(int cardIndex)
+    {
+        foreach (NetworkInstanceId objectNetId in CardReader.propertyCards[cardIndex].buildings)
+        {
+            NetworkServer.Destroy(NetworkServer.FindLocalObject(objectNetId));
+        }
+        RpcRemoveHouses(cardIndex);
     }
 
     public void CmdDeconstructHouse(int cardIndex)
