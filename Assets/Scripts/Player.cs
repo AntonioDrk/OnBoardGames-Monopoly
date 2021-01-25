@@ -11,9 +11,13 @@ public class Player : NetworkBehaviour
     [SyncVar] private int indexPosition; // Indicates the position on the board list (the list of cards that are on the board)
     [SyncVar] private int money = 1500;
     [SyncVar] private Color plyColor;
+    [SyncVar] private int meshIndex;
 
     private List<Card> ownedPropertyCards;
     private List<GameObject> ownedPropertyList;
+
+    public List<GameObject> cachedMeshes;
+    
 
     private int doublesRolled;
     private int roundsInJail;
@@ -31,8 +35,8 @@ public class Player : NetworkBehaviour
     private Animator anim;
     private DiceManager diceManagerScript;
     private GameManager gameManagerScript;
-    private readonly Vector3 goPosition = new Vector3(2.5f, 0.125f, -6.49f);
-    private Vector3 jailPosition = new Vector3(-11f, 0.125f, -6f), justVisitingPosition = new Vector3(-11.45854f, 0.125f, -6.49f);
+    private readonly Vector3 goPosition = new Vector3(2.5f, 0, -6.49f);
+    private Vector3 jailPosition = new Vector3(-11f, 0, -6f), justVisitingPosition = new Vector3(-11.45854f, 0.125f, -6.49f);
     private GameObject jail;
     private Text playerMoneyText;
 
@@ -41,7 +45,7 @@ public class Player : NetworkBehaviour
         gameManagerScript = GameObject.Find("GameManager").GetComponent<GameManager>();
         diceManagerScript = GameObject.Find("DiceManager").GetComponent<DiceManager>();
         anim = GetComponent<Animator>();
-        renderer = transform.GetChild(0).GetComponent<Renderer>();
+        //renderer = transform.GetChild(0).GetComponent<Renderer>();
 
         if (isLocalPlayer)
         {
@@ -275,6 +279,9 @@ public class Player : NetworkBehaviour
     public int getIndexPosition() { return indexPosition; }
     public int getStage() { return stage; }
     public int getMoney() { return money; }
+
+    public int getMeshIndex() { return meshIndex;}
+    public void setMeshIndex(int index) { meshIndex = index;}
 
     // Checks if you have got a double and if not, then let's you end turn
     public void endMovement()
@@ -565,6 +572,18 @@ public class Player : NetworkBehaviour
     {
         renderer.material.color = col;
         plyColor = col;
+    }
+    
+    [ClientRpc]
+    public void RpcUpdateMesh(int index)
+    {
+        if (transform.childCount < 1)
+        {
+            Instantiate(cachedMeshes[index], transform);
+        }
+        
+        renderer = transform.GetChild(0).GetChild(0).GetChild(0).GetComponent<MeshRenderer>();
+        meshIndex = index;
     }
 
     [ClientRpc]

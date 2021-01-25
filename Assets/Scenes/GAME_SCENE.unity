@@ -1504,6 +1504,13 @@ MonoBehaviour:
   targetPlayerIsMoving: 0
   targetPlayer: {fileID: 0}
   currentRolledNumber: 0
+  playerMeshes:
+  - {fileID: 3821419111825450676, guid: a0b3451e76ca47d40bd91c46ec7c6e72, type: 3}
+  - {fileID: 6533602055932333669, guid: 0264787a3b3414e45b6ed91a5de91797, type: 3}
+  - {fileID: 833482038991682648, guid: 295ab2aa51d4c2941b2f800dc477eb1b, type: 3}
+  - {fileID: 6522725249845208148, guid: 2b7415c1ecbb485429ad3d71ab888a20, type: 3}
+  - {fileID: 1084564099775440374, guid: 261350890fabf8540bc0ea9898690a82, type: 3}
+  - {fileID: 1583951220069757677, guid: 08ce9179c5013194ca8ad4f2064f78a5, type: 3}
   gameStarted: 0
   playerTurn: 0
   playerTurnId: 0
@@ -11533,7 +11540,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 6960453869527875716}
   m_Direction: 2
   m_Value: 0.9999998
-  m_Size: 0.46399996
+  m_Size: 0.464
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:

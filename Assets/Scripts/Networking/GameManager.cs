@@ -16,6 +16,7 @@ public class GameManager : NetworkBehaviour
     private Vector3 cameraPosition = new Vector3(-5, 18, 0.5f); // the position of the camera when the target player is not moving
     
     private List<Color> playerColors; // colors of the players    
+    [SerializeField] private List<GameObject> playerMeshes;
     private List<GameObject> playerInfo = new List<GameObject>(); // info panels of the players
 
     [SyncVar] public bool gameStarted;
@@ -45,7 +46,7 @@ public class GameManager : NetworkBehaviour
             UIManager.startGameButton.GetComponent<Button>().onClick.AddListener(startGame);
             UIManager.startGameButton.SetActive(true);
             addPlayerColor(new List<Color> { new Color32(0, 108, 0, 255), new Color32(200, 7, 0, 255), new Color32(0, 21, 161, 255), new Color32(160, 130, 0, 255),
-                new Color32(139, 0, 162, 255), Color.black });
+                new Color32(139, 0, 162, 255), new Color32(85, 227, 231, 255) });
         }
 
         for (int i = 0; i < 28; i++)
@@ -205,11 +206,20 @@ public class GameManager : NetworkBehaviour
         playerScript.idPlayer = connectedPlayers;
         connectedPlayers++;
 
+        //Asign the Mesh Token for the player
+        int randomIndex = Random.Range(0, playerMeshes.Count);
+        playerScript.setMeshIndex(randomIndex);
+        playerMeshes.RemoveAt(randomIndex);
+        for (int i = 0; i < connectedPlayers; i++)
+        {
+            players[i].GetComponent<Player>().RpcUpdateMesh(players[i].GetComponent<Player>().getMeshIndex());
+        }
+
         // Asign the Color for the player
-        Color randomColor = playerColors[Random.Range(0, playerColors.Count - 1)];
+        Color randomColor = playerColors[Random.Range(0, playerColors.Count)];
         playerScript.setPlyColor(randomColor);
         playerColors.Remove(randomColor);
-        playerScript.getRenderer().material.color = playerScript.getPlyColor();
+        //playerScript.getRenderer().material.color = playerScript.getPlyColor();
 
         // Update each player for the new color change
         for (int i = 0; i < connectedPlayers; i++)
